@@ -1,4 +1,4 @@
-﻿//#define DRAW_BOUNDINGBOX
+﻿//#define DRAW_BOUNDINGVOLUME
 
 using System;
 using System.Collections.Generic;
@@ -42,11 +42,12 @@ namespace XNA_PoolGame.Models
         private BoundingFrustum frustum;
 
         private bool worldDirty = true;
+
+        protected VolumeType volume;
         BoundingBox boundingBox;
         BoundingSphere boundingSphere;
         
         public bool isObjectAtScenario = true;
-                
 
         public delegate void RenderHandler();
 
@@ -133,6 +134,7 @@ namespace XNA_PoolGame.Models
             position = Vector3.Zero;
             textureAsset = null;
             useTexture = null;
+            volume = VolumeType.BoundingBoxes;
 
             worldDirty = true;
         }
@@ -140,6 +142,13 @@ namespace XNA_PoolGame.Models
         public BasicModel(Game _game, String _modelName, String _textureAsset)
             : this(_game, _modelName)
         {
+            this.textureAsset = _textureAsset;
+        }
+
+        public BasicModel(Game _game, String _modelName, VolumeType volume, String _textureAsset)
+            : this(_game, _modelName)
+        {
+            this.volume = volume;
             this.textureAsset = _textureAsset;
         }
 
@@ -251,9 +260,6 @@ namespace XNA_PoolGame.Models
                     DrawModel(true, LightManager.lights, PostProcessManager.modelEffect, "ModelTechnique", delegate { SetParametersModelEffect(LightManager.lights); });
                     break;
             }
-
-            //DrawBoundingSphere();
-            //DrawBoundingBox();
         }
 
         public void DrawModel(bool enableTexture, Light light, Effect effect, String technique, RenderHandler setParameter)
@@ -285,31 +291,12 @@ namespace XNA_PoolGame.Models
                     parts.Effect = effect;
                 }
                 mesh.Draw();
-                
+
             }
 
-#if DRAW_BOUNDINGBOX
-            if (PostProcessManager.currentRenderMode != RenderMode.ScreenSpaceSoftShadowRender &&
-                PostProcessManager.currentRenderMode != RenderMode.BasicRender) return;
-
-            bool b1 = PoolGame.device.RenderState.DepthBufferEnable;
-            bool b2 = PoolGame.device.RenderState.DepthBufferWriteEnable;
-            VectorRenderComponent vectorRenderer = World.poolTable.vectorRenderer;
-            PoolGame.device.RenderState.DepthBufferEnable = false;
-            PoolGame.device.RenderState.DepthBufferWriteEnable = false;
-
-            vectorRenderer.SetViewProjMatrix(World.camera.ViewProjection);
-            //vectorRenderer.SetWorldMatrix(localWorld);
-            vectorRenderer.SetWorldMatrix(Matrix.Identity);
-
-            {
-                vectorRenderer.SetColor(Color.Red);
-                //vectorRenderer.DrawBoundingBox(boundingBox);
-                vectorRenderer.DrawBoundingBox(new BoundingBox(Vector3.Transform(boundingBox.Min, localWorld), Vector3.Transform(boundingBox.Max, localWorld)));
-            }
-
-            PoolGame.device.RenderState.DepthBufferEnable = b1;
-            PoolGame.device.RenderState.DepthBufferWriteEnable = b2;
+#if DRAW_BOUNDINGVOLUME
+            if (volume == VolumeType.BoundingSpheres) DrawBoundingSphere();
+            else DrawBoundingBox();
 #endif
         }
         public void DrawBoundingSphere()
@@ -317,27 +304,24 @@ namespace XNA_PoolGame.Models
             if (PostProcessManager.currentRenderMode != RenderMode.ScreenSpaceSoftShadowRender &&
                 PostProcessManager.currentRenderMode != RenderMode.BasicRender) return;
 
-            //bool b1 = PoolGame.device.RenderState.DepthBufferEnable;
-            //bool b2 = PoolGame.device.RenderState.DepthBufferWriteEnable;
+
+            PoolGame.device.RenderState.DepthBufferEnable = false;
+            PoolGame.device.RenderState.DepthBufferWriteEnable = false;
+
             VectorRenderComponent vectorRenderer = World.poolTable.vectorRenderer;
-            //PoolGame.device.RenderState.DepthBufferEnable = false;
-            //PoolGame.device.RenderState.DepthBufferWriteEnable = false;
 
             vectorRenderer.SetViewProjMatrix(World.camera.ViewProjection);
-            //vectorRenderer.SetWorldMatrix(localWorld);
-            vectorRenderer.SetWorldMatrix(Matrix.Identity);
+            vectorRenderer.SetWorldMatrix(localWorld);
 
+            vectorRenderer.SetColor(Color.Aqua);
+            
             {
-                vectorRenderer.SetColor(Color.Red);
-                //vectorRenderer.DrawBoundingBox(boundingBox);
-
-
-
                 vectorRenderer.DrawBoundingSphere(boundingSphere);
             }
 
-            //PoolGame.device.RenderState.DepthBufferEnable = b1;
-            //PoolGame.device.RenderState.DepthBufferWriteEnable = b2;
+
+            PoolGame.device.RenderState.DepthBufferEnable = true;
+            PoolGame.device.RenderState.DepthBufferWriteEnable = true;
         }
 
         public void DrawBoundingBox()
@@ -345,19 +329,13 @@ namespace XNA_PoolGame.Models
             if (PostProcessManager.currentRenderMode != RenderMode.ScreenSpaceSoftShadowRender &&
                 PostProcessManager.currentRenderMode != RenderMode.BasicRender) return;
 
-            //bool b1 = PoolGame.device.RenderState.DepthBufferEnable;
-            //bool b2 = PoolGame.device.RenderState.DepthBufferWriteEnable;
             VectorRenderComponent vectorRenderer = World.poolTable.vectorRenderer;
-            //PoolGame.device.RenderState.DepthBufferEnable = false;
-            //PoolGame.device.RenderState.DepthBufferWriteEnable = false;
 
             vectorRenderer.SetViewProjMatrix(World.camera.ViewProjection);
-            //vectorRenderer.SetWorldMatrix(localWorld);
             vectorRenderer.SetWorldMatrix(Matrix.Identity);
 
             {
                 vectorRenderer.SetColor(Color.Red);
-                //vectorRenderer.DrawBoundingBox(boundingBox);
 
                 Vector3 _min = Vector3.Transform(boundingBox.Min, localWorld);
                 Vector3 _max = Vector3.Transform(boundingBox.Max, localWorld);
@@ -366,21 +344,26 @@ namespace XNA_PoolGame.Models
 
                 vectorRenderer.DrawBoundingBox(new BoundingBox(min, max));
             }
-
-            //PoolGame.device.RenderState.DepthBufferEnable = b1;
-            //PoolGame.device.RenderState.DepthBufferWriteEnable = b2;
         }
         public bool ModelInFrustumVolume()
         {
             if (World.camera.EnableFrustumCulling)
             {
-                Vector3 _min = Vector3.Transform(boundingBox.Min, localWorld);
-                Vector3 _max = Vector3.Transform(boundingBox.Max, localWorld);
-                Vector3 min = Vector3.Min(_min, _max);
-                Vector3 max = Vector3.Max(_min, _max);
+                if (volume == VolumeType.BoundingBoxes)
+                {
+                    Vector3 _min = Vector3.Transform(boundingBox.Min, localWorld);
+                    Vector3 _max = Vector3.Transform(boundingBox.Max, localWorld);
+                    Vector3 min = Vector3.Min(_min, _max);
+                    Vector3 max = Vector3.Max(_min, _max);
 
-                if (frustum.Contains(new BoundingBox(min, max)) == ContainmentType.Disjoint)
-                    return false;
+                    if (frustum.Contains(new BoundingBox(min, max)) == ContainmentType.Disjoint)
+                        return false;
+                }
+                else
+                {
+                    if (frustum.Contains(new BoundingSphere(Vector3.Transform(boundingSphere.Center, localWorld), boundingSphere.Radius * Math.Max(scale.X, Math.Max(scale.Y, scale.Z)))) == ContainmentType.Disjoint)
+                        return false;
+                }
             }
             
             /*if (World.camera.EnableFrustumCulling)

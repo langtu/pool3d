@@ -94,6 +94,7 @@
     <Compile Include="Graphics\FrustumCulling.cs" />
     <Compile Include="Graphics\GaussianBlur.cs" />
     <Compile Include="Graphics\Particles\Fire\FireParticleSystem.cs" />
+    <Compile Include="Graphics\Particles\Fire\SmokeStackFireParticleSystem.cs" />
     <Compile Include="Graphics\Particles\ParticleSettings.cs" />
     <Compile Include="Graphics\Particles\ParticleSystem.cs" />
     <Compile Include="Graphics\Particles\ParticleVertex.cs" />

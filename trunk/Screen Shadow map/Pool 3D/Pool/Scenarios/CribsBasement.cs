@@ -44,7 +44,7 @@ namespace XNA_PoolGame.Scenarios
 
         public override void Initialize()
         {
-            fireParticles = new FireParticleSystem(Game, PoolGame.content);
+            fireParticles = new SmokeStackFireParticleSystem(Game, PoolGame.content);
             //fireParticles.DrawOrder = 4000;
             
             PoolGame.game.Components.Add(fireParticles);
@@ -345,7 +345,7 @@ namespace XNA_PoolGame.Scenarios
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            const int fireParticlesPerFrame = 20;
+            const int fireParticlesPerFrame = 10;
 
             Vector3 center = new Vector3(1150.0f - 120.0f, 80.0f, -15.0f);
             //Vector3 center = new Vector3(0,200 ,0 );
@@ -358,7 +358,7 @@ namespace XNA_PoolGame.Scenarios
 
             //smokeParticles.AddParticle(new Vector3(0, 200, 0), Vector3.Zero);
             //smokeParticles.AddParticle(new Vector3(0, 200, 0), Vector3.Zero);
-            //smokeParticles.AddParticle(center, Vector3.Zero);
+            smokeParticles.AddParticle(center + Vector3.Up * 10.0f, Vector3.Zero);
             //smokeParticles.AddParticle(RandomPointOnCube(center + Vector3.Up * 60.0f, 90.0f), Vector3.Zero);
         }
 

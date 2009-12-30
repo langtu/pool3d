@@ -47,7 +47,7 @@ namespace XNA_PoolGame.PoolTables
         public float MAX_HEAD_X = 0.0f;
         public float MAX_HEAD_Z = 0.0f;
 
-        public float SURFACEPOS_Y = 192.6f;
+        public float SURFACE_POSITION_Y = 192.6f;
         public float MAXSURFACEPOS_Y = 204.0f;
 
         public float MAX_X = 285.0f;
@@ -91,17 +91,17 @@ namespace XNA_PoolGame.PoolTables
             this.SpecularColor = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
             roundInfo.StartSet();
 
-            cueBall = new Ball(PoolGame.game, 0, "Models\\Balls\\newball", "Textures\\Balls\\ball 3", World.ballRadius);
+            cueBall = new Ball(PoolGame.game, 0, "Models\\Balls\\newball", "Textures\\Balls\\ball 3", this, World.ballRadius);
             if (!World.DebugMatch)
-                cueBall.SetCenter(MIN_HEAD_X, SURFACEPOS_Y + World.ballRadius, 0);
+                cueBall.SetCenter(MIN_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, 0);
             else
-                cueBall.SetCenter(new Vector3(MIN_X + World.ballRadius * 3.5f, SURFACEPOS_Y + World.ballRadius, MIN_Z / 2 - World.ballRadius));
+                cueBall.SetCenter(new Vector3(MIN_X + World.ballRadius * 3.5f, SURFACE_POSITION_Y + World.ballRadius, MIN_Z / 2 - World.ballRadius));
 
             cueBall.Scale = new Vector3(poolballscaleFactor);
 
 
 
-            BuildBallsTriangle(new Vector3(MIN_X / 3, SURFACEPOS_Y + World.ballRadius, -World.ballRadius), World.gameMode, World.ballRadius);
+            BuildBallsTriangle(new Vector3(MIN_X / 3, SURFACE_POSITION_Y + World.ballRadius, -World.ballRadius), World.gameMode, World.ballRadius);
 
             //((CribsBasement)(World.scenario)).eightRackTriangle.Position = poolBalls[4].Position + new Vector3(-World.ballRadius, -World.ballRadius, 0);
 
@@ -216,19 +216,19 @@ namespace XNA_PoolGame.PoolTables
                             if (row == BLACK_ROW && col == BLACK_COL)
                             {
                                 ballnumber = 7;
-                                poolBalls[TotalBalls] = new Ball(PoolGame.game, 8, "Models\\Balls\\newball", "Textures\\Balls\\ball 8", ballRadius);
+                                poolBalls[TotalBalls] = new Ball(PoolGame.game, 8, "Models\\Balls\\newball", "Textures\\Balls\\ball 8", this, ballRadius);
                             }
                             else if (row == 5 && (col == 1 || col == 5))
                             {
                                 ballnumber = col == 1 ? solidballnumber : stripeballnumber;
 
-                                poolBalls[TotalBalls] = new Ball(PoolGame.game, ballnumber + 1, "Models\\Balls\\newball", "Textures\\Balls\\ball " + (ballnumber + 1), ballRadius);
+                                poolBalls[TotalBalls] = new Ball(PoolGame.game, ballnumber + 1, "Models\\Balls\\newball", "Textures\\Balls\\ball " + (ballnumber + 1), this, ballRadius);
                                 
                             }
                             else
                             {
                                 ballnumber = findRandomBall(ballsReady);
-                                poolBalls[TotalBalls] = new Ball(PoolGame.game, ballnumber + 1, "Models\\Balls\\newball", "Textures\\Balls\\ball " + (ballnumber + 1), ballRadius);
+                                poolBalls[TotalBalls] = new Ball(PoolGame.game, ballnumber + 1, "Models\\Balls\\newball", "Textures\\Balls\\ball " + (ballnumber + 1), this, ballRadius);
                             }
                             ballsReady[ballnumber] = true;
 
@@ -245,7 +245,7 @@ namespace XNA_PoolGame.PoolTables
                 case GameMode.NineBalls:
                     TotalBalls = 1;
                     poolBalls = new Ball[1];
-                    poolBalls[0] = new Ball(PoolGame.game, 1, "Models\\Balls\\newball", "Textures\\Balls\\Ball 1", World.ballRadius);
+                    poolBalls[0] = new Ball(PoolGame.game, 1, "Models\\Balls\\newball", "Textures\\Balls\\Ball 1", this, World.ballRadius);
                     poolBalls[0].SetCenter(triangleOrigin);
                     break;
                 #endregion
@@ -315,9 +315,9 @@ namespace XNA_PoolGame.PoolTables
         public override void Update(GameTime gameTime)
         {
             if (!loaded || cueBall == null) return;
-            if (ballsMoving)
+            /*if (ballsMoving)
             {
-                /*if (CheckBallIsPotted(cueBall))
+                if (CheckBallIsPotted(cueBall))
                 {
                     //roundInfo.cueballPotted = true;
                 }
@@ -328,11 +328,11 @@ namespace XNA_PoolGame.PoolTables
                         // check rules!!
                         p.isInPlay = false;
                     }
-                }*/
+                }
 
                 //CheckBallCollisions(gameTime);
                 CheckSideCollisions(gameTime);
-            }
+            }*/
 
             // Gets if there is a new state of the balls, including cueball
             bool ballMovingState = ballsMoving;
@@ -554,7 +554,7 @@ namespace XNA_PoolGame.PoolTables
                     p.min_Altitute = 173.44f;
                     p.pocketWhereAt = i;
                     p.currentTrajectory = Trajectory.Free;
-                    p.velocity.Y = -p.velocity.Length();
+                    //p.velocity.Y = -p.velocity.Length();
 
 
                     return true;
@@ -568,8 +568,6 @@ namespace XNA_PoolGame.PoolTables
         public override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
-
-            //base.DrawBoundingBox();
 
 #if DRAW_BOUNDINGBOX
             if (PostProcessManager.currentRenderMode != RenderMode.ScreenSpaceSoftShadowRender &&
@@ -593,9 +591,6 @@ namespace XNA_PoolGame.PoolTables
                 vectorRenderer.SetWorldMatrix(insidebands_pockets[i].WorldTransform);
                 vectorRenderer.DrawBoundingBox(insidebands_pockets[i].LocalBoundingBox);
             }
-
-            //vectorRenderer.SetWorldMatrix(localobb.WorldTransform);
-            //vectorRenderer.DrawBoundingBox(localobb.LocalBoundingBox);
 
             vectorRenderer.SetWorldMatrix(Matrix.Identity);
             vectorRenderer.SetColor(Color.Aqua);
@@ -629,13 +624,13 @@ namespace XNA_PoolGame.PoolTables
         }
         #endregion
 
-        #region Get out the cue ball if were potted
+        #region Get out the cue ball of any pocket
         public void UnpottedcueBall()
         {
             roundInfo.cueballPotted = false;
             cueBall.pocketWhereAt = -1;
             cueBall.Visible = true;
-            cueBall.SetCenter(MAX_X - Math.Abs(MAX_X - MIN_X) / 5, SURFACEPOS_Y + World.ballRadius, 0);
+            cueBall.SetCenter(MAX_X - Math.Abs(MAX_X - MIN_X) / 5, SURFACE_POSITION_Y + World.ballRadius, 0);
         }
         #endregion
 

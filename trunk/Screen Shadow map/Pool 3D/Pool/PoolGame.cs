@@ -390,9 +390,8 @@ namespace XNA_PoolGame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            //graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
-            PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target, Color.CornflowerBlue, 1.0f, 0);
-
+            graphics.GraphicsDevice.Clear(Color.Black);
+            
             SpriteBatch batch = PostProcessManager.spriteBatch;
             
             //PoolGame.device.RenderState.DepthBias = 0.0003f;

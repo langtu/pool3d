@@ -5,6 +5,11 @@ using System.Text;
 
 namespace XNA_PoolGame
 {
+    public enum VolumeType
+    {
+        BoundingBoxes,
+        BoundingSpheres
+    }
     public enum FrustumTest
     {
         Outside,

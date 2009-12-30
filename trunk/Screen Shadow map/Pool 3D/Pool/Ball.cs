@@ -6,6 +6,8 @@ using XNA_PoolGame.Models;
 using Microsoft.Xna.Framework;
 using System.Threading;
 using System.Diagnostics;
+using XNA_PoolGame.Helpers;
+using XNA_PoolGame.PoolTables;
 
 namespace XNA_PoolGame
 {
@@ -35,7 +37,8 @@ namespace XNA_PoolGame
         public const float MIN_SPEED_Y = 0.73333f;//0.02999f;//0.10f;
         public int previousHitRail = -1, previousInsideHitRail = -1;
         private float MIN_SPEED_SQUARED;
-        public float min_Altitute = World.ballRadius + World.poolTable.SURFACEPOS_Y;
+        public PoolTable table;
+        public float min_Altitute = World.ballRadius + World.poolTable.SURFACE_POSITION_Y;
         public Trajectory currentTrajectory = Trajectory.Motion;
 
         #region Properties
@@ -88,17 +91,19 @@ namespace XNA_PoolGame
 
         #region Constructors
 
-        public Ball(Game game, int ballNumber, String ballModel, float radius)
+        public Ball(Game game, int ballNumber, String ballModel, PoolTable table, float radius)
             : base(game, ballModel)
         {
+            this.table = table;
             this.ballNumber = ballNumber;
             this.radius = radius;
             previousHitRail = -1; previousInsideHitRail = -1; pocketWhereAt = -1;
             isInPlay = true;
+            volume = VolumeType.BoundingSpheres;
         }
 
-        public Ball(Game game, int ballNumber, String ballModel, String ballTexture, float radius)
-            : this(game, ballNumber, ballModel, radius)
+        public Ball(Game game, int ballNumber, String ballModel, String ballTexture, PoolTable table, float radius)
+            : this(game, ballNumber, ballModel, table, radius)
         {
             this.textureAsset = ballTexture;
 
@@ -130,7 +135,64 @@ namespace XNA_PoolGame
             return false;
             
         }
-        
+
+        public void Motion()
+        {
+            if (!IsMoving()) return;
+
+
+            //friction deceleration
+            acceleration -= velocity * 0.5f;
+
+            //recompute new velocity and position
+            velocity += acceleration * dt;
+
+            if (velocity.LengthSquared() < MIN_SPEED_SQUARED)
+            {
+                velocity = Vector3.Zero;
+                acceleration = Vector3.Zero;
+            }
+
+            float remainingTime = dt;
+
+
+            if (this.pocketWhereAt == -1 && World.poolTable.cueBall != null)
+            {
+                if (World.poolTable.cueBall != this)
+                    CollideSphereWithSphere(this, World.poolTable.cueBall, remainingTime, out remainingTime);
+
+                foreach (Ball sd in World.poolTable.poolBalls)
+                {
+                    if (sd != this && sd.pocketWhereAt == -1)
+                        CollideSphereWithSphere(this, sd, remainingTime, out remainingTime);
+                }
+            }
+
+            if (World.poolTable.cueBall != null)
+                CollideSphereWithSide(this, remainingTime);
+
+            CheckInsidePocketCollisions();
+
+            Vector3 movementDelta = velocity * remainingTime;
+            this.Position += movementDelta;
+
+            float distanceMoved = movementDelta.Length();
+
+            Vector3 frontVector = velocity;
+            Vector3 upvector = Vector3.Up;
+            Vector3 rightVector = Vector3.Cross(frontVector, upvector);
+            if (rightVector.Length() > 0.0f)
+                rightVector.Normalize();
+
+            Quaternion quat = Quaternion.CreateFromAxisAngle(rightVector, -distanceMoved * World.ballRadius * 0.0222f);
+            quat.Normalize();
+            Rotation *= Matrix.CreateFromQuaternion(quat);
+            //Rotation *= Matrix.CreateFromAxisAngle(rightVector, -distanceMoved);
+            acceleration = Vector3.Zero;
+
+            
+        }
+
         public override void Update(GameTime gameTime)
         {
             dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -139,164 +201,122 @@ namespace XNA_PoolGame
             {
                 #region Motion
                 case Trajectory.Motion:
-                    if (!IsMoving()) return;
-
-                    //friction deceleration
-                    acceleration -= velocity * 0.5f;
-
-                    //recompute new velocity and position
-                    velocity += acceleration * dt;
-
-                    if (velocity.LengthSquared() < MIN_SPEED_SQUARED)
-                    {
-                        velocity = Vector3.Zero;
-                        acceleration = Vector3.Zero;
-                    }
-
-                    float remainingTime = dt;
-
-                    if (this.pocketWhereAt == -1 && World.poolTable.cueBall != null)
-                    {
-                        if (World.poolTable.cueBall != this)
-                            CollideSphereWithSphere(this, World.poolTable.cueBall, remainingTime, out remainingTime);
-
-                        foreach (Ball sd in World.poolTable.poolBalls)
-                        {
-                            if (sd != this && sd.pocketWhereAt == -1)
-                                CollideSphereWithSphere(this, sd, remainingTime, out remainingTime);
-                        }
-                    }
-
-                    if (World.poolTable.cueBall != null)
-                        CollideSphereWithWall(this, remainingTime);
-
-                    Vector3 movementDelta = velocity * remainingTime;
-                    this.Position += movementDelta;
-
-                    float distanceMoved = movementDelta.Length();
-
-                    Vector3 frontVector = velocity;
-                    Vector3 upvector = Vector3.Up;
-                    Vector3 rightVector = Vector3.Cross(frontVector, upvector);
-                    if (rightVector.Length() > 0.0f)
-                        rightVector.Normalize();
-
-                    Rotation *= Matrix.CreateFromAxisAngle(rightVector, -distanceMoved * World.ballRadius * 0.0230f);
-                    //Rotation *= Matrix.CreateFromAxisAngle(rightVector, -distanceMoved);
-                    acceleration = Vector3.Zero;
+                    Motion();
                     break;
                 #endregion
                 #region Free
                 case Trajectory.Free:
-                    t = dt * World.timeFactor;
+                    Motion();
 
-                    if (IsMoving())
-                    {
-                        //Vector3 tmp = velocity - new Vector3(0, velocity.Y, 0);
-                        Vector3 tmp = velocity;
-                        Vector3 axis = Vector3.Normalize(Vector3.Cross(Vector3.Up, velocity));
-                        float angle = tmp.Length() * World.ballRadius * 0.0229f * t;
-                        //float angle = velocity.Length() * dt * MathHelper.TwoPi / World.ballRadious;
+                    //t = dt * World.timeFactor;
 
-                        //Quaternion rotationThisFrame = Quaternion.CreateFromAxisAngle(axis, angle);
-                        //localRotation *= rotationThisFrame;
+                    //if (IsMoving())
+                    //{
+                    //    //Vector3 tmp = velocity - new Vector3(0, velocity.Y, 0);
+                    //    Vector3 tmp = velocity;
+                    //    Vector3 axis = Vector3.Normalize(Vector3.Cross(Vector3.Up, velocity));
+                    //    float angle = tmp.Length() * World.ballRadius * 0.0229f * t;
+                    //    //float angle = velocity.Length() * dt * MathHelper.TwoPi / World.ballRadious;
 
-                        //localRotation.Normalize();
+                    //    //Quaternion rotationThisFrame = Quaternion.CreateFromAxisAngle(axis, angle);
+                    //    //localRotation *= rotationThisFrame;
 
-                        //this.Rotation = Matrix.CreateFromQuaternion(localRotation);
-                    }
+                    //    //localRotation.Normalize();
 
-                    PositionX += velocity.X * t;
-                    PositionZ += velocity.Z * t;
+                    //    //this.Rotation = Matrix.CreateFromQuaternion(localRotation);
+                    //}
 
-                    if (PositionY > min_Altitute)
-                        velocity.Y += World.gravity * t;
+                    //PositionX += velocity.X * t;
+                    //PositionZ += velocity.Z * t;
 
-                    if (PositionY < min_Altitute - 0.05f)
-                    {
-                        PositionY = min_Altitute;
-                        velocity.Y *= -0.08f;
-                        velocity.X *= 0.7f;
-                        velocity.Z *= 0.7f;
-                    }
-                    else
-                    {
-                        PositionY += velocity.Y * t + 0.5f * World.gravity * t * t;
-                    }
-                    /*if (Math.Abs(velocity.X) < MIN_SPEED)
-                    {
-                        velocity.X = 0;
-                    }*/
-                    /*if (Math.Abs(velocity.Z) < MIN_SPEED)
-                    {
-                        velocity.Z = 0;
-                    }*/
+                    //if (PositionY > min_Altitute)
+                    //    velocity.Y += World.gravity * t;
 
-                    //Console.WriteLine(velocity.Y);
-                    if (Math.Abs(velocity.X) < MIN_SPEED && Math.Abs(velocity.Z) < MIN_SPEED && Math.Abs(velocity.Y) < MIN_SPEED_Y
-                        && pocketWhereAt != -1 && PositionY >= min_Altitute && PositionY <= min_Altitute + 2.0f)
-                    {
-                        Stop();
-                    }
+                    //if (PositionY < min_Altitute - 0.05f)
+                    //{
+                    //    PositionY = min_Altitute;
+                    //    velocity.Y *= -0.08f;
+                    //    velocity.X *= 0.7f;
+                    //    velocity.Z *= 0.7f;
+                    //}
+                    //else
+                    //{
+                    //    PositionY += velocity.Y * t + 0.5f * World.gravity * t * t;
+                    //}
+                    ///*if (Math.Abs(velocity.X) < MIN_SPEED)
+                    //{
+                    //    velocity.X = 0;
+                    //}*/
+                    ///*if (Math.Abs(velocity.Z) < MIN_SPEED)
+                    //{
+                    //    velocity.Z = 0;
+                    //}*/
+
+                    ////Console.WriteLine(velocity.Y);
+                    //if (Math.Abs(velocity.X) < MIN_SPEED && Math.Abs(velocity.Z) < MIN_SPEED && Math.Abs(velocity.Y) < MIN_SPEED_Y
+                    //    && pocketWhereAt != -1 && PositionY >= min_Altitute && PositionY <= min_Altitute + 2.0f)
+                    //{
+                    //    Stop();
+                    //}
 
                     break;
                 #endregion
                 #region Potting
                 case Trajectory.Potting:
-                    //float x, y, z;
-                    t = dt * World.timeFactor;
+                    ////float x, y, z;
+                    //t = dt * World.timeFactor;
 
-                    if (IsMoving())
-                    {
-                        Vector3 tmp = velocity - new Vector3(0, velocity.Y, 0);
-                        Vector3 axis = Vector3.Normalize(Vector3.Cross(Vector3.Up, velocity));
-                        float angle = tmp.Length() * World.ballRadius * 0.0229f * t;
-                        //float angle = velocity.Length() * dt * MathHelper.TwoPi / World.ballRadious;
+                    //if (IsMoving())
+                    //{
+                    //    Vector3 tmp = velocity - new Vector3(0, velocity.Y, 0);
+                    //    Vector3 axis = Vector3.Normalize(Vector3.Cross(Vector3.Up, velocity));
+                    //    float angle = tmp.Length() * World.ballRadius * 0.0229f * t;
+                    //    //float angle = velocity.Length() * dt * MathHelper.TwoPi / World.ballRadious;
 
-                        //Quaternion rotationThisFrame = Quaternion.CreateFromAxisAngle(axis, angle);
-                        //localRotation *= rotationThisFrame;
+                    //    //Quaternion rotationThisFrame = Quaternion.CreateFromAxisAngle(axis, angle);
+                    //    //localRotation *= rotationThisFrame;
 
-                        //localRotation.Normalize();
+                    //    //localRotation.Normalize();
 
-                        //this.Rotation = Matrix.CreateFromQuaternion(localRotation);
-                    }
-
-
-                    PositionX += velocity.X * t;
-                    PositionZ += velocity.Z * t;
+                    //    //this.Rotation = Matrix.CreateFromQuaternion(localRotation);
+                    //}
 
 
-
-                    //if (PositionY > min_Altitute) PositionY += velocity.Y * t + 0.5f * World.gravity * t * t;
-
-                    PositionY += velocity.Y * t + 0.5f * World.gravity * t * t;
-                    velocity.Y += World.gravity * t;
-
-                    //if (PositionY < min_Altitute + 3.0f)
-                    if (PositionY < min_Altitute)
-                    {
-                        //PositionY = min_Altitute + 3.0f;
-                        PositionY = min_Altitute;
-
-                        velocity.Y = (Math.Abs(velocity.Y) * 0.05f);// *(1 / World.timeFactor);
-                    }
-                    //else velocity.Y += World.gravity * t;
+                    //PositionX += velocity.X * t;
+                    //PositionZ += velocity.Z * t;
 
 
-                    if (PositionY == min_Altitute)
-                    {
-                        velocity.X *= World.poolTable.FRICTION_SURFACE;
-                        velocity.Z *= World.poolTable.FRICTION_SURFACE;
-                    }
 
-                    if (IsMoving())
-                    {
-                        //if (Math.Abs(velocity.X) < MIN_SPEED && Math.Abs(velocity.Z) < MIN_SPEED && Math.Abs(velocity.Y) < MIN_SPEED)
-                        if (Math.Abs(velocity.X) < MIN_SPEED && Math.Abs(velocity.Z) < MIN_SPEED)
-                        {
-                            Stop();
-                        }
-                    }
+                    ////if (PositionY > min_Altitute) PositionY += velocity.Y * t + 0.5f * World.gravity * t * t;
+
+                    //PositionY += velocity.Y * t + 0.5f * World.gravity * t * t;
+                    //velocity.Y += World.gravity * t;
+
+                    ////if (PositionY < min_Altitute + 3.0f)
+                    //if (PositionY < min_Altitute)
+                    //{
+                    //    //PositionY = min_Altitute + 3.0f;
+                    //    PositionY = min_Altitute;
+
+                    //    velocity.Y = (Math.Abs(velocity.Y) * 0.05f);// *(1 / World.timeFactor);
+                    //}
+                    ////else velocity.Y += World.gravity * t;
+
+
+                    //if (PositionY == min_Altitute)
+                    //{
+                    //    velocity.X *= World.poolTable.FRICTION_SURFACE;
+                    //    velocity.Z *= World.poolTable.FRICTION_SURFACE;
+                    //}
+
+                    //if (IsMoving())
+                    //{
+                    //    //if (Math.Abs(velocity.X) < MIN_SPEED && Math.Abs(velocity.Z) < MIN_SPEED && Math.Abs(velocity.Y) < MIN_SPEED)
+                    //    if (Math.Abs(velocity.X) < MIN_SPEED && Math.Abs(velocity.Z) < MIN_SPEED)
+                    //    {
+                    //        Stop();
+                    //    }
+                    //}
                     break;
                 #endregion
             }
@@ -377,9 +397,42 @@ namespace XNA_PoolGame
                 remainingTime = elapsedSeconds;
             }
         }
-        
+        private OrientedBoundingBox localobb;
+        public bool CheckInsidePocketCollisions()
+        {
+            for (int i = 0; i < table.insidebands_pockets.Length; i++)
+            {
+                if (table.insidebands_pockets[i] == null) continue;
+                localobb = new OrientedBoundingBox(this.Position,
+                    Vector3.One * this.Radius * 0.699f, Matrix.CreateRotationY(MathHelper.ToRadians(World.players[World.playerInTurn].stick.AngleY)));
+                //Vector3 aa = p.velocity;
+                //if (aa != Vector3.Zero) aa.Normalize();
 
-        private void CollideSphereWithWall(Ball ball, float remainingTime)
+                //localobb = new OrientedBoundingBox(p.Position + aa * p.Radius,
+                //    Vector3.One, Matrix.CreateRotationY(MathHelper.ToRadians( World.players[World.playerInTurn].stick.AngleY)));
+
+
+                if (localobb.Intersects(table.insidebands_pockets[i]) && this.previousInsideHitRail != i)
+                {
+                    this.InitialRotation *= this.Rotation;
+                    this.Rotation = Matrix.Identity;
+
+                    this.previousInsideHitRail = i;
+
+
+                    float rapidez = this.velocity.Length();
+
+                    Vector3 normal = table.inside_normals[i];
+
+                    this.velocity = Vector3.Reflect(this.velocity, normal) * 0.9f;
+
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void CollideSphereWithSide(Ball ball, float remainingTime)
         {
             
             for (int i = 0; i < World.poolTable.rails.Length; i++)

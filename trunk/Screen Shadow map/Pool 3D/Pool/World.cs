@@ -31,13 +31,11 @@ namespace XNA_PoolGame
         public static GameMode gameMode = GameMode.Black;
 
 
-
-        #region Shadows
-        public static bool displayShadows = true;
+        // SHADOWS
+        public static bool displayShadows = false;
         public static bool displayShadowsTextures = false;
         public static bool displaySceneFromLightSource = false;
-        #endregion
-
+        
 
     }
 }

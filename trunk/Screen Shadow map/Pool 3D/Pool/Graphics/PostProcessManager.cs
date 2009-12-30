@@ -80,7 +80,7 @@ namespace XNA_PoolGame.Graphics
         {
             spriteBatch = new SpriteBatch(PoolGame.device);
 
-            shadowMapSize = 1024;
+            shadowMapSize = 1024 / 2;
             depthBias = 0.0042f; // 0.0035f;
             ShadowTechnique = Shadow.Normal;
 
@@ -237,7 +237,6 @@ namespace XNA_PoolGame.Graphics
             }
 
             //Screen Space SoftShadow
-            //PoolGame.device.SetRenderTarget(0, null);
             PoolGame.device.SetRenderTarget(0, mainRT);
             PoolGame.device.Clear(Color.CornflowerBlue);
 
@@ -245,18 +244,24 @@ namespace XNA_PoolGame.Graphics
             PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
         }
         #endregion
+
+        #region No Shadows
+        public static void RenderTextured()
+        {
+            PoolGame.device.SetRenderTarget(0, mainRT);
+            PoolGame.device.Clear(Color.CornflowerBlue);
+        }
+        #endregion
         
         #region DOF
-        //public static Texture2D dofMapTex;
+        public static Texture2D dofMapTex;
         public static void CreateDOFMap()
         {
-            Effect depth = Depth;
-
             PoolGame.device.SetRenderTarget(0, DepthOfFieldRT);
             PoolGame.device.Clear(Color.White);
 
-            depth.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
-            depth.Parameters["MaxDepth"].SetValue(World.camera.FarPlane);
+            Depth.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
+            Depth.Parameters["MaxDepth"].SetValue(World.camera.FarPlane);
         }
 
         public static void CombineDOF()
@@ -273,16 +278,6 @@ namespace XNA_PoolGame.Graphics
             PoolGame.device.SetRenderTarget(0, GBlurVRT);
             DrawQuad(GBlurHRT.GetTexture(), GBlurV);
 
-            
-
-            /*Texture2D endTexture = PostProcessManager.mainRT.GetTexture();
-            Rectangle rect = new Rectangle(0, 0, 128, 128);
-
-            spriteBatch.Begin(SpriteBlendMode.None);
-            
-            spriteBatch.Draw(endTexture, rect, Color.White);
-            spriteBatch.End();*/
-
             PoolGame.device.SetRenderTarget(0, null);
             PoolGame.device.Textures[0] = resolveTarget;
             PoolGame.device.Textures[1] = GBlurVRT.GetTexture();
@@ -290,13 +285,7 @@ namespace XNA_PoolGame.Graphics
             DrawQuad(resolveTarget, DoFCombine);
         }
         #endregion
-
-        public static void RenderTextured()
-        {
-            PoolGame.device.SetRenderTarget(0, mainRT);
-            PoolGame.device.Clear(Color.CornflowerBlue);
-        }
-
+        
         #region Initialize Render Targets
         public static void InitRenderTargets()
         {
@@ -429,6 +418,7 @@ namespace XNA_PoolGame.Graphics
         }
         #endregion
 
+        #region Quad
         public static void DrawQuad(Texture2D texture, Effect effect)
         {
             Viewport viewport = PoolGame.device.Viewport;
@@ -467,6 +457,7 @@ namespace XNA_PoolGame.Graphics
                 effect.End();
             }
         }
+        #endregion
 
         #region Unload
         public static void UnloadContent()
