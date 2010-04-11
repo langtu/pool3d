@@ -1,5 +1,0 @@
-pootable 1
-camera 2 1000
------ 3
-PoolBall 4
-Stick 5
