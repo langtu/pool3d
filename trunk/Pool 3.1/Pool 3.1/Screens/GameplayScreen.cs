@@ -68,7 +68,7 @@ namespace XNA_PoolGame.Screens
 
             LightManager.sphereModel = new Entity(PoolGame.game, "Models\\Balls\\newball", VolumeType.BoundingSpheres);
             LightManager.sphereModel.isObjectAtScenario = false;
-            LightManager.sphereModel.Position = LightManager.lights.Position;
+            LightManager.sphereModel.Position = LightManager.lights[0].Position;
             LightManager.sphereModel.LoadContent();
 
             /////// PLAYERS
@@ -125,6 +125,7 @@ namespace XNA_PoolGame.Screens
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
+            //GC.Collect();
             //GC.GetTotalMemory(false);
         }
         #endregion
@@ -213,8 +214,16 @@ namespace XNA_PoolGame.Screens
             #region LIGHT'S POINT
             //PoolGame.game.PrepareRenderStates();
             PostProcessManager.ChangeRenderMode(RenderMode.BasicRender);
-            if (LightManager.sphereModel != null) 
-                LightManager.sphereModel.Draw(gameTime);
+            if (LightManager.sphereModel != null)
+            {
+                for (int i = 0; i < LightManager.totalLights; ++i)
+                {
+
+                    LightManager.sphereModel.Position = new Vector3(LightManager.lights[i].Position.X, LightManager.lights[i].Position.Y, LightManager.lights[i].Position.Z);
+                    LightManager.sphereModel.Draw(gameTime);
+                    
+                }
+            }
             #endregion
 
             #region PARTICLES
@@ -284,7 +293,7 @@ namespace XNA_PoolGame.Screens
 
             #endregion
 
-            //if (World.motionblurType != MotionBlurType.None)
+            if (World.motionblurType != MotionBlurType.None)
             {
                 foreach (Entity e in World.scenario.objects)
                     e.SetPreviousWorld();

@@ -17,7 +17,7 @@ namespace XNA_PoolGame.Graphics.Shadows
         public TextureInUse shadowMapTIU;
         public TextureInUse shadowTIU;
         public int shadowMapSize;
-        public RenderTarget2D ShadowMapRT;
+        public RenderTarget2D[] ShadowMapRT;
         public RenderTarget2D ShadowRT;
 
         public abstract void Draw(GameTime gameTime);

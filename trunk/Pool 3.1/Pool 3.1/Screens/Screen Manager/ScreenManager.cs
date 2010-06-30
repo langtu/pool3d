@@ -135,6 +135,11 @@ namespace XNA_PoolGame.Screens.Screen_Manager
             {
                 screen.UnloadContent();
             }
+
+            //GC.Collect();
+            //GC.GetTotalMemory(true);
+            //GC.WaitForPendingFinalizers();
+            //GC.Collect();
         }
 
 
@@ -240,8 +245,6 @@ namespace XNA_PoolGame.Screens.Screen_Manager
             screen.ControllingPlayer = controllingPlayer;
             screen.ScreenManager = this;
             screen.IsExiting = false;
-
-            //GC.GetTotalMemory(false);
 
             // If we have a graphics device, tell the screen to load content.
             if (isInitialized)

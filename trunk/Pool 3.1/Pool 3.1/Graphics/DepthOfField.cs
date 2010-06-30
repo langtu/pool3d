@@ -27,10 +27,6 @@ namespace XNA_PoolGame.Graphics
         {
 
         }
-
-        
-        
-
         protected void GenerateDownscaleTargetSW(RenderTarget2D source, RenderTarget2D result)
         {
             String techniqueName = "Downscale4";

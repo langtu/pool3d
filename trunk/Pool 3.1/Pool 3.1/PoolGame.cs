@@ -26,6 +26,7 @@ using XNA_PoolGame.Cameras;
 using XNA_PoolGame.Scenarios;
 using XNA_PoolGame.Graphics.Particles;
 using XNA_PoolGame.Graphics.Models;
+using XNA_PoolGame.Threading;
 #endregion
 
 namespace XNA_PoolGame
@@ -43,6 +44,8 @@ namespace XNA_PoolGame
         public static FPSCounter framesPerSecond = null;
         public static ScreenManager screenManager = null;
         private float saturation = 1.0f;
+
+        public int currentlight = 0;
 
         #region Constants
 
@@ -87,8 +90,8 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 800;
-            graphics.PreferredBackBufferHeight = 600;
+            graphics.PreferredBackBufferWidth = 600;
+            graphics.PreferredBackBufferHeight = 480;
             graphics.SynchronizeWithVerticalRetrace = false;
             //graphics.PreferMultiSampling = true;
             
@@ -181,7 +184,6 @@ namespace XNA_PoolGame
 
             // Create the screen manager component.
             screenManager = new ScreenManager(this);
-
             Components.Add(screenManager);
 
             // Activate the first screens.
@@ -260,21 +262,21 @@ namespace XNA_PoolGame
             }
             if (kb.IsKeyDown(Keys.Z) )
             {
-                LightManager.lights.LightFarPlane = LightManager.lights.LightFarPlane + 1.1f;
+                LightManager.lights[0].LightFarPlane = LightManager.lights[0].LightFarPlane + 1.1f;
             }
             if (kb.IsKeyDown(Keys.X) )
             {
-                LightManager.lights.LightFarPlane = LightManager.lights.LightFarPlane - 1.1f;
+                LightManager.lights[0].LightFarPlane = LightManager.lights[0].LightFarPlane - 1.1f;
             }
             if (kb.IsKeyDown(Keys.Add))
             {
-                LightManager.lights.LightFOV = LightManager.lights.LightFOV + 0.001f;
+                LightManager.lights[0].LightFOV = LightManager.lights[0].LightFOV + 0.001f;
             }
             if (kb.IsKeyDown(Keys.Subtract))
             {
-               LightManager.lights.LightFOV = LightManager.lights.LightFOV - 0.001f;
+                LightManager.lights[0].LightFOV = LightManager.lights[0].LightFOV - 0.001f;
             }
-            LightManager.lights.LightFOV = MathHelper.Clamp(LightManager.lights.LightFOV, MathHelper.ToRadians(0.1f), MathHelper.ToRadians(179.999f));
+            LightManager.lights[0].LightFOV = MathHelper.Clamp(LightManager.lights[0].LightFOV, MathHelper.ToRadians(0.1f), MathHelper.ToRadians(179.999f));
 
             if (kb.IsKeyDown(Keys.Q))
                 World.poolTable.roundInfo.cueBallInHand = true;
@@ -406,14 +408,16 @@ namespace XNA_PoolGame
 
             if (LightManager.sphereModel != null)
             {
-                /*GamePadState state = GamePad.GetState(PlayerIndex.One);
-                Vector3 pos = new Vector3(LightManager.lights.Position.X, LightManager.lights.Position.Y, LightManager.lights.Position.Z);
+                if (kb.IsKeyDown(Keys.C) && lastkb.IsKeyUp(Keys.C)) currentlight = (currentlight + 1) % 2;
+                GamePadState state = GamePad.GetState(PlayerIndex.One);
+
+                Vector3 pos = new Vector3(LightManager.lights[currentlight].Position.X, LightManager.lights[currentlight].Position.Y, LightManager.lights[currentlight].Position.Z);
                 pos.X += state.ThumbSticks.Left.X;
                 pos.Y += state.ThumbSticks.Left.Y;
                 pos.Z += state.ThumbSticks.Right.X;
-                LightManager.lights.Position = pos;
+                LightManager.lights[currentlight].Position = pos;
                 LightManager.sphereModel.Position = pos;
-                LightManager.sphereModel.Update(gameTime);*/
+                LightManager.sphereModel.Update(gameTime);
             }
 
             #endregion
@@ -477,7 +481,7 @@ namespace XNA_PoolGame
             // Show Shadow Map Texture (depth) 
             if (World.displayShadows && World.displayShadowsTextures)
             {
-                Texture2D endTexture = PostProcessManager.shadows.ShadowMapRT.GetTexture();
+                Texture2D endTexture = PostProcessManager.shadows.ShadowMapRT[0].GetTexture();
                 //Texture2D endTexture = PostProcessManager.depthRT.GetTexture();
                 //Texture2D endTexture = PostProcessManager.motionBlur.RT.GetTexture();
                 Rectangle rect = new Rectangle(0, 0, 128, 128);
@@ -487,7 +491,7 @@ namespace XNA_PoolGame
                 batch.Draw(endTexture, rect, Color.White);
 
 
-                endTexture = PostProcessManager.shadows.ShadowRT.GetTexture();
+                endTexture = PostProcessManager.shadows.ShadowMapRT[1].GetTexture();
                 rect = new Rectangle(0, 128, 128, 128);
                 //rect = new Rectangle(0, 0, Width, Height);
                 batch.Draw(endTexture, rect, Color.White);
@@ -562,8 +566,8 @@ namespace XNA_PoolGame
             text += "\nShadowTechnique: " + PostProcessManager.shadowBlurTech.ToString() + " (KEY: J)";
             text += "\nSaturation: " + saturation + " (KEYS: U, I)";
 
-            text += "\nFarPlane: " + LightManager.lights.LightFarPlane + " (KEYS: Z, X)";
-            text += "\n\nFOV: " + LightManager.lights.LightFOV + " (KEYS: +, -)";
+            text += "\nFarPlane: " + LightManager.lights[0].LightFarPlane + " (KEYS: Z, X)";
+            text += "\n\nFOV: " + LightManager.lights[0].LightFOV + " (KEYS: +, -)";
 
             batch.DrawString(spriteFont, text, new Vector2(18, height - 276), Color.Black);
             batch.DrawString(spriteFont, text, new Vector2(17, height - 277), Color.Tomato);
