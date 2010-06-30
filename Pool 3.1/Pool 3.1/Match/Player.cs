@@ -63,7 +63,7 @@ namespace XNA_PoolGame
 
         /// <summary>
         /// Create a standard stick for this player.
-        /// If it has been created, just add it to component's list.
+        /// If it has been created, just add it to components list.
         /// </summary>
         public void CreateStick()
         {
@@ -227,14 +227,22 @@ namespace XNA_PoolGame
         #region Dispose
         protected override void Dispose(bool disposing)
         {
-            if (stick != null) stick.Dispose();
-            stick = null;
-            table = null;
-            controller = null;
-            World.players[this.playerIndex] = null;
-            PoolGame.game.Components.Remove(this);
+            if (disposing)
+            {
+                PoolGame.game.Components.Remove(this);
+                if (stick != null) stick.Dispose();
+                stick = null;
+                table = null;
+                controller = null;
+                World.players[this.playerIndex] = null;
+                //GC.SuppressFinalize(this);
+            }
             base.Dispose(disposing);
         }
+        //~Player()
+        //{
+        //    this.Dispose();
+        //}
         #endregion
     }
 }

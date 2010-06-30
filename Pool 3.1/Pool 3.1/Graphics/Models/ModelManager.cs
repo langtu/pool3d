@@ -6,6 +6,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using XNA_PoolGame.Graphics;
 using XNA_PoolGame.Graphics.Models;
+using XNA_PoolGame.Threading;
+using XNA_PoolGame.PoolTables;
 
 namespace XNA_PoolGame.Graphics
 {

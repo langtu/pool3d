@@ -30,10 +30,11 @@ namespace XNA_PoolGame.Graphics.Shadows
 
             PresentationParameters pp = PoolGame.device.PresentationParameters;
 
-            ShadowMapRT = new RenderTarget2D(PoolGame.device, shadowMapSize, shadowMapSize, 1, pp.BackBufferFormat);
+            ShadowMapRT = new RenderTarget2D[2];
+            ShadowMapRT[0] = new RenderTarget2D(PoolGame.device, shadowMapSize, shadowMapSize, 1, pp.BackBufferFormat);
+            ShadowMapRT[1] = new RenderTarget2D(PoolGame.device, shadowMapSize, shadowMapSize, 1, pp.BackBufferFormat);
 
-
-            PostProcessManager.renderTargets.Add(new TextureInUse(ShadowMapRT, false));
+            PostProcessManager.renderTargets.Add(new TextureInUse(ShadowMapRT[0], false));
 
             ShadowRT = new RenderTarget2D(PoolGame.device, pp.BackBufferWidth, pp.BackBufferHeight, 1, PoolGame.device.DisplayMode.Format,
                 pp.MultiSampleType, pp.MultiSampleQuality);
@@ -47,14 +48,22 @@ namespace XNA_PoolGame.Graphics.Shadows
         public override void Draw(GameTime gameTime)
         {
             PostProcessManager.ChangeRenderMode(RenderMode.ShadowMapRender);
-            RenderShadowMap();
 
-            World.scenario.DrawScene(gameTime);
+            oldBuffer = PoolGame.device.DepthStencilBuffer;
+            World.lightpass = 0;
+            for (int i = 0; i < LightManager.totalLights; ++i)
+            {
+                RenderShadowMap(i);
+
+                World.scenario.DrawScene(gameTime);
+                World.lightpass++;
+            }
 
             PostProcessManager.ChangeRenderMode(RenderMode.PCFShadowMapRender);
             RenderPCFShadowMap();
 
             World.scenario.DrawScene(gameTime);
+
 
             World.camera.ItemsDrawn = 0;
             PostProcessManager.ChangeRenderMode(RenderMode.ScreenSpaceSoftShadowRender);
@@ -67,18 +76,19 @@ namespace XNA_PoolGame.Graphics.Shadows
 
         }
 
-        private void RenderShadowMap()
+        private void RenderShadowMap(int lightindex)
         {
             PoolGame.device.RenderState.DepthBufferEnable = true;
             PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
 
             //Render Shadow Map
-            oldBuffer = PoolGame.device.DepthStencilBuffer;
+            
             PoolGame.device.DepthStencilBuffer = stencilBuffer;
-            PoolGame.device.SetRenderTarget(0, ShadowMapRT);
+            PoolGame.device.SetRenderTarget(0, ShadowMapRT[lightindex]);
             PoolGame.device.Clear(Color.White);
 
             // UPGRADE (MULTIPLE LIGHTS)
+
         }
 
         private void RenderPCFShadowMap()

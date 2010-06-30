@@ -124,7 +124,14 @@ namespace XNA_PoolGame
         Bar,
         CristalHotel
     }
-    
+    public enum BallCollisionType
+    {
+        None,
+        TwoBalls,
+        BallWithRail,
+        BallWithInsideRailPocket,
+        BallWithPocket
+    }
 
     
 }

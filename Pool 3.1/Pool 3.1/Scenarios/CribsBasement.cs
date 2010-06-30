@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using XNA_PoolGame.Graphics.Particles;
 using XNA_PoolGame.Graphics.Particles.Fire;
 using XNA_PoolGame.Graphics.Models;
+using XNA_PoolGame.Graphics.Shadows;
 
 namespace XNA_PoolGame.Scenarios
 {
@@ -32,10 +33,12 @@ namespace XNA_PoolGame.Scenarios
         public Entity[] tabourets;
         public Entity smokestack = null;
         public Entity smokeStackFireWood = null;
+        public Entity stairs = null;
 
         public ParticleSystem fireParticles = null;
         public ParticleSystem smokeParticles = null;
 
+        private ParticlesCore core;
         public CribsBasement(Game game)
             : base(game)
         {
@@ -57,6 +60,11 @@ namespace XNA_PoolGame.Scenarios
 
             particles.Add(fireParticles);
             particles.Add(smokeParticles);
+
+            core = new ParticlesCore(Game);
+            core.Scenario = this;
+            core.AddParticlesFromMultiMap(particles);
+            core.BuildThread(true);
 
             smokestack = new Entity(PoolGame.game, "Models\\Cribs\\smokestack");
             smokestack.Position = new Vector3(1150.0f - 120.0f, 0, 0);
@@ -210,13 +218,13 @@ namespace XNA_PoolGame.Scenarios
             
 
             /////////////// ROOF
-            roof = new Entity(PoolGame.game, "Models\\Cribs\\roof");
+            roof = new Entity(PoolGame.game, "Models\\Cribs\\roof", "Textures\\Cribs\\ceramic_floor_tile_600x600x9_2mm");
             roof.Position = new Vector3(0, 700, 0);
             roof.Scale = new Vector3(2.0f);
             roof.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
             roof.SpecularColor = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
             roof.occluder = false;
-            roof.normalMapAsset = "Textures\\Cribs\\RooftilesTiles_5_S_N";
+            roof.normalMapAsset = "Textures\\Cribs\\ceramic_floor_tile_600x600x9_2mm_N";
             PoolGame.game.Components.Add(roof);
 
             /////////////// FLOOR
@@ -259,7 +267,15 @@ namespace XNA_PoolGame.Scenarios
                 PoolGame.game.Components.Add(wall);
             }
 
+            /////////////// STAIRS
+            stairs = new Entity(PoolGame.game, "Models\\Cribs\\Lstairs");
+            stairs.Position = new Vector3(-500.0f, 0.0f, 750.0f);
+            stairs.SpecularColor = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+            stairs.PreRotation = Matrix.CreateRotationY(MathHelper.ToRadians(90.0f));
 
+            PoolGame.game.Components.Add(stairs);
+
+            ////////////////////////////////////////////////
             World.scenario.Objects.Add(smokestack);
             World.scenario.Objects.Add(smokeStackFireWood);
             
@@ -288,6 +304,7 @@ namespace XNA_PoolGame.Scenarios
             foreach (Entity wall in walls)
                 World.scenario.Objects.Add(wall);
 
+            World.scenario.Objects.Add(stairs);
 
             base.Initialize();
             LoadContent();
@@ -299,6 +316,25 @@ namespace XNA_PoolGame.Scenarios
         /// </summary>
         public override void LoadLights()
         {
+            lights = new List<Light>();
+
+            //lights = new Light(new Vector3(-286 , 500, 144));
+            Light light1 = new Light(new Vector3(0, 500, 144));
+            light1.LightFarPlane = 1000.0f;
+
+            lights.Add(light1);
+
+
+            Light light2 = new Light(new Vector3(200, 500, 144));
+
+            //light2.LookAt = new Vector3(0, 0, 2 * 144);
+            light2.LookAt = new Vector3(-2.0f * 144.0f, 0, 0);
+            light2.LightFOV = MathHelper.ToRadians(120.0f);
+            light2.LightFarPlane = 1800.0f;
+
+            lights.Add(light2);
+
+            LightManager.lights = lights;
             LightManager.Load();
         }
 
@@ -310,16 +346,13 @@ namespace XNA_PoolGame.Scenarios
         }
         public override void Draw(GameTime gameTime)
         {
-            smokeParticles.Draw(gameTime);
-
-            fireParticles.Draw(gameTime);
             base.Draw(gameTime);
         }
 
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            const int fireParticlesPerFrame = 1;
+            const int fireParticlesPerFrame = 5;
             //////const int fireParticlesPerFrame = 10;
 
             Vector3 center = new Vector3(1150.0f - 120.0f, 80.0f, -15.0f);
@@ -361,8 +394,10 @@ namespace XNA_PoolGame.Scenarios
             if (smokeStackFireWood != null) smokeStackFireWood.Dispose();
             if (floor != null) floor.Dispose();
             if (walls != null)
+            {
                 foreach (Entity wall in walls)
                     wall.Dispose();
+            }
 
             if (couch != null) couch.Dispose();
 
@@ -371,12 +406,16 @@ namespace XNA_PoolGame.Scenarios
             if (cueRack != null) cueRack.Dispose();
 
             if (poolBallsOnCueRack != null)
+            {
                 foreach (Entity ball in poolBallsOnCueRack)
                     ball.Dispose();
+            }
 
             if (sticksOnCueRack != null)
+            {
                 foreach (Entity stick in sticksOnCueRack)
                     stick.Dispose();
+            }
 
             if (snowPainting != null) snowPainting.Dispose();
             if (aloneCouch != null) aloneCouch.Dispose();
@@ -386,17 +425,23 @@ namespace XNA_PoolGame.Scenarios
             if (roof != null) roof.Dispose();
 
             if (columns != null)
+            {
                 foreach (Entity col in columns)
                     col.Dispose();
+            }
 
             if (tabourets != null)
+            {
                 foreach (Entity tab in tabourets)
                     tab.Dispose();
+            }
 
             if (fireParticles != null) fireParticles.Dispose();
             if (smokeParticles != null) smokeParticles.Dispose();
 
+            if (stairs != null) stairs.Dispose();
 
+            core.Dispose();
             base.Dispose(disposing);
         }
         #endregion

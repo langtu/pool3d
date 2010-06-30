@@ -90,7 +90,21 @@ Content\Textures\Racks\WoodFine0024_S2.xnb
 Content\Textures\SplashScreen\SplashScreen.xnb
 Content\Textures\Sticks\stick.xnb
 Content\Textures\Sticks\stick_universal.xnb
-Content\Effects\basicEffects.xnb
+Content\Textures\white.xnb
+Content\Textures\Cribs\BrickBrown_S_N.xnb
+Content\Textures\Cribs\ConcreteNew0003_S2_N.xnb
+Content\Textures\Cribs\PlanksNew0026_9_L2_N.xnb
+Content\Textures\Cribs\RooftilesTiles_5_S_N.xnb
+Content\Textures\Cribs\TilesOrnate0106_4_S_N.xnb
+Content\Textures\Cribs\ceramic_floor_tile_600x600x9_2mm.xnb
+Content\Textures\Cribs\ceramic_floor_tile_600x600x9_2mm_N.xnb
+Content\Textures\Cribs\floor_pavement_stone4_2.xnb
+Content\Textures\Cribs\floor_pavement_stone4_2_N.xnb
+Content\Textures\Cribs\floor_pavingStone_ceramic.xnb
+Content\Textures\Cribs\floor_pavingStone_ceramic_N.xnb
+Content\Textures\Cribs\floor_tile_ceramic2_N.xnb
+Content\Textures\Cribs\floor_tile_ceramic2.xnb
+Content\Effects\basicEffect.xnb
 Content\Effects\BloomCombine.xnb
 Content\Effects\BloomExtract.xnb
 Content\Effects\Depth.xnb
@@ -105,6 +119,15 @@ Content\Effects\Saturate.xnb
 Content\Effects\ScreenSpaceSoftShadow.xnb
 Content\Effects\ShadowMap.xnb
 Content\Effects\VectorLineEffect.xnb
+Content\Effects\MotionBlur.xnb
+Content\Effects\ScreenSpaceSoftShadow_MRT.xnb
+Content\Effects\ClearGBuffer.xnb
+Content\Effects\ModelEffect_MRT.xnb
+Content\Effects\DOF.xnb
+Content\Effects\Blur.xnb
+Content\basicEffect.xnb
+Content\Effects\ShadowFinal.xnb
+Content\Effects\Scale.xnb
 Content\Fonts\Arial.xnb
 Content\Fonts\MenuFont.xnb
 Content\Models\Balls\ball1.xnb
@@ -164,6 +187,7 @@ Content\Models\poolTable2.xnb
 Content\Models\Racks\8 balls rack.xnb
 Content\Models\Sticks\stick.xnb
 Content\Models\Sticks\stick_universal.xnb
+Content\Models\Cribs\floor_new.xnb
 Content\Textures\Balls\1 copy_0.xnb
 Content\Textures\Balls\10 copy_0.xnb
 Content\Textures\Balls\11 copy_0.xnb
@@ -181,7 +205,7 @@ Content\Textures\Balls\8 copy_0.xnb
 Content\Textures\Balls\9 copy_0.xnb
 Content\Models\Balls\ball 13 1024_0.xnb
 Content\Textures\Cribs\black_leather_0.xnb
-Content\Textures\Cribs\BrickBrown_S_0.xnb
+Content\Textures\Cribs\floor_pavingStone_ceramic_0.xnb
 Content\Textures\Cribs\cue rack_0.xnb
 Content\Textures\Cribs\lenia1_0.xnb
 Content\Textures\Cribs\BarkPine0007_1_S_0.xnb
@@ -213,7 +237,6 @@ Content\Textures\Painting\snowpainting_0.xnb
 Content\Models\newbmp_0.xnb
 Content\Textures\Racks\WoodFine0024_S2_0.xnb
 Content\Textures\Sticks\stick_universal_0.xnb
-Content\Textures\white.xnb
-Content\Effects\MotionBlur.xnb
-Content\Effects\ScreenSpaceSoftShadow_MRT.xnb
-Content\Effects\ClearGBuffer.xnb
+Content\Models\Cribs\WoodFine0024_S2.xnb
+Content\Models\Cribs\WoodFine0024_S2_0.xnb
+Content\Models\Cribs\Lstairs.xnb

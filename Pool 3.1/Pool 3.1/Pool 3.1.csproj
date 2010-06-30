@@ -91,6 +91,10 @@
     <Compile Include="Graphics\Shadows\ScreenSpaceShadowMapping.cs" />
     <Compile Include="Graphics\Shadows\Shadow.cs" />
     <Compile Include="Graphics\Shadows\PSMShadowMapping.cs" />
+    <Compile Include="Helpers\Tuple.cs" />
+    <Compile Include="PoolTables\BallCollider.cs" />
+    <Compile Include="Scenarios\ParticlesCore.cs" />
+    <Compile Include="Threading\ThreadComponent.cs" />
     <Compile Include="Helpers\Maths.cs" />
     <Compile Include="PoolTables\Ball.cs" />
     <Compile Include="Cameras\Camera.cs" />
@@ -105,7 +109,7 @@
     <Compile Include="Graphics\FrustumCulling.cs" />
     <Compile Include="Graphics\GaussianBlur.cs" />
     <Compile Include="Graphics\IDrawable.cs" />
-    <Compile Include="Graphics\IThreadable.cs" />
+    <Compile Include="Threading\IThreadable.cs" />
     <Compile Include="Graphics\Models\CustomModel.cs" />
     <Compile Include="Graphics\Models\Entity.cs" />
     <Compile Include="Graphics\Models\ModelManager.cs" />

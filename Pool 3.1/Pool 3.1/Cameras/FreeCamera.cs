@@ -113,16 +113,16 @@ namespace XNA_PoolGame.Cameras
                     last_position = cameraPosition;
                     last_angle = angle;
                     //cameraPosition = new Vector3(0, 1000, 0);
-                    viewMatrix = LightManager.lights.LightView;
+                    viewMatrix = LightManager.lights[PoolGame.game.currentlight].LightView;
 
 
                     angle.X = (float)Maths.AngleBetweenVectors(Vector3.Up, viewMatrix.Up);
                     angle.Y = -(float)Maths.AngleBetweenVectors(Vector3.Right, viewMatrix.Right);
                     angle.Z = MathHelper.ToRadians(0.0f);
 
-                    cameraPosition = LightManager.lights.Position;
+                    cameraPosition = LightManager.lights[PoolGame.game.currentlight].Position;
                     prevPojection = this.Projection;
-                    projectionMatrix = LightManager.lights.LightProjection;
+                    projectionMatrix = LightManager.lights[PoolGame.game.currentlight].LightProjection;
 
                     //angle.X = MathHelper.ToRadians(90.0f);
                     //angle.Y = MathHelper.ToRadians(90.0f);

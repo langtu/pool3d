@@ -934,6 +934,11 @@
     <None Include="Effects\pp_Common.fxh">
       <Name>pp_Common</Name>
     </None>
+    <Compile Include="Models\Cribs\Lstairs.X">
+      <Name>Lstairs</Name>
+      <Importer>XImporter</Importer>
+      <Processor>CustomModelProcessor</Processor>
+    </Compile>
     <Compile Include="Models\Cribs\floor_new.X">
       <Name>floor_new</Name>
       <Importer>XImporter</Importer>
@@ -1031,6 +1036,13 @@
   <ItemGroup>
     <Compile Include="Textures\Cribs\floor_tile_ceramic2.jpg">
       <Name>floor_tile_ceramic2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\Cribs\WoodFine0024_S2.jpg">
+      <Name>WoodFine0024_S2</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

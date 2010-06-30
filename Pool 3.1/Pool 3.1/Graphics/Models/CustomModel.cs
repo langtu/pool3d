@@ -220,6 +220,5 @@ namespace XNA_PoolGame.Graphics.Models
             }
             if (j != 0) objectsDrawnThisFrame++;
         }
-
     }
 }

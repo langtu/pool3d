@@ -111,7 +111,7 @@ namespace XNA_PoolGame.PoolTables
 
             BuildBallsTriangle(new Vector3(MIN_X / 3, SURFACE_POSITION_Y + World.ballRadius, -World.ballRadius), World.gameMode, World.ballRadius);
 
-            //TotalBalls = 1;
+            //TotalBalls = 4;
             poolBalls[0] = cueBall;
 
             for (int i = 0; i < TotalBalls; i++)
@@ -120,6 +120,9 @@ namespace XNA_PoolGame.PoolTables
                 PoolGame.game.Components.Add(poolBalls[i]);
                 World.scenario.Objects.Add(poolBalls[i]);
             }
+
+            World.ballcollider = new BallCollider(PoolGame.game);
+            World.ballcollider.BuildThread(true);
 
             roundInfo = new RoundInformation();
             roundInfo.table = this;
@@ -134,7 +137,7 @@ namespace XNA_PoolGame.PoolTables
 
             for (int i = 0; i < TotalBalls; i++)
             {
-                while (poolBalls[i].thinkingFlag) { }
+                while (poolBalls[i].thinkingFlag || poolBalls[i].collisionFlag) { }
                 poolBalls[i].Stop();
 
                 poolBalls[i].Position = roundInfo.ballsState[i].Position;
@@ -429,6 +432,8 @@ namespace XNA_PoolGame.PoolTables
             
             poolBalls = null;
 
+            if (World.ballcollider != null) World.ballcollider.Dispose();
+            World.ballcollider = null;
             base.Dispose(disposing);
         }
         #endregion

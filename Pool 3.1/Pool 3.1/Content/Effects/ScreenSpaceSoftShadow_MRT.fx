@@ -81,14 +81,14 @@ struct VS_ScreenSpaceShadow_Output
 {
     float4 Position			: POSITION;
     float2 TexCoord			: TEXCOORD0;
-    float2 ProjCoord		: TEXCOORD1;
-    float4 ScreenCoord		: TEXCOORD2;
-    float4 WorldPosition	: TEXCOORD3;
+    //float2 ProjCoord		: TEXCOORD1;
+    float4 ScreenCoord		: TEXCOORD1;
+    float4 WorldPosition	: TEXCOORD2;
     
-    float4 PrevPositionCS	: TEXCOORD4;
-    float4 CurrPositionCS	: TEXCOORD5;
-    float4 PositionViewS	: TEXCOORD6;
-    float3x3 TBN				: TEXCOORD7;
+    float4 PrevPositionCS	: TEXCOORD3;
+    float4 CurrPositionCS	: TEXCOORD4;
+    float4 PositionViewS	: TEXCOORD5;
+    float3x3 TBN				: TEXCOORD6;
     
     
 };
@@ -116,9 +116,9 @@ VS_ScreenSpaceShadow_Output VS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Input inpu
 	//
 	output.TexCoord = input.TexCoord;
 	
-    float4 ShadowMapPos = mul(output.WorldPosition, LightViewProj);
-    output.ProjCoord[0] = ShadowMapPos.x / ShadowMapPos.w / 2.0f + 0.5f;
-    output.ProjCoord[1] = -ShadowMapPos.y / ShadowMapPos.w / 2.0f + 0.5f;
+    //float4 ShadowMapPos = mul(output.WorldPosition, LightViewProj);
+    //output.ProjCoord[0] = ShadowMapPos.x / ShadowMapPos.w / 2.0f + 0.5f;
+    //output.ProjCoord[1] = -ShadowMapPos.y / ShadowMapPos.w / 2.0f + 0.5f;
     
     /////output.ScreenCoord.x = (output.Position.x * 0.5f + output.Position.w * 0.5f);
     /////output.ScreenCoord.y = (output.Position.w * 0.5f - output.Position.y * 0.5f);

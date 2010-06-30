@@ -44,7 +44,7 @@ namespace XNA_PoolGame.Threading
         }
 
         /// <summary>
-        /// Run Method.
+        /// Run Method. Can be overwritten.
         /// </summary>
         public virtual void Run()
         {

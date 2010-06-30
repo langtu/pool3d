@@ -10,7 +10,7 @@ using XNA_PoolGame.Helpers;
 namespace XNA_PoolGame.Graphics.Particles
 {
     /// <summary>
-    /// The main component in charge of displaying particles.
+    /// The main component in charge of displaying particles on GPU.
     /// </summary>
     public abstract class ParticleSystem : GameComponent, IDrawable, IKey<int>
     {

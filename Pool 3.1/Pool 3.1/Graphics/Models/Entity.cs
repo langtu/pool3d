@@ -313,13 +313,16 @@ namespace XNA_PoolGame.Graphics.Models
             switch (renderMode)
             {
                 case RenderMode.ShadowMapRender:
-                    frustum = LightManager.lights.Frustum;
-                    DrawModel(false, LightManager.lights, PostProcessManager.Depth, "DepthMap", delegate { SetParametersShadowMap(LightManager.lights); });
+                    {
+                        frustum = LightManager.lights[World.lightpass].Frustum;
+                        DrawModel(false, PostProcessManager.Depth, "DepthMap", delegate { SetParametersShadowMap(LightManager.lights[World.lightpass]); });
+                    }
+                    
                     break;
 
                 case RenderMode.PCFShadowMapRender:
                     frustum = World.camera.FrustumCulling;
-                    DrawModel(false, LightManager.lights, PostProcessManager.PCFShadowMap, "PCFSMTechnique", delegate { SetParametersPCFShadowMap(LightManager.lights); });
+                    DrawModel(false, PostProcessManager.PCFShadowMap, "PCFSMTechnique", delegate { SetParametersPCFShadowMap(LightManager.lights); });
                     break;
 
                 case RenderMode.ScreenSpaceSoftShadowRender:
@@ -333,14 +336,14 @@ namespace XNA_PoolGame.Graphics.Models
                         PoolGame.device.SamplerStates[3].AddressU = TEXTURE_ADDRESS_MODE;
                         PoolGame.device.SamplerStates[3].AddressV = TEXTURE_ADDRESS_MODE;
                     }
-                    DrawModel(true, LightManager.lights, PostProcessManager.SSSoftShadow_MRT, basicTechnique, delegate { SetParametersSoftShadowMRT(LightManager.lights); });
+                    DrawModel(true, PostProcessManager.SSSoftShadow_MRT, basicTechnique, delegate { SetParametersSoftShadowMRT(LightManager.lights); });
                     
                     //DrawModel(true, LightManager.lights, PostProcessManager.SSSoftShadow, "SSSTechnique", delegate { SetParametersSoftShadow(LightManager.lights); });
                     break;
 
                 case RenderMode.DoF:
                     frustum = World.camera.FrustumCulling;
-                    DrawModel(false, null, PostProcessManager.Depth, "DepthMap", delegate { SetParametersDoFMap(); });
+                    DrawModel(false, PostProcessManager.Depth, "DepthMap", delegate { SetParametersDoFMap(); });
                     break;
 
                 case RenderMode.MotionBlur:
@@ -348,7 +351,7 @@ namespace XNA_PoolGame.Graphics.Models
                     break;
                 case RenderMode.BasicRender:
                     frustum = World.camera.FrustumCulling;
-                    DrawModel(true, LightManager.lights, PostProcessManager.modelEffect, "ModelTechnique", delegate { SetParametersModelEffectMRT(LightManager.lights); });
+                    DrawModel(true, PostProcessManager.modelEffect, "ModelTechnique", delegate { SetParametersModelEffectMRT(LightManager.lights); });
                     
                     break;
             }
@@ -366,7 +369,7 @@ namespace XNA_PoolGame.Graphics.Models
         }
 
 
-        public void DrawModel(bool enableTexture, Light light, Effect effect, String technique, RenderHandler setParameter)
+        public void DrawModel(bool enableTexture, Effect effect, String technique, RenderHandler setParameter)
         {
             if (setParameter != null) setParameter.Invoke();
 
@@ -624,7 +627,7 @@ namespace XNA_PoolGame.Graphics.Models
 
             basicEffect.EnableDefaultLighting();
             basicEffect.PreferPerPixelLighting = true;
-            Vector3 light0Direction = Vector3.Normalize(-LightManager.lights.Position);
+            Vector3 light0Direction = Vector3.Normalize(-LightManager.lights[0].Position);
             basicEffect.DirectionalLight0.Direction = light0Direction;
             basicEffect.DirectionalLight0.DiffuseColor = Vector3.One;
             
@@ -668,14 +671,17 @@ namespace XNA_PoolGame.Graphics.Models
 
         #region Set Parameters for Basic Render
 
-        public void SetParametersModelEffectMRT(Light light)
+        public void SetParametersModelEffectMRT(List<Light> lights)
         {
             PostProcessManager.modelEffect.Parameters["MaxDepth"].SetValue(World.camera.FarPlane);
             PostProcessManager.modelEffect.Parameters["View"].SetValue(World.camera.View);
             PostProcessManager.modelEffect.Parameters["PrevWorldViewProj"].SetValue(this.prelocalWorld * World.camera.PrevView * World.camera.Projection);
 
             PostProcessManager.modelEffect.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
-            PostProcessManager.modelEffect.Parameters["LightPosition"].SetValue(new Vector4(light.Position.X, light.Position.Y, light.Position.Z, 1.0f));
+            for (int i = 0; i < lights.Count; ++i)
+            {
+                PostProcessManager.modelEffect.Parameters["LightPosition"].SetValue(new Vector4(lights[i].Position.X, lights[i].Position.Y, lights[i].Position.Z, 1.0f));
+            }
 
             PostProcessManager.modelEffect.Parameters["vSpecularColor"].SetValue(specularColor);
             PostProcessManager.modelEffect.Parameters["Shineness"].SetValue(shineness);
@@ -702,14 +708,18 @@ namespace XNA_PoolGame.Graphics.Models
 
         #region Set Parameters for Shadow
 
-        public void SetParametersSoftShadowMRT(Light light)
+        public void SetParametersSoftShadowMRT(List<Light> lights)
         {
             PostProcessManager.SSSoftShadow_MRT.Parameters["MaxDepth"].SetValue(World.camera.FarPlane);
             PostProcessManager.SSSoftShadow_MRT.Parameters["View"].SetValue(World.camera.View);
             PostProcessManager.SSSoftShadow_MRT.Parameters["PrevWorldViewProj"].SetValue(this.prelocalWorld * World.camera.PrevView * World.camera.Projection);
 
             PostProcessManager.SSSoftShadow_MRT.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
-            PostProcessManager.SSSoftShadow_MRT.Parameters["LightViewProj"].SetValue(light.LightViewProjection);
+            for (int i = 0; i < LightManager.totalLights; ++i)
+            {
+                PostProcessManager.SSSoftShadow_MRT.Parameters["LightViewProj"].SetValue(lights[i].LightViewProjection);
+                PostProcessManager.SSSoftShadow_MRT.Parameters["LightPosition"].SetValue(new Vector4(lights[i].Position.X, lights[i].Position.Y, lights[i].Position.Z, 1.0f));
+            }
 
             if (PostProcessManager.shadowBlurTech == ShadowBlurTechnnique.SoftShadow)
                 PostProcessManager.SSSoftShadow_MRT.Parameters["TexBlurV"].SetValue(PostProcessManager.GBlurVRT.GetTexture());
@@ -717,7 +727,7 @@ namespace XNA_PoolGame.Graphics.Models
                 PostProcessManager.SSSoftShadow_MRT.Parameters["TexBlurV"].SetValue(PostProcessManager.shadows.ShadowRT.GetTexture());
 
 
-            PostProcessManager.SSSoftShadow_MRT.Parameters["LightPosition"].SetValue(new Vector4(light.Position.X, light.Position.Y, light.Position.Z, 1.0f));
+            
 
             PostProcessManager.SSSoftShadow_MRT.Parameters["vSpecularColor"].SetValue(specularColor);
             PostProcessManager.SSSoftShadow_MRT.Parameters["Shineness"].SetValue(shineness);
@@ -746,19 +756,25 @@ namespace XNA_PoolGame.Graphics.Models
 
         }
 
-        public void SetParametersPCFShadowMap(Light light)
+        public void SetParametersPCFShadowMap(List<Light> lights)
         {
             PostProcessManager.PCFShadowMap.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
-            PostProcessManager.PCFShadowMap.Parameters["LightViewProj"].SetValue(light.LightViewProjection);
-            PostProcessManager.PCFShadowMap.Parameters["MaxDepth"].SetValue(light.LightFarPlane);
-            PostProcessManager.PCFShadowMap.Parameters["ShadowMap"].SetValue(PostProcessManager.shadows.ShadowMapRT.GetTexture());
+            for (int i = 0; i < LightManager.totalLights; ++i)
+            {
+                PostProcessManager.PCFShadowMap.Parameters["LightViewProj" + i].SetValue(lights[i].LightViewProjection);
+                PostProcessManager.PCFShadowMap.Parameters["ShadowMap" + i].SetValue(PostProcessManager.shadows.ShadowMapRT[i].GetTexture());
+                PostProcessManager.PCFShadowMap.Parameters["MaxDepth" + i].SetValue(lights[i].LightFarPlane);
+            }
+            
             PostProcessManager.PCFShadowMap.Parameters["PCFSamples"].SetValue(PostProcessManager.shadows.pcfSamples);
             PostProcessManager.PCFShadowMap.Parameters["depthBias"].SetValue(PostProcessManager.shadows.depthBias);
         }
 
         public void SetParametersShadowMap(Light light)
         {
-            PostProcessManager.Depth.Parameters["ViewProj"].SetValue(light.LightViewProjection);
+            {
+                PostProcessManager.Depth.Parameters["ViewProj"].SetValue(light.LightViewProjection);
+            }
             PostProcessManager.Depth.Parameters["MaxDepth"].SetValue(light.LightFarPlane);
         }
 
@@ -775,7 +791,7 @@ namespace XNA_PoolGame.Graphics.Models
         {
             if (disposing)
             {
-                //if (model != null) model.Dispose();
+                PoolGame.game.Components.Remove(this);
                 model = null;
                 if (boxes != null) boxes.Clear();
                 boxes = null;
@@ -786,7 +802,6 @@ namespace XNA_PoolGame.Graphics.Models
                 if (normalMapTexture != null) normalMapTexture.Dispose();
                 normalMapTexture = null;
 
-                PoolGame.game.Components.Remove(this);
                 
             }
             base.Dispose(disposing);
