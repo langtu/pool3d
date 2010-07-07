@@ -90,8 +90,8 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 600;
-            graphics.PreferredBackBufferHeight = 480;
+            graphics.PreferredBackBufferWidth = 1280;
+            graphics.PreferredBackBufferHeight = 720;
             graphics.SynchronizeWithVerticalRetrace = false;
             //graphics.PreferMultiSampling = true;
             
@@ -247,7 +247,7 @@ namespace XNA_PoolGame
 
             if (kb.IsKeyDown(Keys.Q) && lastkb.IsKeyUp(Keys.Q) && World.poolTable != null)
             {
-                World.poolTable.cueBall.Stop();
+                World.poolTable.StopAllBalls();
             }
 
             // SHADOWS
@@ -430,9 +430,9 @@ namespace XNA_PoolGame
 
             #endregion
 
-            while (World.poolTable.ballsready > 0)
+            //while (World.poolTable.ballsready > 0)
             {
-                this.kb.Equals(null);
+                
             }
             base.Update(gameTime);
             

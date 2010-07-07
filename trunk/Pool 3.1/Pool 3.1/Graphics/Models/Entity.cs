@@ -27,7 +27,8 @@ namespace XNA_PoolGame.Graphics.Models
         private CustomModel model = null;
         private String modelName = null;
         protected String textureAsset = null;
-        
+        protected bool drawboundingvolume = false;
+
         #region //// MATERIAL PROPERTIES ////
 
         /// <summary>
@@ -46,7 +47,6 @@ namespace XNA_PoolGame.Graphics.Models
 
         #endregion
 
-        
         #region //// FRUSTUM CULLING ////
 
         /// <summary>
@@ -415,7 +415,7 @@ namespace XNA_PoolGame.Graphics.Models
 
             bool drawvolume = PostProcessManager.currentRenderMode == RenderMode.ScreenSpaceSoftShadowRender || PostProcessManager.currentRenderMode == RenderMode.BasicRender;
 #if !DRAW_BOUNDINGVOLUME
-            drawvolume = false;
+            drawvolume &= drawboundingvolume;
 #endif
             int i = 0, j = 0;
             foreach (ModelPart modelPart in model.modelParts)
