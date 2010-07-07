@@ -86,7 +86,6 @@ float4 PixelShader(VertexShaderOutput input) : COLOR
 		if ((saturate(ProjectedTexCoords.x) == ProjectedTexCoords.x) && 
 			(saturate(ProjectedTexCoords.y) == ProjectedTexCoords.y))
 		{
-			result0 = float4(0,0,0,0);
 			float shadowTerm = 0.0f;
 			for( int i = 0; i < 9; i++ )
 			{
@@ -99,18 +98,18 @@ float4 PixelShader(VertexShaderOutput input) : COLOR
 				{
 					shadowTerm++;
 				}
-			}	
+			}
 			
 			shadowTerm /= 9.0f;
 			
 			if (shadowTerm < 60.0 / 255.0f) shadowTerm = 60.0 / 255.0f;
 			result0 = 1.0f * shadowTerm;
-			result0.w = 1.0f;
+			//result0.w = 1.0f;
 		}
 		wt[j] = result0;
     }
-    if (totalLights == 1) wt[1] =  float4(1,1,1,1);
-    return (wt[0]*wt[1]);
+    if (totalLights == 1) wt[1] = float4(1,1,1,1);
+    return saturate(wt[0]*wt[1]);
 }
 
 

@@ -165,7 +165,10 @@ namespace XNA_PoolGame.Graphics.Shadows
             set { viewDirty = true; viewProjDirty = true; position = value; }
         }
 
-
+        public bool HasChanged
+        {
+            get { return (viewDirty || projDirty || viewProjDirty); }
+        }
         #endregion
 
         #region Constructor

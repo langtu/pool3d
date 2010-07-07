@@ -54,7 +54,6 @@ Content\Textures\Cribs\cue rack.xnb
 Content\Textures\Cribs\DoorsRollup0012_S.xnb
 Content\Textures\Cribs\FloorsRegular.xnb
 Content\Textures\Cribs\lenia1.xnb
-Content\Textures\Cribs\MetalBare0104_1_S2.xnb
 Content\Textures\Cribs\PisoPorcelana5.xnb
 Content\Textures\Cribs\PlanksNew0026_9_L2.xnb
 Content\Textures\Cribs\red wall.xnb
@@ -104,6 +103,10 @@ Content\Textures\Cribs\floor_pavingStone_ceramic.xnb
 Content\Textures\Cribs\floor_pavingStone_ceramic_N.xnb
 Content\Textures\Cribs\floor_tile_ceramic2_N.xnb
 Content\Textures\Cribs\floor_tile_ceramic2.xnb
+Content\Models\Cribs\WoodFine0024_S2.xnb
+Content\Textures\Cribs\floor_tile_stoneIrregular.xnb
+Content\Textures\black.xnb
+Content\Textures\Cribs\MetalBare0104_1_S2.xnb
 Content\Effects\basicEffect.xnb
 Content\Effects\BloomCombine.xnb
 Content\Effects\BloomExtract.xnb
@@ -187,6 +190,8 @@ Content\Models\poolTable2.xnb
 Content\Models\Racks\8 balls rack.xnb
 Content\Models\Sticks\stick.xnb
 Content\Models\Sticks\stick_universal.xnb
+Content\Models\Cribs\rooflamp.xnb
+Content\Models\Cribs\Lstairs.xnb
 Content\Models\Cribs\floor_new.xnb
 Content\Textures\Balls\1 copy_0.xnb
 Content\Textures\Balls\10 copy_0.xnb
@@ -237,3 +242,6 @@ Content\Textures\Painting\snowpainting_0.xnb
 Content\Models\newbmp_0.xnb
 Content\Textures\Racks\WoodFine0024_S2_0.xnb
 Content\Textures\Sticks\stick_universal_0.xnb
+Content\Textures\white_0.xnb
+Content\Textures\black_0.xnb
+Content\Models\Cribs\WoodFine0024_S2_0.xnb

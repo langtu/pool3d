@@ -343,7 +343,8 @@ namespace XNA_PoolGame.Scenarios
 
             Light light1 = new Light(new Vector3(-178, 383, 0));
             //light1.AmbientColor = new Vector4(0.0f, 0.01f, 0.01f, 1.0f);
-            light1.DepthBias = 0.01193f;
+            //light1.DepthBias = 0.01193f;
+            light1.DepthBias = 0.008193f;
             light1.LightFarPlane = 1100.0f;
             light1.LightFOV = 2.604f;
 
@@ -353,7 +354,8 @@ namespace XNA_PoolGame.Scenarios
             //Light light2 = new Light(new Vector3(200, 500, 144));
             Light light2 = new Light(new Vector3(178, 383, 0));
             //light2.DiffuseColor = new Vector4(0.85f, 1.0f, 1.0f, 1.0f);
-            light2.DepthBias = 0.00582496f;
+            light2.DepthBias = 0.00382496f;//600 x 480
+
             //light2.LookAt = new Vector3(0, 0, 0);
             //light2.LookAt = new Vector3(-178 * 10, 0, 0);
             //light2.LightFOV = MathHelper.ToRadians(120.0f);

@@ -441,6 +441,12 @@ namespace XNA_PoolGame.PoolTables
         }
         #endregion
 
-                
+
+
+        public void StopAllBalls()
+        {
+            for (int i = 0; i < TotalBalls; ++i)
+                poolBalls[i].Stop();
+        }
     }
 }

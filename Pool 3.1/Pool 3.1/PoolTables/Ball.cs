@@ -1,4 +1,7 @@
-﻿using System;
+﻿//#define DRAWBALL_BOUNDINGVOLUME
+
+#region Using Statements
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +12,7 @@ using System.Diagnostics;
 using XNA_PoolGame.Helpers;
 using XNA_PoolGame.PoolTables;
 using XNA_PoolGame.Graphics.Models;
+#endregion
 
 namespace XNA_PoolGame
 {
@@ -28,6 +32,9 @@ namespace XNA_PoolGame
 
         public Vector3 initialvelocity = Vector3.Zero;
         public Vector3 velocity = Vector3.Zero;
+        public Vector3 previousvelocity = Vector3.One * 550.0f; // any number
+        public Vector3 prepreviousvelocity = Vector3.Up * 750.0f; // any number
+
         public Vector3 acceleration = Vector3.Zero;
         public Vector2 angularVelocity = Vector2.Zero;
         public Vector3 rightVector = Vector3.Zero;
@@ -39,7 +46,7 @@ namespace XNA_PoolGame
         public Vector3 angularMomentum = Vector3.Zero;
         public Matrix invBodyInertia = Matrix.Identity;
 
-        private const int numSteps = 7;
+        private const int numSteps = 6;
 
         public float mMass = 1.0f;
 
@@ -97,7 +104,8 @@ namespace XNA_PoolGame
             }
             else if (currentTrajectory == Trajectory.Free)
             {
-                if (velocity.LengthSquared() < MIN_SPEED_SQUARED && this.PositionY == min_Altitute)
+                //if (velocity.LengthSquared() < MIN_SPEED_SQUARED /*&& (this.PositionY == min_Altitute)*/)
+                if (prepreviousvelocity == previousvelocity && previousvelocity == velocity)
                     return false;
                 else
                     return true;
@@ -129,6 +137,10 @@ namespace XNA_PoolGame
             pocketWhereAt = -1;
             volume = VolumeType.BoundingSpheres;
             rightVector = Vector3.Zero;
+
+#if DRAWBALL_BOUNDINGVOLUME
+            drawboundingvolume = true;
+#endif
         }
 
         public Ball(Game game, int ballNumber, String ballModel, String ballTexture, PoolTable table, float radius)
@@ -252,10 +264,6 @@ namespace XNA_PoolGame
 
                 float angleOnThisFrame = (-movementDelta.Length() / this.radius);
 
-
-                //if (this == table.cueBall && angleOnThisFrame >= -0.018f)
-                //    angleOnThisFrame = -0.018f;
-
                 angleRotation += angleOnThisFrame;
                 this.Rotation = Matrix.CreateFromAxisAngle(rightVector, angleRotation);
 
@@ -279,8 +287,11 @@ namespace XNA_PoolGame
         #region HandleFree
         public void HandleFree(float _dt)
         {
-            for (int step = 0; step < numSteps && this.currentTrajectory == Trajectory.Free; ++step)
+            for (int step = 0; step < numSteps && this.currentTrajectory == Trajectory.Free && this.pocketWhereAt != -1; ++step)
             {
+                prepreviousvelocity = previousvelocity;
+                previousvelocity = velocity;
+
                 this.thinkingFlag = true;
                 float dt = _dt / (float)numSteps;
                 acceleration -= velocity;
@@ -294,63 +305,60 @@ namespace XNA_PoolGame
                 float t = x2 + y2 - r2;
                 //Console.WriteLine(t);
                 float remainingTime = dt;
+                bool hascollided = false;
                 if (t <= -60.0f && this.PositionY > min_Altitute)
                 {
-                    if (t > -thisr2 /*&& t <= -60.0f*/ && this.PositionY <= table.SURFACE_POSITION_Y + this.radius &&
+                    float constant;
+                    if (t > -thisr2 && this.PositionY <= table.SURFACE_POSITION_Y + this.radius &&
                         this.PositionY >= table.SURFACE_POSITION_Y - 5.0f)
                     {
-                        acceleration.Y += World.gravity * 0.75f;
-
                         Vector3 normal = table.pockets[this.pocketWhereAt].bounds.Center - this.Position;
                         normal.Normalize();
-                        //Vector3 speedVector = acceleration;
-                        //speedVector.Y = 0.0f;
-                        //float speed = 1.0f / (speedVector.Length());
 
-                        acceleration.X += normal.X * 950.0f;
-                        acceleration.Z += normal.Z * 950.0f;
+                        acceleration.X += normal.X * 1000.0f;
+                        acceleration.Z += normal.Z * 1000.0f;
 
-                        for (int i = 0; i < table.TotalBalls; ++i)
-                        {
-                            if (table.poolBalls[i] != this)
-                            {
-                                Vector3 s1p = this.Position, s2p = table.poolBalls[i].Position;
-                                int collisionResult = AreSpheresColliding(this, table.poolBalls[i], dt, out remainingTime, this.Position, table.poolBalls[i].Position, out s1p, out s2p);
-                                if (collisionResult != 0)
-                                {
-                                    acceleration.Y -= World.gravity * 0.75f;
-                                }
-                            }
-                        }
+                        constant = 0.6f;
+                        if (!hascollided) acceleration.Y += World.gravity * 0.6f;
                     }
                     else
+                        constant = 1.0f;
+                    
+
+                    Dictionary<Ball, bool> pelotasVisitadas = new Dictionary<Ball, bool>();
+
+                    for (int i = 0; i < table.TotalBalls; ++i) pelotasVisitadas[table.poolBalls[i]] = this == table.poolBalls[i];
+
+
+                    Queue<Ball> cola = new Queue<Ball>();
+                    cola.Enqueue(this);
+
+                    while (cola.Count > 0)
                     {
-                        acceleration.Y += World.gravity;
+                        Ball elemento = cola.Dequeue();
+
                         for (int i = 0; i < table.TotalBalls; ++i)
                         {
-                            if (table.poolBalls[i] != this)
+                            if (!pelotasVisitadas[table.poolBalls[i]] && Vector3.Distance(this.Position, table.poolBalls[i].Position) <= 2.0f * this.radius)
                             {
-                                Vector3 s1p = this.Position, s2p = table.poolBalls[i].Position;
-                                int collisionResult = AreSpheresColliding(this, table.poolBalls[i], dt, out remainingTime, this.Position, table.poolBalls[i].Position, out s1p, out s2p);
-                                if (collisionResult != 0)
-                                {
-                                    acceleration.Y -= World.gravity;
-                                }
+                                CheckBallWithBallCollision(this, table.poolBalls[i], remainingTime, out remainingTime);
+                                hascollided = true;
+                                cola.Enqueue(table.poolBalls[i]);
+                                pelotasVisitadas[table.poolBalls[i]] = true;
+
                             }
                         }
-                    }
-                }
 
+                    }
+                    if (!hascollided) acceleration.Y += World.gravity * constant;
+                }
+                //Console.WriteLine("acceleration = " + acceleration);
+                
 
                 Vector3 velocityOnThisFrame = acceleration * dt;
                 velocity += velocityOnThisFrame;
 
-                direction = velocity;
-                direction.Normalize();
-
-                //SetOBB();
-
-                if (velocity.LengthSquared() < MIN_SPEED_SQUARED)
+                if (velocity.LengthSquared() < 0.0036f && hascollided)
                 {
                     velocity = Vector3.Zero;
                     initialvelocity = Vector3.Zero;
@@ -360,24 +368,13 @@ namespace XNA_PoolGame
                     totaltime = 0.0f;
                 }
 
-
-                if (table.cueBall != null)
-                {
-                    int collisionResult = 0;
-                    for (int i = 0; i < table.TotalBalls; ++i)
-                    {
-                        if (table.poolBalls[i] != this)
-                        {
-                            //lock (this)
-                            collisionResult = CheckBallWithBallCollision(this, table.poolBalls[i], remainingTime, out remainingTime);
-                        }
-                    }
-                }
+                direction = velocity;
+                if (direction != Vector3.Zero) direction.Normalize();
 
                 Vector3 movementDelta = velocity * remainingTime + 0.5f * acceleration * remainingTime * remainingTime;
                 Vector3 newPosition = this.Position + movementDelta;
 
-                if (this.pocketWhereAt != -1 && newPosition.Y < this.min_Altitute)
+                if (this.pocketWhereAt != -1 && newPosition.Y <= this.min_Altitute)
                 {
                     newPosition.Y = this.min_Altitute;
                     velocity.Y = -velocity.Y * 0.65f;
@@ -386,7 +383,17 @@ namespace XNA_PoolGame
 
                     velocity.X = velocity.X * 0.97f;
                     velocity.Z = velocity.Z * 0.97f;
+                    if ((velocity - previousvelocity).LengthSquared() < MIN_SPEED_SQUARED * MIN_SPEED_SQUARED)
+                    {
+                        velocity = Vector3.Zero;
+                        initialvelocity = Vector3.Zero;
+                        acceleration = Vector3.Zero;
+                        previousHitRail = -1; previousInsideHitRail = -1;
+                        direction = Vector3.Zero;
+                        totaltime = 0.0f;
+                    }
                 }
+                
 
                 this.Position = newPosition;
 
@@ -403,15 +410,16 @@ namespace XNA_PoolGame
                 Vector3 frontVector = velocity;
                 Vector3 upvector = Vector3.Up;
                 Vector3 rightVector = Vector3.Cross(frontVector, upvector);
-                if (rightVector.Length() > 0.0f)
+                if (rightVector != Vector3.Zero)
+                {
                     rightVector.Normalize();
 
-                float angleOnThisFrame = (-movement.Length() / this.radius);
-                angleRotation += angleOnThisFrame;
+                    float angleOnThisFrame = (-movement.Length() / this.radius);
+                    angleRotation += angleOnThisFrame;
 
-                this.Rotation = Matrix.CreateFromAxisAngle(rightVector, angleRotation);
+                    this.Rotation = Matrix.CreateFromAxisAngle(rightVector, angleRotation);
+                }
                 acceleration = Vector3.Zero;
-
                 // End
                 this.thinkingFlag = false;
             }
@@ -492,7 +500,7 @@ namespace XNA_PoolGame
         private void resolveSphereSphereCollision(Ball cur, ref Ball other)
         {
             // the coefficient of restitution (1 for perfect elastic pulse)
-            float e = 0.1f;
+            float e = 0.5f;
             float j = 0.0f;
 
             // compute penetration
@@ -819,87 +827,7 @@ namespace XNA_PoolGame
             int collisionResult = AreSpheresColliding(thisball, ball2, elapsedSeconds, out remainingTime, thisball.Position, ball2.Position, out s1p, out s2p);
             if (collisionResult != 0)
             {
-                //while (thisball.collisionFlag || ball2.collisionFlag) 
-                {
-                    //Monitor.Wait(s1.syncObject);
-                }
-                //we have collision, compute new velocities;
-
-                object tmp = ball2.syncObject;
-                ball2.syncObject = thisball.syncObject;
-
-                //lock (thisball.syncObject)
-                /*{
-                    lock (ball2.syncObject)
-                    {
-                        ball2.collisionFlag = true;
-                        thisball.collisionFlag = true;
-                        World.ballcollider.AddToQueue(thisball, ball2);
-                        World.ballcollider.BeginThread();
-                        //ball2.mutex.WaitOne();
-                        mutex.WaitOne();
-                    }
-                }*/
-                //thisball.StopThread();
-                //ball2.StopThread();
-                //thisball.Position = s1p; ball2.Position = s2p;
-
-                // Compute the final velocity of the two spheres.
-                lock (thisball.syncObject)
-                {
-
-                    thisball.collisionFlag = true;
-                    ball2.collisionFlag = true;
-                    //if (collisionResult == 2) s1.Position = s1p;
-                    //if (collisionResult == 2) s2.Position = s2p;
-                    Vector3 relativePosition = thisball.Position - ball2.Position;
-                    Vector3 relativeUnit = Vector3.Normalize(relativePosition);
-
-                    float s1VelDotUnit = Vector3.Dot(thisball.velocity, relativeUnit);
-                    float s2VelDotUnit = Vector3.Dot(ball2.velocity, relativeUnit);
-
-                    float momentumDifference = (2.0f * (s1VelDotUnit - s2VelDotUnit)) / (2.0f);
-                    thisball.SetVelocity(thisball.velocity - momentumDifference * relativeUnit);
-                    thisball.previousHitRail = -1; thisball.previousInsideHitRail = -1;
-                    thisball.initialvelocity = thisball.velocity;
-
-                    thisball.PreRotation *= thisball.Rotation;
-                    thisball.Rotation = Matrix.Identity;
-                    thisball.angleRotation = 0.0f;
-                    thisball.totaltime = 0.0f;
-                    
-                    //s1.InitialRotation = s1.Rotation;
-                    //s1.Rotation = Matrix.Identity;
-
-                    //Monitor.PulseAll(s1.syncObject);
-                    //Monitor.PulseAll(s1.syncObject);
-
-                    //lock (s2.syncObject)
-                    {
-                        ball2.SetVelocity(ball2.velocity + momentumDifference * relativeUnit);
-                        
-
-                        ball2.previousHitRail = -1; ball2.previousInsideHitRail = -1;
-                        ball2.initialvelocity = ball2.velocity;
-                        ball2.totaltime = 0.0f;
-
-                        ball2.PreRotation *= ball2.Rotation;
-                        ball2.Rotation = Matrix.Identity;
-                        ball2.angleRotation = 0.0f;
-
-                        //s2.InitialRotation = s2.Rotation;
-                        //s2.Rotation = Matrix.Identity;
-                        //Monitor.PulseAll(s2.syncObject);
-                    }
-                    //Monitor.PulseAll(s1.syncObject);
-                }
-                 
-
-                ball2.syncObject = tmp;
-
-                thisball.collisionFlag = false;
-                ball2.collisionFlag = false;
-
+                DoCollision(thisball, ball2);
             }
             else
             {
@@ -908,6 +836,107 @@ namespace XNA_PoolGame
                 remainingTime = elapsedSeconds;
             }
             return collisionResult;
+        }
+
+        private void DoCollision(Ball thisball, Ball ball2)
+        {
+            //while (thisball.collisionFlag || ball2.collisionFlag) 
+            {
+                //Monitor.Wait(s1.syncObject);
+            }
+            //we have collision, compute new velocities;
+
+
+
+            //lock (thisball.syncObject)
+            /*{
+                lock (ball2.syncObject)
+                {
+                    ball2.collisionFlag = true;
+                    thisball.collisionFlag = true;
+                    World.ballcollider.AddToQueue(thisball, ball2);
+                    World.ballcollider.BeginThread();
+                    //ball2.mutex.WaitOne();
+                    mutex.WaitOne();
+                }
+            }*/
+            //thisball.StopThread();
+            //ball2.StopThread();
+            //thisball.Position = s1p; ball2.Position = s2p;
+
+            object tmp = ball2.syncObject;
+            ball2.syncObject = thisball.syncObject;
+            // Compute the final velocity of the two spheres.
+            lock (thisball.syncObject)
+            {
+                Vector3 tmpvelocity;
+                thisball.collisionFlag = true;
+                ball2.collisionFlag = true;
+                //if (collisionResult == 2) s1.Position = s1p;
+                //if (collisionResult == 2) s2.Position = s2p;
+                Vector3 relativePosition = thisball.Position - ball2.Position;
+                Vector3 relativeUnit = Vector3.Normalize(relativePosition);
+
+                float s1VelDotUnit = Vector3.Dot(thisball.velocity, relativeUnit);
+                float s2VelDotUnit = Vector3.Dot(ball2.velocity, relativeUnit);
+
+                float momentumDifference = (2.0f * (s1VelDotUnit - s2VelDotUnit)) / (2.0f);
+
+                tmpvelocity = thisball.velocity - momentumDifference * relativeUnit;
+                if (Math.Abs(tmpvelocity.Y) < MIN_SPEED_Y)
+                {
+                    tmpvelocity.Y = 0.0f;
+                    ball2.acceleration.Y = 0.0f;
+                }
+                thisball.SetVelocity(tmpvelocity);
+
+                //Console.WriteLine("this = " + thisball.velocity);
+                thisball.previousHitRail = -1; thisball.previousInsideHitRail = -1;
+                thisball.initialvelocity = thisball.velocity;
+
+                thisball.PreRotation *= thisball.Rotation;
+                thisball.Rotation = Matrix.Identity;
+                thisball.angleRotation = 0.0f;
+                thisball.totaltime = 0.0f;
+
+                //s1.InitialRotation = s1.Rotation;
+                //s1.Rotation = Matrix.Identity;
+
+                //Monitor.PulseAll(s1.syncObject);
+                //Monitor.PulseAll(s1.syncObject);
+
+                //lock (s2.syncObject)
+                {
+                    tmpvelocity = ball2.velocity + momentumDifference * relativeUnit;
+                    if (Math.Abs(tmpvelocity.Y) < MIN_SPEED_Y)
+                    {
+                        tmpvelocity.Y = 0.0f;
+                        ball2.acceleration.Y = 0.0f;
+                    }
+                    ball2.SetVelocity(tmpvelocity);
+
+                    //Console.WriteLine("ball2 = " + ball2.velocity);
+
+                    ball2.previousHitRail = -1; ball2.previousInsideHitRail = -1;
+                    ball2.initialvelocity = ball2.velocity;
+                    ball2.totaltime = 0.0f;
+
+                    ball2.PreRotation *= ball2.Rotation;
+                    ball2.Rotation = Matrix.Identity;
+                    ball2.angleRotation = 0.0f;
+
+                    //s2.InitialRotation = s2.Rotation;
+                    //s2.Rotation = Matrix.Identity;
+                    //Monitor.PulseAll(s2.syncObject);
+                }
+                //Monitor.PulseAll(s1.syncObject);
+            }
+
+
+            ball2.syncObject = tmp;
+
+            thisball.collisionFlag = false;
+            ball2.collisionFlag = false;
         }
 
         public bool CheckInsidePocketCollision()
@@ -926,20 +955,24 @@ namespace XNA_PoolGame
                     if (obb != null && obb.Intersects(table.pockets[i].insideBands[j]) && this.previousInsideHitRail != (i * 2 + j)
                         && angle > MathHelper.PiOver2 && angle <= MathHelper.Pi)
                     {
-                        this.PreRotation *= this.Rotation;
-                        this.Rotation = Matrix.Identity;
+                        lock (this.syncObject)
+                        {
+                            this.PreRotation *= this.Rotation;
+                            this.Rotation = Matrix.Identity;
 
-                        this.angleRotation = 0.0f;
-                        this.previousInsideHitRail = i * 2 + j;
-                        this.previousHitRail = -1;
+                            this.angleRotation = 0.0f;
+                            this.previousInsideHitRail = i * 2 + j;
+                            this.previousHitRail = -1;
+                            this.angleRotation = 0.0f;
 
-                        Vector3 normal = table.pockets[i].insideNormal[j];
-
-
-
-                        this.SetVelocity(Vector3.Reflect(this.velocity, normal) * 0.9f);
+                            Vector3 normal = table.pockets[i].insideNormal[j];
 
 
+
+                            this.SetVelocity(Vector3.Reflect(this.velocity, normal) * 0.9f);
+                            this.initialvelocity = this.velocity;
+                            totaltime = 0.0f;
+                        }
                         return true;
                     }
                 }
@@ -1052,10 +1085,9 @@ namespace XNA_PoolGame
                         this.velocity.Y += acceleration.Y * remainingTime;
                     }
 
+
                     Vector3 movementDelta = velocity * remainingTime + 0.5f * acceleration * remainingTime * remainingTime;
-
                     this.Position += movementDelta;
-
                     coll = true;
                 }
             }
@@ -1113,10 +1145,10 @@ namespace XNA_PoolGame
         {
             this.PreRotation *= this.Rotation;
             this.Rotation = Matrix.Identity;
-            initialvelocity = impulse;
+            this.angleRotation = 0.0f;
 
             SetVelocity(velocity + impulse);
-
+            this.initialvelocity = this.velocity;
 
             totaltime = 0.0f;
             //collision.Set();
@@ -1145,10 +1177,14 @@ namespace XNA_PoolGame
             Vector3 frontVector = velocity;
             Vector3 upvector = Vector3.Up;
             rightVector = Vector3.Cross(frontVector, upvector);
-            if (rightVector.Length() > 0.0f) rightVector.Normalize();
+            if (rightVector.Length() > 0.0f)
+            {
+                rightVector.Normalize();
 
-            direction = velocity;
-            direction.Normalize();
+                direction = velocity;
+                direction.Normalize();
+            }
+
         }
 
         #region Stop the ball
@@ -1167,7 +1203,7 @@ namespace XNA_PoolGame
                 direction = Vector3.Zero;
                 velocity = Vector3.Zero;
                 previousHitRail = -1; previousInsideHitRail = -1;
-                currentTrajectory = Trajectory.Motion;
+                //currentTrajectory = Trajectory.Motion;
                 totaltime = 0.0f;
 
 
