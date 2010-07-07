@@ -318,11 +318,6 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Textures\Cribs\MetalBare0104_1_S2.bmp">
-      <Name>MetalBare0104_1_S2</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
     <Compile Include="Textures\Cribs\PisoPorcelana5.bmp">
       <Name>PisoPorcelana5</Name>
       <Importer>TextureImporter</Importer>
@@ -934,6 +929,11 @@
     <None Include="Effects\pp_Common.fxh">
       <Name>pp_Common</Name>
     </None>
+    <Compile Include="Models\Cribs\rooflamp.X">
+      <Name>rooflamp</Name>
+      <Importer>XImporter</Importer>
+      <Processor>CustomModelProcessor</Processor>
+    </Compile>
     <Compile Include="Models\Cribs\Lstairs.X">
       <Name>Lstairs</Name>
       <Importer>XImporter</Importer>
@@ -1043,6 +1043,27 @@
   <ItemGroup>
     <Compile Include="Models\Cribs\WoodFine0024_S2.jpg">
       <Name>WoodFine0024_S2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\floor_tile_stoneIrregular.jpg">
+      <Name>floor_tile_stoneIrregular</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\black.jpg">
+      <Name>black</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\MetalBare0104_1_S2.jpg">
+      <Name>MetalBare0104_1_S2</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

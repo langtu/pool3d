@@ -28,6 +28,7 @@ namespace XNA_PoolGame.Graphics.Shadows
 
         private float lightNearPlane = 0.01f;
         private float lightFarPlane = 1620.0f;
+        private float depthBias = 0.0042f;
 
         #endregion
 
@@ -35,10 +36,16 @@ namespace XNA_PoolGame.Graphics.Shadows
         private bool viewDirty = true;
         private bool projDirty = true;
         private bool viewProjDirty = true;
+        private bool frustumDirty = true;
 
         #endregion
 
         #region Properties
+        public float DepthBias
+        {
+            get { return depthBias; }
+            set { depthBias = value; }
+        }
         public float LightPower
         {
             get { return lightPower; }
@@ -46,7 +53,16 @@ namespace XNA_PoolGame.Graphics.Shadows
         }
         public BoundingFrustum Frustum
         {
-            get { return frustum; }
+            get {
+                if (frustumDirty)
+                {
+                    frustum = new BoundingFrustum(LightViewProjection);
+#if USE_DIRTY_STATES
+                    frustumDirty = false;
+#endif
+                }
+                return frustum; 
+            }
             set { frustum = value; }
         }
 
@@ -76,9 +92,9 @@ namespace XNA_PoolGame.Graphics.Shadows
                 {
                     viewProjectionMatrix = LightView * LightProjection;
 
-                    #if USE_DIRTY_STATES
-                    viewProjDirty = false; 
-                    #endif
+#if USE_DIRTY_STATES
+                    viewProjDirty = false; frustumDirty = true;
+#endif
                 }
                 return viewProjectionMatrix; 
             }
@@ -89,11 +105,11 @@ namespace XNA_PoolGame.Graphics.Shadows
             {
                 if (viewDirty)
                 {
-                    viewMatrix = Matrix.CreateLookAt(Position, new Vector3(lookAt.X, lookAt.Y, lookAt.Z), new Vector3(0, 1, 0));
-
-                    #if USE_DIRTY_STATES
-                    viewDirty = false; viewProjDirty = true;
-                    #endif
+                    viewMatrix = Matrix.CreateLookAt(Position, lookAt, Vector3.Up);
+                    
+#if USE_DIRTY_STATES
+                    viewDirty = false; viewProjDirty = true; frustumDirty = true;
+#endif
                 }
 
                 return viewMatrix;
@@ -110,9 +126,9 @@ namespace XNA_PoolGame.Graphics.Shadows
                     projectionMatrix = Matrix.CreatePerspectiveFieldOfView(lightFOV, 1.0f, lightNearPlane, lightFarPlane);
                     //projectionMatrix = Matrix.CreateOrthographic(800.0f, 800.0f, 1.0f, 1800.0f);
 
-                    #if USE_DIRTY_STATES
+#if USE_DIRTY_STATES
                     projDirty = false; viewProjDirty = true;
-                    #endif
+#endif
                 }
                 return projectionMatrix;
             }
@@ -157,12 +173,13 @@ namespace XNA_PoolGame.Graphics.Shadows
         {
             this.position = position;
             this.lookAt = Vector3.Zero;
-            this.ambientColor = new Vector4(0.1843f, 0.3098f, 0.3098f, 1);
-            //this.ambientColor = new Vector4(0, 0, 0, 1);
-            this.diffuseColor = new Vector4(0.3921f, 0.5843f, 0.9294f, 1);
+            //this.ambientColor = new Vector4(0.1843f, 0.3098f, 0.3098f, 1);
+            //this.diffuseColor = new Vector4(0.3921f, 0.5843f, 0.9294f, 1);
+
+            this.ambientColor = new Vector4(0, 0, 0, 1);
             this.diffuseColor = new Vector4(1f, 1f, 1f, 1);
             this.specularColor = new Vector4(1, 1, 1, 1);
-            this.lightPower = 2f;
+            this.lightPower = 1f;
 
             frustum = new BoundingFrustum(LightViewProjection);
         }

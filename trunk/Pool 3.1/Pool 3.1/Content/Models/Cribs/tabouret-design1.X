@@ -16725,7 +16725,7 @@ Frame Cylinder01 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\MetalBare0104_1_S2.bmp";
+     "..\\..\\Textures\\Cribs\\MetalBare0104_1_S2.jpg";
     }
    }
   }
@@ -18159,7 +18159,7 @@ Frame Torus01 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\MetalBare0104_1_S2.bmp";
+     "..\\..\\Textures\\Cribs\\MetalBare0104_1_S2.jpg";
     }
    }
   }
@@ -19667,7 +19667,7 @@ Frame Torus03 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\MetalBare0104_1_S2.bmp";
+     "..\\..\\Textures\\Cribs\\MetalBare0104_1_S2.jpg";
     }
    }
   }
@@ -23221,7 +23221,7 @@ Frame Torus04 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\MetalBare0104_1_S2.bmp";
+     "..\\..\\Textures\\Cribs\\MetalBare0104_1_S2.jpg";
     }
    }
   }

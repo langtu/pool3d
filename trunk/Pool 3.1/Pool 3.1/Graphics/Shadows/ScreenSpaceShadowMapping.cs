@@ -82,12 +82,12 @@ namespace XNA_PoolGame.Graphics.Shadows
             PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
 
             //Render Shadow Map
-            
+
+            // UPGRADE (MULTIPLE LIGHTS)
             PoolGame.device.DepthStencilBuffer = stencilBuffer;
             PoolGame.device.SetRenderTarget(0, ShadowMapRT[lightindex]);
             PoolGame.device.Clear(Color.White);
 
-            // UPGRADE (MULTIPLE LIGHTS)
 
         }
 
@@ -123,10 +123,19 @@ namespace XNA_PoolGame.Graphics.Shadows
             //Screen Space Shadow
 
             PoolGame.device.SetRenderTarget(0, PostProcessManager.mainRT);
-            PoolGame.device.SetRenderTarget(1, PostProcessManager.depthRT);
-            PoolGame.device.SetRenderTarget(2, PostProcessManager.velocityRT);
-            PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
-            PostProcessManager.DrawQuad(PostProcessManager.whiteTexture, PostProcessManager.clearGBufferEffect);
+            if (!(World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None))
+            {
+                PoolGame.device.SetRenderTarget(1, PostProcessManager.depthRT);
+                PoolGame.device.SetRenderTarget(2, PostProcessManager.velocityRT);
+                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
+                PostProcessManager.DrawQuad(PostProcessManager.whiteTexture, PostProcessManager.clearGBufferEffect);
+            }
+            else
+            {
+                PoolGame.device.SetRenderTarget(1, null);
+                PoolGame.device.SetRenderTarget(2, null);
+                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target, Color.CornflowerBlue, 1.0f, 0);
+            }
 
             PoolGame.device.RenderState.DepthBufferEnable = true;
             PoolGame.device.RenderState.DepthBufferWriteEnable = true;
