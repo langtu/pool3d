@@ -1,18 +1,18 @@
 float4x4 World;
 float4x4 View;
 float4x4 ViewProj;
-float4x4 LightViewProj;
+//float4x4 LightViewProj;
 float4x4 PrevWorldViewProj;
-float4 LightPosition;
+float4 LightPosition[2];
 
 float4 CameraPosition;
 
 float Shineness = 96.0f;
 float MaxDepth;
-float4 vSpecularColor = {1.0f, 1.0f, 1.0f, 1.0f};
-float4 vAmbient = {0.1f, 0.1f, 0.1f, 1.0f};
-float4 vDiffuseColor = {1.0f, 1.0f, 1.0f, 1.0f};
-
+float4 vSpecularColor[2];// = {1.0f, 1.0f, 1.0f, 1.0f};
+float4 vAmbient[2]; //= {0.1f, 0.1f, 0.1f, 1.0f};
+float4 vDiffuseColor[2];// = {1.0f, 1.0f, 1.0f, 1.0f};
+int totalLights;
 // PARALLAX
 float    g_fHeightMapScale; 
 bool     g_bDisplayShadows = true;        
@@ -145,22 +145,35 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output inp
 	float4 Color = tex2D(ColorSampler, input.TexCoord);
 	
 	float fShadowTerm = tex2Dproj(BlurVSampler, input.ScreenCoord).x;
-	
-	//
-    float3 LightDir = normalize(LightPosition - input.WorldPosition);
-    float3 ViewDir = normalize(CameraPosition - input.WorldPosition);    
+	float4 totalDiffuse = float4(0,0,0,0);
+	float4 totalAmbient = float4(0,0,0,0);
+	float4 totalSpecular = float4(0,0,0,0);
+	for (int k = 0; k < totalLights; k++)
+	{
+		//
+		float3 LightDir = normalize(LightPosition[k] - input.WorldPosition);
+		float3 ViewDir = normalize(CameraPosition - input.WorldPosition);    
+	    
+		// Calculate normal diffuse light.
+		float DiffuseLightingFactor = dot(LightDir, input.TBN[2]);
+	    
+		// R = 2 * (N.L) * N – L
+		float3 Reflect = normalize(2 * DiffuseLightingFactor * input.TBN[2] - LightDir);  
+		float Specular = pow(saturate(dot(Reflect, ViewDir)), Shineness); // R.V^n
+	    
+		// I = A + Dcolor * Dintensity * N.L + Scolor * Sintensity * (R.V)n
+	    totalDiffuse += vDiffuseColor[k] * DiffuseLightingFactor;
+	    totalSpecular += vSpecularColor[k] * Specular;
+	    totalAmbient += vAmbient[k];
+    }
     
-	// Calculate normal diffuse light.
-    float DiffuseLightingFactor = dot(LightDir, input.TBN[2]);
+    //totalDiffuse /= totalLights;
+    //totalAmbient /= totalLights;
     
-    // R = 2 * (N.L) * N – L
-    float3 Reflect = normalize(2 * DiffuseLightingFactor * input.TBN[2] - LightDir);  
-    float Specular = pow(saturate(dot(Reflect, ViewDir)), Shineness); // R.V^n
-    
-    // I = A + Dcolor * Dintensity * N.L + Scolor * Sintensity * (R.V)n
-    
+    totalDiffuse = saturate(totalDiffuse);
     //
-    output.Color  = (Color * (vAmbient + vDiffuseColor * DiffuseLightingFactor) + vSpecularColor * Specular) * fShadowTerm;
+    //output.Color  = (Color * (vAmbient + vDiffuseColor * DiffuseLightingFactor) + vSpecularColor * Specular) * fShadowTerm;
+    output.Color = saturate((Color * (totalAmbient + totalDiffuse) + totalSpecular)) * fShadowTerm;
     
     //
     output.DepthColor = float4(-input.PositionViewS.z / MaxDepth, 1.0f, 1.0f, 1.0f);
@@ -181,6 +194,47 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output inp
 	
 }
 
+float4 PS_ScreenSpaceShadowNoMRT(VS_ScreenSpaceShadow_Output input) : COLOR
+{
+	
+	///////////////////////////////////////////////////////////////////////
+	
+	float4 Color = tex2D(ColorSampler, input.TexCoord);
+	
+	float fShadowTerm = tex2Dproj(BlurVSampler, input.ScreenCoord).x;
+	float4 totalDiffuse = float4(0,0,0,0);
+	float4 totalAmbient = float4(0,0,0,0);
+	float4 totalSpecular = float4(0,0,0,0);
+	for (int k = 0; k < totalLights; k++)
+	{
+		//
+		float3 LightDir = normalize(LightPosition[k] - input.WorldPosition);
+		float3 ViewDir = normalize(CameraPosition - input.WorldPosition);    
+	    
+		// Calculate normal diffuse light.
+		float DiffuseLightingFactor = dot(LightDir, input.TBN[2]);
+	    
+		// R = 2 * (N.L) * N – L
+		float3 Reflect = normalize(2 * DiffuseLightingFactor * input.TBN[2] - LightDir);  
+		float Specular = pow(saturate(dot(Reflect, ViewDir)), Shineness); // R.V^n
+	    
+		// I = A + Dcolor * Dintensity * N.L + Scolor * Sintensity * (R.V)n
+	    totalDiffuse += vDiffuseColor[k] * DiffuseLightingFactor;
+	    totalSpecular += vSpecularColor[k] * Specular;
+	    totalAmbient += vAmbient[k];
+    }
+    
+    //totalDiffuse /= totalLights;
+    //totalAmbient /= totalLights;
+    
+    totalDiffuse = saturate(totalDiffuse);
+    totalAmbient = saturate(totalAmbient);
+    //
+    //output.Color  = (Color * (vAmbient + vDiffuseColor * DiffuseLightingFactor) + vSpecularColor * Specular) * fShadowTerm;
+    return saturate((Color * (totalAmbient + totalDiffuse) + totalSpecular)) * fShadowTerm;
+    
+}
+
 PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadowWithNormalMapping(VS_ScreenSpaceShadow_Output input)
 {
 	PS_ScreenSpaceShadow_Output output;
@@ -198,7 +252,7 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadowWithNormalMapping(VS_ScreenSpace
     Normal = normalize(mul(Normal, input.TBN));
 	
 	//
-    float3 LightDir = normalize(LightPosition - input.WorldPosition);
+    float3 LightDir = normalize(LightPosition[0] - input.WorldPosition);
     float3 ViewDir = normalize(CameraPosition - input.WorldPosition);    
     
 	// Calculate normal diffuse light.
@@ -211,7 +265,7 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadowWithNormalMapping(VS_ScreenSpace
     // I = A + Dcolor * Dintensity * N.L + Scolor * Sintensity * (R.V)n
     
     //
-    output.Color  = (Color * (vAmbient + vDiffuseColor * DiffuseLightingFactor) + vSpecularColor * Specular) * fShadowTerm;
+    output.Color  = (Color * (vAmbient[0] + vDiffuseColor[0] * DiffuseLightingFactor) + vSpecularColor[0] * Specular) * fShadowTerm;
     
     //
     output.DepthColor = float4(-input.PositionViewS.z / MaxDepth, 1.0f, 1.0f, 1.0f);
@@ -474,7 +528,26 @@ technique SSSTechnique
         StencilEnable = false;
     }
 }
-
+technique NoMRTSSSTechnique
+{
+    pass Pass1
+    {
+		ZEnable = true;
+		ZWriteEnable = true;
+		AlphaBlendEnable = false;
+		CullMode = CCW;
+		AlphaTestEnable = false;
+		StencilEnable = true;
+		StencilFunc = ALWAYS;
+		StencilRef = 1;
+		StencilPass = REPLACE;
+		StencilZFail = KEEP;
+        VertexShader = compile vs_3_0 VS_ScreenSpaceShadow();
+        PixelShader = compile ps_3_0 PS_ScreenSpaceShadowNoMRT();
+        
+        StencilEnable = false;
+    }
+}
 technique NormalMappingSSSTechnique
 {
     pass Pass1

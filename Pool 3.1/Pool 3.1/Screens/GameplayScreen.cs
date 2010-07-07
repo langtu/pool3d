@@ -213,7 +213,7 @@ namespace XNA_PoolGame.Screens
 
             #region LIGHT'S POINT
             //PoolGame.game.PrepareRenderStates();
-            PostProcessManager.ChangeRenderMode(RenderMode.BasicRender);
+            /*PostProcessManager.ChangeRenderMode(RenderMode.BasicRender);
             if (LightManager.sphereModel != null)
             {
                 for (int i = 0; i < LightManager.totalLights; ++i)
@@ -223,7 +223,7 @@ namespace XNA_PoolGame.Screens
                     LightManager.sphereModel.Draw(gameTime);
                     
                 }
-            }
+            }*/
             #endregion
 
             #region PARTICLES
@@ -232,8 +232,11 @@ namespace XNA_PoolGame.Screens
             World.scenario.Draw(gameTime);
 
             PoolGame.device.SetRenderTarget(0, null);
-            PoolGame.device.SetRenderTarget(1, null);
-            PoolGame.device.SetRenderTarget(2, null);
+            if (!(World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None))
+            {
+                PoolGame.device.SetRenderTarget(1, null);
+                PoolGame.device.SetRenderTarget(2, null);
+            }
             
 
             #endregion

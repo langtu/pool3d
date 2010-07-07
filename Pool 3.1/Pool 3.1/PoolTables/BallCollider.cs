@@ -9,40 +9,18 @@ using System.Threading;
 
 namespace XNA_PoolGame.PoolTables
 {
-    class State
-    {
-        private readonly Ball ball1;
-        private readonly Object ball2;
-        private readonly BallCollisionType collisiontype;
-        public State(Ball ball1, Object ball2, BallCollisionType collisiontype)
-        {
-            this.ball1 = ball1;
-            this.ball2 = ball2;
-            this.collisiontype = collisiontype;
-        }
-        public Ball Ball1
-        {
-            get { return ball1; }
-        }
-        public Object Ball2
-        {
-            get { return ball2; }
-        }
-        public BallCollisionType CollisionType
-        {
-            get { return collisiontype; }
-        }
-    }
     /// <summary>
     /// Entity in charge of collisions synchronously.
     /// </summary>
     public class BallCollider : ThreadComponent
     {
         private Queue<State> queue = null;
+        private int totalcollisions;
         public BallCollider(Game _game)
             : base(_game)
         {
             queue = new Queue<State>();
+            totalcollisions = 0;
             UseThread = true;
         }
         /// <summary>
@@ -57,17 +35,28 @@ namespace XNA_PoolGame.PoolTables
             {
                 //Console.WriteLine(""+ ball1.ballNumber + ", "+ ball2.ballNumber);
                 queue.Enqueue(new State(ball1, ball2, collision));
+                ++totalcollisions;
+            }
+        }
+        public void AddToQueue(Ball ball1, Object ball2, Object ball3, BallCollisionType collision)
+        {
+            lock (queue)
+            {
+                //Console.WriteLine(""+ ball1.ballNumber + ", "+ ball2.ballNumber);
+                queue.Enqueue(new State(ball1, ball2, ball3, collision));
+                ++totalcollisions;
             }
         }
 
         public override void Update(GameTime gameTime)
         {
-            while (queue.Count > 0)
+            while (totalcollisions > 0)
             {
                 State state;
                 lock (queue)
                 {
                     state = queue.Dequeue();
+                    --totalcollisions;
                 }
 
                 switch (state.CollisionType)
@@ -103,11 +92,29 @@ namespace XNA_PoolGame.PoolTables
                             state.Ball1.collisionFlag = false;
                             ball2.collisionFlag = false;
                             state.Ball1.BeginThread();
+                            ball2.BeginThread();
                         }
                         break;
                     case BallCollisionType.BallWithInsideRailPocket:
                         {
+                            int i = (int)state.Ball2;
+                            int j = (int)state.Ball3;
+                            state.Ball1.PreRotation *= state.Ball1.Rotation;
+                            state.Ball1.Rotation = Matrix.Identity;
 
+                            state.Ball1.angleRotation = 0.0f;
+                            state.Ball1.previousInsideHitRail = i * 2 + j;
+                            state.Ball1.previousHitRail = -1;
+
+
+                            Vector3 normal = state.Ball1.table.pockets[i].insideNormal[j];
+                            state.Ball1.totaltime = 0.0f;
+
+
+                            state.Ball1.SetVelocity(Vector3.Reflect(state.Ball1.velocity, normal) * 0.9f);
+
+                            state.Ball1.collisionFlag = false;
+                            state.Ball1.BeginThread();
                         }
                         break;
                     case BallCollisionType.BallWithRail:
@@ -132,6 +139,43 @@ namespace XNA_PoolGame.PoolTables
                 //tuple.Second.BeginThread();
             }
             base.Update(gameTime);
+        }
+    }
+    class State
+    {
+        private readonly Ball ball1;
+        private readonly Object ball2;
+        private readonly Object ball3;
+        private readonly BallCollisionType collisiontype;
+        public State(Ball ball1, Object ball2, BallCollisionType collisiontype)
+        {
+            this.ball1 = ball1;
+            this.ball2 = ball2;
+            this.ball3 = null;
+            this.collisiontype = collisiontype;
+        }
+        public State(Ball ball1, Object ball2, Object ball3, BallCollisionType collisiontype)
+        {
+            this.ball1 = ball1;
+            this.ball2 = ball2;
+            this.ball3 = ball3;
+            this.collisiontype = collisiontype;
+        }
+        public Ball Ball1
+        {
+            get { return ball1; }
+        }
+        public Object Ball2
+        {
+            get { return ball2; }
+        }
+        public Object Ball3
+        {
+            get { return ball3; }
+        }
+        public BallCollisionType CollisionType
+        {
+            get { return collisiontype; }
         }
     }
 }

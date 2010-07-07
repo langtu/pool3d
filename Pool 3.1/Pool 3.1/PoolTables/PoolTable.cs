@@ -27,6 +27,8 @@ namespace XNA_PoolGame.PoolTables
         public Ball cueBall = null;
         public Ball[] poolBalls;
         public int TotalBalls;
+        public volatile int ballsready = 0;
+        public object syncballsready = new object();
         public RoundInformation roundInfo = null;
 
         public bool ballsMoving = false;
@@ -121,8 +123,9 @@ namespace XNA_PoolGame.PoolTables
                 World.scenario.Objects.Add(poolBalls[i]);
             }
 
-            World.ballcollider = new BallCollider(PoolGame.game);
-            World.ballcollider.BuildThread(true);
+            
+            //World.ballcollider = new BallCollider(PoolGame.game);
+            //World.ballcollider.BuildThread(true);
 
             roundInfo = new RoundInformation();
             roundInfo.table = this;
@@ -274,7 +277,7 @@ namespace XNA_PoolGame.PoolTables
         public override void Update(GameTime gameTime)
         {
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (!loaded || cueBall == null) return;
+            if (!loaded || cueBall == null || pockets == null) return;
 
             // Gets if there is a new state of the balls, including cueball
             bool ballMovingState = ballsMoving;
@@ -431,7 +434,7 @@ namespace XNA_PoolGame.PoolTables
             TotalBalls = 0;
             
             poolBalls = null;
-
+            cueBall = null;
             if (World.ballcollider != null) World.ballcollider.Dispose();
             World.ballcollider = null;
             base.Dispose(disposing);

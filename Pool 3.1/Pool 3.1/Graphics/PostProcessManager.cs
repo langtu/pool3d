@@ -215,66 +215,28 @@ namespace XNA_PoolGame.Graphics
         #endregion
 
         #region Shadow Mapping
-        /*public static void RenderShadowMap()
-        {
-            PoolGame.device.RenderState.DepthBufferEnable = true;
-            PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
-
-            //Render Shadow Map
-            oldBuffer = PoolGame.device.DepthStencilBuffer;
-            PoolGame.device.DepthStencilBuffer = stencilBuffer;
-            PoolGame.device.SetRenderTarget(0, ShadowMapRT);
-            PoolGame.device.Clear(Color.White);
-        }
-
-        public static void RenderPCFShadowMap()
-        {
-            //Render PCF Shadow Map
-            PoolGame.device.DepthStencilBuffer = oldBuffer;
-            PoolGame.device.SetRenderTarget(0, ShadowRT);
-            PoolGame.device.Clear(Color.White);
-
-            PoolGame.device.RenderState.CullMode = CullMode.None;
-        }
-
-        public static void RenderSSSoftShadow()
-        {
-            if (ShadowTechnique == Shadow.SoftShadow)
-            {
-                SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0, GBlurH);
-                SetBlurEffectParameters(0, 0.5f / PoolGame.device.Viewport.Height, GBlurV);
-
-                //Gaussian Blur H
-                PoolGame.device.SetRenderTarget(0, GBlurHRT);
-                DrawQuad(ShadowRT.GetTexture(), GBlurH);
-
-                //Guassian Blur V
-                PoolGame.device.SetRenderTarget(0, GBlurVRT);
-                DrawQuad(GBlurHRT.GetTexture(), GBlurV);
-                
-                SetBlurEffectParameters(1.5f / PoolGame.device.Viewport.Width, 0, GBlurH);
-                SetBlurEffectParameters(0, 1.5f / PoolGame.device.Viewport.Height, GBlurV);
-            }
-
-            //Screen Space SoftShadow
-            if (World.displayMOTIONBLUR) PoolGame.device.SetRenderTarget(0, motionBlur.RT);
-            else PoolGame.device.SetRenderTarget(0, mainRT);
-            PoolGame.device.Clear(Color.CornflowerBlue);
-
-            PoolGame.device.RenderState.DepthBufferEnable = true;
-            PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
-        }*/
+        
         #endregion
 
         #region No Shadows
         public static void RenderTextured()
         {
             PoolGame.device.SetRenderTarget(0, mainRT);
-            PoolGame.device.SetRenderTarget(1, depthRT);
-            PoolGame.device.SetRenderTarget(2, velocityRT);
-            //PoolGame.device.Clear(ClearOptions.Target | ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
-            PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
-            PostProcessManager.DrawQuad(PostProcessManager.whiteTexture, PostProcessManager.clearGBufferEffect);
+            if (World.dofType == DOFType.None && World.motionblurType == MotionBlurType.None)
+            {
+                PoolGame.device.SetRenderTarget(1, null);
+                PoolGame.device.SetRenderTarget(2, null);
+                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target, Color.CornflowerBlue, 1.0f, 0);
+            }
+            else
+            {
+                PoolGame.device.SetRenderTarget(1, depthRT);
+                PoolGame.device.SetRenderTarget(2, velocityRT);
+
+                //PoolGame.device.Clear(ClearOptions.Target | ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
+                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
+                PostProcessManager.DrawQuad(PostProcessManager.whiteTexture, PostProcessManager.clearGBufferEffect);
+            }
 
             
 

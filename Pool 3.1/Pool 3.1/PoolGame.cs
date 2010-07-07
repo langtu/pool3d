@@ -262,21 +262,21 @@ namespace XNA_PoolGame
             }
             if (kb.IsKeyDown(Keys.Z) )
             {
-                LightManager.lights[0].LightFarPlane = LightManager.lights[0].LightFarPlane + 1.1f;
+                LightManager.lights[currentlight].LightFarPlane = LightManager.lights[currentlight].LightFarPlane + 1.1f;
             }
             if (kb.IsKeyDown(Keys.X) )
             {
-                LightManager.lights[0].LightFarPlane = LightManager.lights[0].LightFarPlane - 1.1f;
+                LightManager.lights[currentlight].LightFarPlane = LightManager.lights[currentlight].LightFarPlane - 1.1f;
             }
             if (kb.IsKeyDown(Keys.Add))
             {
-                LightManager.lights[0].LightFOV = LightManager.lights[0].LightFOV + 0.001f;
+                LightManager.lights[currentlight].LightFOV = LightManager.lights[currentlight].LightFOV + 0.001f;
             }
             if (kb.IsKeyDown(Keys.Subtract))
             {
-                LightManager.lights[0].LightFOV = LightManager.lights[0].LightFOV - 0.001f;
+                LightManager.lights[currentlight].LightFOV = LightManager.lights[currentlight].LightFOV - 0.001f;
             }
-            LightManager.lights[0].LightFOV = MathHelper.Clamp(LightManager.lights[0].LightFOV, MathHelper.ToRadians(0.1f), MathHelper.ToRadians(179.999f));
+            LightManager.lights[currentlight].LightFOV = MathHelper.Clamp(LightManager.lights[currentlight].LightFOV, MathHelper.ToRadians(0.1f), MathHelper.ToRadians(179.999f));
 
             if (kb.IsKeyDown(Keys.Q))
                 World.poolTable.roundInfo.cueBallInHand = true;
@@ -391,8 +391,8 @@ namespace XNA_PoolGame
             if (kb.IsKeyDown(Keys.N) && lastkb.IsKeyUp(Keys.N)) World.BloomPostProcessing = !World.BloomPostProcessing;
 
             ////////////////////////////////////////// DEPTH BIAS
-            if (kb.IsKeyDown(Keys.G)) PostProcessManager.shadows.depthBias += 0.015f * dt;
-            if (kb.IsKeyDown(Keys.H)) PostProcessManager.shadows.depthBias -= 0.015f * dt;
+            if (kb.IsKeyDown(Keys.G)) { LightManager.lights[currentlight].DepthBias += 0.015f * dt; LightManager.UpdateLights(); }
+            if (kb.IsKeyDown(Keys.H)) { LightManager.lights[currentlight].DepthBias -= 0.015f * dt; LightManager.UpdateLights(); }
 
             if (kb.IsKeyDown(Keys.J) && lastkb.IsKeyUp(Keys.J)) PostProcessManager.shadowBlurTech = (ShadowBlurTechnnique)((((int)PostProcessManager.shadowBlurTech) + 1) % 2);
 
@@ -408,20 +408,32 @@ namespace XNA_PoolGame
 
             if (LightManager.sphereModel != null)
             {
-                if (kb.IsKeyDown(Keys.C) && lastkb.IsKeyUp(Keys.C)) currentlight = (currentlight + 1) % 2;
+                
+                if (kb.IsKeyDown(Keys.C) && lastkb.IsKeyUp(Keys.C)) currentlight = (currentlight + 1) % LightManager.totalLights;
                 GamePadState state = GamePad.GetState(PlayerIndex.One);
 
-                Vector3 pos = new Vector3(LightManager.lights[currentlight].Position.X, LightManager.lights[currentlight].Position.Y, LightManager.lights[currentlight].Position.Z);
-                pos.X += state.ThumbSticks.Left.X;
-                pos.Y += state.ThumbSticks.Left.Y;
-                pos.Z += state.ThumbSticks.Right.X;
-                LightManager.lights[currentlight].Position = pos;
-                LightManager.sphereModel.Position = pos;
+                if (state.ThumbSticks.Left.X != 0.0f || state.ThumbSticks.Left.Y != 0.0f || state.ThumbSticks.Right.X != 0.0f)
+                {
+
+                    Vector3 pos = new Vector3(LightManager.lights[currentlight].Position.X, LightManager.lights[currentlight].Position.Y, LightManager.lights[currentlight].Position.Z);
+                    pos.X += state.ThumbSticks.Left.X;
+                    pos.Y += state.ThumbSticks.Left.Y;
+                    pos.Z += state.ThumbSticks.Right.X;
+
+                    LightManager.lights[currentlight].Position = pos;
+
+                    LightManager.sphereModel.Position = pos;
+                    LightManager.UpdateLights();
+                }
                 LightManager.sphereModel.Update(gameTime);
             }
 
             #endregion
-            
+
+            while (World.poolTable.ballsready > 0)
+            {
+                this.kb.Equals(null);
+            }
             base.Update(gameTime);
             
         }
@@ -492,6 +504,7 @@ namespace XNA_PoolGame
 
 
                 endTexture = PostProcessManager.shadows.ShadowMapRT[1].GetTexture();
+                //endTexture = PostProcessManager.shadows.ShadowRT.GetTexture();
                 rect = new Rectangle(0, 128, 128, 128);
                 //rect = new Rectangle(0, 0, Width, Height);
                 batch.Draw(endTexture, rect, Color.White);
@@ -560,17 +573,18 @@ namespace XNA_PoolGame
 
             text += "\n\nBloom Name: (" + PostProcessManager.bloomSettings.Name + ") (KEY: B)" + "\nShow buffer (" + PostProcessManager.showBuffer.ToString() + ")" + " (KEY: V)";
 
-            text += "\n\nDepthBias: " + PostProcessManager.shadows.depthBias + " (KEYS: G, H)";
 
             text += "\n\nShow Shadows: " + World.displayShadows.ToString() + " (KEY: Y)";
             text += "\nShadowTechnique: " + PostProcessManager.shadowBlurTech.ToString() + " (KEY: J)";
             text += "\nSaturation: " + saturation + " (KEYS: U, I)";
 
-            text += "\nFarPlane: " + LightManager.lights[0].LightFarPlane + " (KEYS: Z, X)";
-            text += "\n\nFOV: " + LightManager.lights[0].LightFOV + " (KEYS: +, -)";
+            text += "\n\nDepthBias: " + LightManager.lights[currentlight].DepthBias + " (KEYS: G, H)";
+            text += "\nFarPlane: " + LightManager.lights[currentlight].LightFarPlane + " (KEYS: Z, X)";
+            text += "\nFOV: " + LightManager.lights[currentlight].LightFOV + " (KEYS: +, -)";
+            text += "\nPosition: " + LightManager.lights[currentlight].Position;
 
-            batch.DrawString(spriteFont, text, new Vector2(18, height - 276), Color.Black);
-            batch.DrawString(spriteFont, text, new Vector2(17, height - 277), Color.Tomato);
+            batch.DrawString(spriteFont, text, new Vector2(18, height - 306), Color.Black);
+            batch.DrawString(spriteFont, text, new Vector2(17, height - 307), Color.Tomato);
 
             batch.End();
         }

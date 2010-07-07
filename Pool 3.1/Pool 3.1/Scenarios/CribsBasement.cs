@@ -35,6 +35,8 @@ namespace XNA_PoolGame.Scenarios
         public Entity smokeStackFireWood = null;
         public Entity stairs = null;
 
+        public Entity[] rooflamps;
+
         public ParticleSystem fireParticles = null;
         public ParticleSystem smokeParticles = null;
 
@@ -113,7 +115,7 @@ namespace XNA_PoolGame.Scenarios
             #region Cue Rack with everything on it
             /////////////// WALL'S CUE RACK
             cueRack = new Entity(PoolGame.game, "Models\\Cribs\\cue rack");
-            cueRack.Position = new Vector3(-500, 120, 1075);
+            cueRack.Position = new Vector3(-500, 120, 1075 - 250);
             cueRack.PreRotation = Matrix.CreateRotationY(MathHelper.ToRadians(180.0f));
             cueRack.SpecularColor = new Vector4(0.4f, 0.4f, 0.4f, 1.0f);
 
@@ -169,7 +171,7 @@ namespace XNA_PoolGame.Scenarios
             tv = new Entity(PoolGame.game, "Models\\Cribs\\tv");
             tv.Position = new Vector3(1150-270, 300.0f, 0);
             tv.PreRotation = Matrix.CreateRotationY(-MathHelper.PiOver2);
-            tv.SpecularColor = new Vector4(0.7f, 0.7f, 0.7f, 1.0f);
+            tv.SpecularColor = new Vector4(0.1f, 0.1f, 0.1f, 1.0f);
             tv.Shinennes = 256.0f;
 
             PoolGame.game.Components.Add(tv);
@@ -183,10 +185,10 @@ namespace XNA_PoolGame.Scenarios
             columns[1].Position = new Vector3(-1150, 0, -1100);
 
             columns[2] = new Entity(PoolGame.game, "Models\\Cribs\\column", "Textures\\Cribs\\floor_pavingStone_ceramic");
-            columns[2].Position = new Vector3(1150, 0, 1100);
+            columns[2].Position = new Vector3(1150, 0, 1100 - 250);
 
             columns[3] = new Entity(PoolGame.game, "Models\\Cribs\\column", "Textures\\Cribs\\floor_pavingStone_ceramic");
-            columns[3].Position = new Vector3(-1150, 0, 1100);
+            columns[3].Position = new Vector3(-1150, 0, 1100-250);
 
             foreach (Entity col in columns)
             {
@@ -218,10 +220,11 @@ namespace XNA_PoolGame.Scenarios
             
 
             /////////////// ROOF
-            roof = new Entity(PoolGame.game, "Models\\Cribs\\roof", "Textures\\Cribs\\ceramic_floor_tile_600x600x9_2mm");
+            roof = new Entity(PoolGame.game, "Models\\Cribs\\roof", "Textures\\Cribs\\ConcreteNew0003_S2");
+
             roof.Position = new Vector3(0, 700, 0);
             roof.Scale = new Vector3(2.0f);
-            roof.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
+            roof.TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;
             roof.SpecularColor = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
             roof.occluder = false;
             roof.normalMapAsset = "Textures\\Cribs\\ceramic_floor_tile_600x600x9_2mm_N";
@@ -253,7 +256,7 @@ namespace XNA_PoolGame.Scenarios
             walls[1].TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;
 
             walls[2] = new Entity(PoolGame.game, "Models\\Cribs\\wall");
-            walls[2].Position = new Vector3(0, 0, 1100);
+            walls[2].Position = new Vector3(0, 0, 850);
             walls[2].Rotation = Matrix.CreateRotationY(MathHelper.PiOver2);
             walls[2].TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;
 
@@ -261,6 +264,8 @@ namespace XNA_PoolGame.Scenarios
             {
                 wall.SpecularColor = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
                 wall.DrawOrder = 1;
+                //wall.TextureAsset = "Textures\\Cribs\\floor_tile_stoneIrregular";
+
                 //wall.normalMapAsset = "Textures\\Cribs\\ConcreteNew0003_S2_N";
                 //wall.normalMapAsset = "Textures\\Cribs\\floor_pavement_stone4_2_N";
                 //wall.normalMapAsset = "Textures\\Cribs\\PlanksNew0026_9_L2_N";
@@ -272,8 +277,23 @@ namespace XNA_PoolGame.Scenarios
             stairs.Position = new Vector3(-500.0f, 0.0f, 750.0f);
             stairs.SpecularColor = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
             stairs.PreRotation = Matrix.CreateRotationY(MathHelper.ToRadians(90.0f));
-
+            stairs.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
             PoolGame.game.Components.Add(stairs);
+
+            //////////////// ROOF LAMPS
+            rooflamps = new Entity[2];
+            rooflamps[0] = new Entity(PoolGame.game, "Models\\Cribs\\rooflamp");
+            rooflamps[0].Position = new Vector3(180.0f, 392.0f, 0.0f);
+
+            rooflamps[1] = new Entity(PoolGame.game, "Models\\Cribs\\rooflamp");
+            rooflamps[1].Position = new Vector3(-180.0f, 392.0f, 0.0f);
+            foreach (Entity lamp in rooflamps)
+            {
+                lamp.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
+                lamp.occluder = false;
+                PoolGame.game.Components.Add(lamp);
+            }
+
 
             ////////////////////////////////////////////////
             World.scenario.Objects.Add(smokestack);
@@ -306,6 +326,9 @@ namespace XNA_PoolGame.Scenarios
 
             World.scenario.Objects.Add(stairs);
 
+            foreach (Entity lamp in rooflamps)
+                World.scenario.Objects.Add(lamp);
+
             base.Initialize();
             LoadContent();
 
@@ -318,20 +341,24 @@ namespace XNA_PoolGame.Scenarios
         {
             lights = new List<Light>();
 
-            //lights = new Light(new Vector3(-286 , 500, 144));
-            Light light1 = new Light(new Vector3(0, 500, 144));
-            light1.LightFarPlane = 1000.0f;
+            Light light1 = new Light(new Vector3(-178, 383, 0));
+            //light1.AmbientColor = new Vector4(0.0f, 0.01f, 0.01f, 1.0f);
+            light1.DepthBias = 0.01193f;
+            light1.LightFarPlane = 1100.0f;
+            light1.LightFOV = 2.604f;
 
             lights.Add(light1);
 
 
-            Light light2 = new Light(new Vector3(200, 500, 144));
-
-            //light2.LookAt = new Vector3(0, 0, 2 * 144);
-            light2.LookAt = new Vector3(-2.0f * 144.0f, 0, 0);
-            light2.LightFOV = MathHelper.ToRadians(120.0f);
-            light2.LightFarPlane = 1800.0f;
-
+            //Light light2 = new Light(new Vector3(200, 500, 144));
+            Light light2 = new Light(new Vector3(178, 383, 0));
+            //light2.DiffuseColor = new Vector4(0.85f, 1.0f, 1.0f, 1.0f);
+            light2.DepthBias = 0.00582496f;
+            //light2.LookAt = new Vector3(0, 0, 0);
+            //light2.LookAt = new Vector3(-178 * 10, 0, 0);
+            //light2.LightFOV = MathHelper.ToRadians(120.0f);
+            light2.LightFarPlane = 1900.0f;
+            light2.LightFOV = 2.504f;
             lights.Add(light2);
 
             LightManager.lights = lights;
@@ -352,7 +379,7 @@ namespace XNA_PoolGame.Scenarios
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            const int fireParticlesPerFrame = 5;
+            const int fireParticlesPerFrame = 3;
             //////const int fireParticlesPerFrame = 10;
 
             Vector3 center = new Vector3(1150.0f - 120.0f, 80.0f, -15.0f);
@@ -440,7 +467,10 @@ namespace XNA_PoolGame.Scenarios
             if (smokeParticles != null) smokeParticles.Dispose();
 
             if (stairs != null) stairs.Dispose();
-
+            if (rooflamps != null)
+                foreach (Entity lamp in rooflamps)
+                    lamp.Dispose();
+                
             core.Dispose();
             base.Dispose(disposing);
         }

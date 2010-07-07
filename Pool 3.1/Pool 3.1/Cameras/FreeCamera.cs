@@ -102,7 +102,18 @@ namespace XNA_PoolGame.Cameras
             }
             if (kb.IsKeyDown(Keys.T) && lastkb.IsKeyUp(Keys.T))
             {
-                World.poolTable.cueBall.LanzarBola();
+                World.poolTable.poolBalls[1].min_Altitute = 138.44f;
+                World.poolTable.poolBalls[1].Position = new Vector3(World.poolTable.pockets[0].bounds.Center.X, World.poolTable.SURFACE_POSITION_Y + World.ballRadius * 15, World.poolTable.pockets[0].bounds.Center.Z);
+                World.poolTable.poolBalls[1].currentTrajectory = Trajectory.Free;
+                World.poolTable.poolBalls[1].pocketWhereAt = 0;
+            }
+
+            if (kb.IsKeyDown(Keys.O) && lastkb.IsKeyUp(Keys.O))
+            {
+                World.poolTable.poolBalls[2].min_Altitute = 138.44f;
+                World.poolTable.poolBalls[2].Position = new Vector3(World.poolTable.pockets[0].bounds.Center.X, World.poolTable.SURFACE_POSITION_Y + World.ballRadius * 15, World.poolTable.pockets[0].bounds.Center.Z);
+                World.poolTable.poolBalls[2].currentTrajectory = Trajectory.Free;
+                World.poolTable.poolBalls[2].pocketWhereAt = 0;
             }
 
             if (kb.IsKeyDown(Keys.F4) && lastkb.IsKeyUp(Keys.F4))

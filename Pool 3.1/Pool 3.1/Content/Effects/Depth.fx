@@ -38,19 +38,11 @@ VertexShaderOutput ShadowMapVS(VertexShaderInput input)
 	return OUT;
 }
 
-struct PS_DEPTH_Output
-{
-	float4 depth : COLOR0;
-};
-
 //-------------------
 //--- PixelShader ---
-PS_DEPTH_Output ShadowMapPS(VertexShaderOutput IN)
+float4 ShadowMapPS(VertexShaderOutput IN) : COLOR0
 {
-	PS_DEPTH_Output output;
-	output.depth = float4(IN.Depth, IN.Depth, IN.Depth, 1.0f);
-	
-    return output;
+    return float4(IN.Depth, IN.Depth, IN.Depth, 1.0f);;
 }
 
 //------------------
