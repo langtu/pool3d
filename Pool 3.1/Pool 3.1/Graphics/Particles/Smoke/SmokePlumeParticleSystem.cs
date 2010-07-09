@@ -23,7 +23,7 @@ namespace XNA_PoolGame.Graphics.Particles
             settings.TextureName = "smoke";
 
             //settings.MaxParticles = 600;
-            settings.MaxParticles = 6;
+            settings.MaxParticles = 10;
 
             settings.Duration = TimeSpan.FromSeconds(10);
 
@@ -44,11 +44,11 @@ namespace XNA_PoolGame.Graphics.Particles
             settings.MinRotateSpeed = -1;
             settings.MaxRotateSpeed = 1;
 
-            settings.MinStartSize = 20;
-            settings.MaxStartSize = 40;
+            settings.MinStartSize = 15;
+            settings.MaxStartSize = 30;
 
-            settings.MinEndSize = 60;
-            settings.MaxEndSize = 200;
+            settings.MinEndSize = 50;
+            settings.MaxEndSize = 80;
 
             settings.SourceBlend = Blend.SourceAlpha;
             settings.DestinationBlend = Blend.InverseSourceAlpha;

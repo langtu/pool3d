@@ -14,7 +14,7 @@ namespace XNA_PoolGame.Graphics.Shadows
         public PSMShadowMapping()
         {
             shadowMapSize = World.shadowMapSize;
-            depthBias = 0.0042f; // 0.0035f;
+            //depthBias = 0.0042f; // 0.0035f;
 
             float texelSize = 0.75f / (float)shadowMapSize;
 
@@ -41,6 +41,7 @@ namespace XNA_PoolGame.Graphics.Shadows
 
             shadowTIU = new TextureInUse(ShadowRT, false);
             PostProcessManager.renderTargets.Add(shadowTIU);
+
             ShadowFinalPCM = PoolGame.content.Load<Effect>("Effects\\ShadowFinal");
             stencilBuffer = new DepthStencilBuffer(PoolGame.device, shadowMapSize, shadowMapSize, PoolGame.device.DepthStencilBuffer.Format);
         }
@@ -110,7 +111,8 @@ namespace XNA_PoolGame.Graphics.Shadows
         }
         public override void Dispose()
         {
-            throw new NotImplementedException();
+
+            base.Dispose();
         }
     }
 }

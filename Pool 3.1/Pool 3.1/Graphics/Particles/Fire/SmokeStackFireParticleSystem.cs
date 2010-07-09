@@ -21,15 +21,17 @@ namespace XNA_PoolGame.Graphics.Particles.Fire
 
         protected override void InitializeSettings(ParticleSettings settings)
         {
-            settings.TextureName = "fire";
+            settings.TextureName = "fire1";
 
-            settings.MaxParticles = 500;
+            settings.MaxParticles = 1500;
+            /////////settings.MaxParticles = 500;
             //////settings.MaxParticles = 1500;
 
-            settings.Duration = TimeSpan.FromSeconds(1.5f);
+            settings.Duration = TimeSpan.FromSeconds(0.85f);
+            /////////settings.Duration = TimeSpan.FromSeconds(1.5f);
             /////settings.Duration = TimeSpan.FromSeconds(1.0);
 
-            settings.DurationRandomness = 1;
+            settings.DurationRandomness = 0.5f;
 
             settings.MinHorizontalVelocity = -10;
             settings.MaxHorizontalVelocity = 30;
@@ -40,17 +42,25 @@ namespace XNA_PoolGame.Graphics.Particles.Fire
             // Set gravity upside down, so the flames will 'fall' upward.
             settings.Gravity = new Vector3(0, 15, 0);
 
-            settings.MinColor = new Color(255, 100, 150, 15);
+            settings.MinColor = new Color(180, 100, 150, 6);
             settings.MaxColor = new Color(255, 170, 170, 40);
+
+            /////settings.MinColor = new Color(255, 100, 150, 15);
+            /////settings.MaxColor = new Color(255, 170, 170, 40);
 
             //settings.MinColor = new Color(255, 255, 255, 25);
             //settings.MaxColor = new Color(255, 255, 255, 40);
 
-            settings.MinStartSize = 5 * 3;
+            settings.MinStartSize = 1 * 3;
             settings.MaxStartSize = 10 * 3;
 
             settings.MinEndSize = 10 * 3;
-            settings.MaxEndSize = 70 * 3;
+            settings.MaxEndSize = 50 * 3;
+
+            //////
+
+            settings.MinRotateSpeed = -1;
+            settings.MaxRotateSpeed = 1;
 
             // Use additive blending.
             settings.SourceBlend = Blend.SourceAlpha;

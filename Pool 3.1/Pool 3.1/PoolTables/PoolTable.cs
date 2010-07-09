@@ -18,36 +18,64 @@ using XNA_PoolGame.Graphics.Models;
 
 namespace XNA_PoolGame.PoolTables
 {
+    /// <summary>
+    /// Pool table
+    /// </summary>
     public class PoolTable : Entity
     {
         public float FRICTION_SURFACE = 0.99f;
         public float BORDER_FRITCION = 0.95f;
 
+        /// <summary>
+        /// Start position of the cueball for a set.
+        /// </summary>
         public Vector3 cueBallStartPosition;
+
+        /// <summary>
+        /// The cueball
+        /// </summary>
         public Ball cueBall = null;
+
+        /// <summary>
+        /// All balls, including cueball.
+        /// </summary>
         public Ball[] poolBalls;
+
+        /// <summary>
+        /// Number of balls.
+        /// </summary>
         public int TotalBalls;
         public volatile int ballsready = 0;
         public object syncballsready = new object();
+
+        /// <summary>
+        /// Round information.
+        /// </summary>
         public RoundInformation roundInfo = null;
 
+        /// <summary>
+        /// Determines if the balls are in motion
+        /// </summary>
         public bool ballsMoving = false;
 
-        public Vector3[] pockets_pos;
-
+        /// <summary>
+        /// Collection of pockets for this pool table
+        /// </summary>
         public Pocket[] pockets;
-
-        //public LinkedList<Ball> mSimulatedSpheres;
-        //public LinkedList<Ball> mSimulatedSpheresNextStep;
 
         public BoundingBox[] rails;
         public Plane[] planes;
         public Vector3[] railsNormals;
         public VectorRenderComponent vectorRenderer;
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         public float pocket_radius;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public Vector3[] headDelimiters;
         public Vector3 MIN_HEAD, MAX_HEAD;
         public float MIN_HEAD_X = 0.0f;
@@ -66,6 +94,16 @@ namespace XNA_PoolGame.PoolTables
 
         protected const float poolballscaleFactor = 1.0f; //1.85f;
         protected bool loaded = false;
+
+        /// <summary>
+        /// Maximum number of balls that supports the pocket.
+        /// </summary>
+        internal int maximumBallsInPocket;
+
+        /// <summary>
+        /// Position of a ball after maximum number of balls supported is over.
+        /// </summary>
+        internal Vector3 ballstuckposition;
 
         #region Constructor
         public PoolTable(Game game, String modelName)
@@ -95,8 +133,6 @@ namespace XNA_PoolGame.PoolTables
 
         public void CommonInitialization()
         {
-
-
             this.SpecularColor = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
             
 
@@ -123,10 +159,6 @@ namespace XNA_PoolGame.PoolTables
                 World.scenario.Objects.Add(poolBalls[i]);
             }
 
-            
-            //World.ballcollider = new BallCollider(PoolGame.game);
-            //World.ballcollider.BuildThread(true);
-
             roundInfo = new RoundInformation();
             roundInfo.table = this;
 
@@ -140,7 +172,7 @@ namespace XNA_PoolGame.PoolTables
 
             for (int i = 0; i < TotalBalls; i++)
             {
-                while (poolBalls[i].thinkingFlag || poolBalls[i].collisionFlag) { }
+                while (poolBalls[i].thinkingFlag) { }
                 poolBalls[i].Stop();
 
                 poolBalls[i].Position = roundInfo.ballsState[i].Position;
@@ -151,10 +183,25 @@ namespace XNA_PoolGame.PoolTables
                 poolBalls[i].rotQ = Quaternion.Identity;
                 poolBalls[i].invWorldInertia = Matrix.Identity;
                 poolBalls[i].angularMomentum = Vector3.Zero;
-                if (poolBalls[i].pocketWhereAt != -1)
-                    pockets[poolBalls[i].pocketWhereAt].balls.Remove(poolBalls[i]);
+
+                if (poolBalls[i].pocketWhereAt != -1 && roundInfo.ballsState[i].PocketWhereAt == -1)
+                {
+                    lock (pockets[poolBalls[i].pocketWhereAt].balls)
+                    {
+                        pockets[poolBalls[i].pocketWhereAt].balls.Remove(poolBalls[i]);
+                    }
+
+                    if (roundInfo.ballsState[i].PocketWhereAt != -1)
+                    {
+                        lock (pockets[roundInfo.ballsState[i].PocketWhereAt].balls)
+                        {
+                            pockets[roundInfo.ballsState[i].PocketWhereAt].balls.Add(poolBalls[i]);
+                        }
+                    }
+                }
 
                 poolBalls[i].pocketWhereAt = roundInfo.ballsState[i].PocketWhereAt;
+                
                 poolBalls[i].previousHitRail = -1; poolBalls[i].previousInsideHitRail = -1;
                 
             }
@@ -186,6 +233,12 @@ namespace XNA_PoolGame.PoolTables
             return num;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="triangleOrigin"></param>
+        /// <param name="gameMode"></param>
+        /// <param name="ballRadius"></param>
         public void BuildBallsTriangle(Vector3 triangleOrigin, GameMode gameMode, float ballRadius)
         {
             bool[] ballsReady;
@@ -267,6 +320,9 @@ namespace XNA_PoolGame.PoolTables
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public virtual void BuildPockets()
         {
 

@@ -18,6 +18,9 @@ using XNA_PoolGame.Graphics.Shadows;
 
 namespace XNA_PoolGame.Screens
 {
+    /// <summary>
+    /// Match screen
+    /// </summary>
     public class GameplayScreen : Screen
     {
         #region Initialization
@@ -38,6 +41,7 @@ namespace XNA_PoolGame.Screens
             World.camera.FarPlane = 5500.0f;
 
             // SET SHADOW TECHNIQUE
+            if (PostProcessManager.shadows != null) PostProcessManager.shadows.Dispose();
             switch (World.shadowTechnique)
             {
                 case ShadowTechnnique.PSMShadowMapping:

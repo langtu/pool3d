@@ -89,7 +89,6 @@ namespace XNA_PoolGame.Graphics
         // DEPTH OF FIELD
         public static DepthOfField depthOfField;
         public static Texture2D dofMapTex;
-        public static TextureInUse depthTIU;
 
         //
         public static FullScreenQuad quad;
@@ -316,12 +315,8 @@ namespace XNA_PoolGame.Graphics
             GBlurVRT = new RenderTarget2D(PoolGame.device, pp.BackBufferWidth, pp.BackBufferHeight, 1, pp.BackBufferFormat, pp.MultiSampleType, pp.MultiSampleQuality);
             renderTargets.Add(new TextureInUse(GBlurVRT, false));
 
-            //DepthOfFieldRT = new RenderTarget2D(PoolGame.device, pp.BackBufferWidth, pp.BackBufferHeight, 1, format);
             depthRT = new RenderTarget2D(PoolGame.device, pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Single, pp.MultiSampleType,
                 pp.MultiSampleQuality, RenderTargetUsage.DiscardContents);
-
-            //depthTIU = new TextureInUse(depthRT, false);
-            //renderTargets.Add(depthTIU);
 
             velocityRT = new RenderTarget2D(PoolGame.device,
                                                 pp.BackBufferWidth,
@@ -630,13 +625,20 @@ namespace XNA_PoolGame.Graphics
         {
             public RenderTarget2D renderTarget;
             public bool inUse;
-
+            public TextureInUse() { }
             public TextureInUse(RenderTarget2D rt2D, bool use)
             {
                 this.renderTarget = rt2D;
                 this.inUse = use;
             }
-            public TextureInUse() { }
+            public void Use() 
+            {
+                inUse = true;
+            }
+            public void DontUse()
+            {
+                inUse = false;
+            }
         }
     }
 }

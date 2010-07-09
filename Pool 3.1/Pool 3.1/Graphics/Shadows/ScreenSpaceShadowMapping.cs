@@ -14,7 +14,7 @@ namespace XNA_PoolGame.Graphics.Shadows
         public ScreenSpaceShadowMapping()
         {
             shadowMapSize = World.shadowMapSize;
-            depthBias = 0.0042f; // 0.0035f;
+            //depthBias = 0.0042f; // 0.0035f;
 
             float texelSize = 0.75f / (float)shadowMapSize;
 
@@ -34,7 +34,12 @@ namespace XNA_PoolGame.Graphics.Shadows
             ShadowMapRT[0] = new RenderTarget2D(PoolGame.device, shadowMapSize, shadowMapSize, 1, pp.BackBufferFormat);
             ShadowMapRT[1] = new RenderTarget2D(PoolGame.device, shadowMapSize, shadowMapSize, 1, pp.BackBufferFormat);
 
-            PostProcessManager.renderTargets.Add(new TextureInUse(ShadowMapRT[0], false));
+            shadowMapTIU = new TextureInUse[2];
+            shadowMapTIU[0] = new TextureInUse(ShadowMapRT[0], false);
+            shadowMapTIU[1] = new TextureInUse(ShadowMapRT[1], false);
+
+            PostProcessManager.renderTargets.Add(shadowMapTIU[0]);
+            PostProcessManager.renderTargets.Add(shadowMapTIU[1]);
 
             ShadowRT = new RenderTarget2D(PoolGame.device, pp.BackBufferWidth, pp.BackBufferHeight, 1, PoolGame.device.DisplayMode.Format,
                 pp.MultiSampleType, pp.MultiSampleQuality);
@@ -47,6 +52,7 @@ namespace XNA_PoolGame.Graphics.Shadows
 
         public override void Draw(GameTime gameTime)
         {
+            ///////////////// PASS 1 ////////////////////
             PostProcessManager.ChangeRenderMode(RenderMode.ShadowMapRender);
 
             oldBuffer = PoolGame.device.DepthStencilBuffer;
@@ -54,26 +60,30 @@ namespace XNA_PoolGame.Graphics.Shadows
             for (int i = 0; i < LightManager.totalLights; ++i)
             {
                 RenderShadowMap(i);
-
+                shadowMapTIU[i].Use();
                 World.scenario.DrawScene(gameTime);
                 World.lightpass++;
             }
 
+            ///////////////// PASS 2 ////////////////////
             PostProcessManager.ChangeRenderMode(RenderMode.PCFShadowMapRender);
             RenderPCFShadowMap();
+            shadowTIU.Use();
 
             World.scenario.DrawScene(gameTime);
 
-
+            ///////////////// PASS 3 ////////////////////
             World.camera.ItemsDrawn = 0;
             PostProcessManager.ChangeRenderMode(RenderMode.ScreenSpaceSoftShadowRender);
             RenderSoftShadow();
 
             World.scenario.DrawScene(gameTime);
 
-            /////////////////////////////////////
+            /////////////////////////////////////////////
             PoolGame.device.RenderState.StencilEnable = false;
-
+            for (int i = 0; i < LightManager.totalLights; ++i)
+                shadowMapTIU[i].DontUse();
+            shadowTIU.DontUse();
         }
 
         private void RenderShadowMap(int lightindex)
@@ -144,7 +154,8 @@ namespace XNA_PoolGame.Graphics.Shadows
 
         public override void Dispose()
         {
-            throw new NotImplementedException();
+
+            base.Dispose();
         }
     }
 }

@@ -8,11 +8,12 @@ using XNA_PoolGame.Helpers;
 namespace XNA_PoolGame.PoolTables
 {
     /// <summary>
-    /// Pocket
+    /// Define a Pocket.
     /// </summary>
     public class Pocket
     {
         public List<Ball> balls;
+        public List<Ball> firstballsstuck;
         public BoundingSphere bounds;
         public Vector3 headpoint;
         public Vector3[] insideNormal;
@@ -22,6 +23,7 @@ namespace XNA_PoolGame.PoolTables
         {
             this.bounds = bounds;
             balls = new List<Ball>();
+            firstballsstuck = new List<Ball>();
             insideNormal = new Vector3[2];
             insideBands = new OrientedBoundingBox[2];
         }
@@ -37,6 +39,8 @@ namespace XNA_PoolGame.PoolTables
 
         public void Dispose()
         {
+            firstballsstuck.Clear();
+            firstballsstuck = null;
             balls.Clear();
             balls = null;
             insideNormal = null;

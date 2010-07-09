@@ -381,7 +381,7 @@ namespace XNA_PoolGame.Scenarios
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            const int fireParticlesPerFrame = 3;
+            const int fireParticlesPerFrame = 13;
             //////const int fireParticlesPerFrame = 10;
 
             Vector3 center = new Vector3(1150.0f - 120.0f, 80.0f, -15.0f);
@@ -392,9 +392,9 @@ namespace XNA_PoolGame.Scenarios
                 //fireParticles.AddParticle(Maths.RandomPointOnCube(center, 90.0f), Vector3.Zero);
                 fireParticles.AddParticle(center, Vector3.Zero);
             }
+            fireParticles.AddParticle(center + new Vector3(0, 20, 0), Vector3.Zero);
 
-
-            const int smokeParticlesPerFrame = 10;
+            const int smokeParticlesPerFrame = 20;
 
             for (int i = 0; i < smokeParticlesPerFrame; i++)
             {
