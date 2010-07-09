@@ -94,7 +94,6 @@ namespace XNA_PoolGame.Graphics.Particles
         public float MinEndSize = 100;
         public float MaxEndSize = 100;
 
-
         // Alpha blending settings.
         public Blend SourceBlend = Blend.SourceAlpha;
         public Blend DestinationBlend = Blend.InverseSourceAlpha;

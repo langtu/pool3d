@@ -40,10 +40,10 @@ namespace XNA_PoolGame
         public static MotionBlurType motionblurType = MotionBlurType.None;
 
         // SHADOWS SETTINGS
-        public static bool displayShadows = false;
-        public static bool displayShadowsTextures = false;
+        public static bool displayShadows = true;
+        public static bool displayShadowsTextures = true;
         public static bool displaySceneFromLightSource = false;
-        public static int shadowMapSize = 1024 / 2;
+        public static int shadowMapSize = 1024 * 2;
         public static ShadowTechnnique shadowTechnique = ShadowTechnnique.ScreenSpaceShadowMapping;
         public static int lightpass = 0;
         // NORMAL MAPPING
@@ -57,5 +57,7 @@ namespace XNA_PoolGame
         public static bool UseThreads = true;
         public static BallCollider ballcollider = null;
 
+        // DISTORTION
+        public static bool doDistortion = true;
     }
 }

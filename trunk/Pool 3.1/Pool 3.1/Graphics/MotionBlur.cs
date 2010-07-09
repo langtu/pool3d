@@ -21,7 +21,6 @@ namespace XNA_PoolGame.Graphics
         public MotionBlur()
         {
             
-
             this.blurScale = 1.0f;
         }
 

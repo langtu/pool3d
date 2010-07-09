@@ -82,7 +82,8 @@ namespace XNA_PoolGame
         Menu,
         FPS,
         Light,
-        ParticleSystem
+        ParticleSystem,
+        DistortionParticleSystem
     }
     /// <summary>
     /// Controls the DOF effect being applied

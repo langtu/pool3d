@@ -921,6 +921,11 @@
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
+    <Compile Include="Effects\DistortionCombine.fx">
+      <Name>DistortionCombine</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
     <None Include="Effects\DOF_Common.fxh">
       <Name>DOF_Common</Name>
       <Importer>EffectImporter</Importer>

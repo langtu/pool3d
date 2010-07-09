@@ -42,6 +42,7 @@ namespace XNA_PoolGame.Graphics.Models
 
         private float shineness = 96.0f;
         private Vector4 specularColor = Vector4.One;
+        private Vector4 materialDiffuseColor = Vector4.One;
         public String normalMapAsset = null;
         protected Texture2D normalMapTexture = null;
 
@@ -89,6 +90,9 @@ namespace XNA_PoolGame.Graphics.Models
 
         #endregion
 
+        /// <summary>
+        /// Render parameters Delegate
+        /// </summary>
         public delegate void RenderHandler();
 
         #endregion

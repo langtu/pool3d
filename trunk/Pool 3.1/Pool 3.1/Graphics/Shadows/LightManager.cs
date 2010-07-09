@@ -39,7 +39,7 @@ namespace XNA_PoolGame.Graphics
             specular = new Vector4[totalLights];
             nospecular = new Vector4[totalLights];
             depthbias = new float[totalLights];
-            totalLights = 1;
+            //totalLights = 1;
 
             UpdateLights();
             
