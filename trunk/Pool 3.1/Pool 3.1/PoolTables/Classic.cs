@@ -48,10 +48,11 @@ namespace XNA_PoolGame.PoolTables
             headDelimiters = new Vector3[2];
             //headDelimiters[0] = new Vector3(MIN_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, MIN_HEAD_Z);
             //headDelimiters[1] = new Vector3(MAX_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, MAX_HEAD_Z);
-            headDelimiters[0] = new Vector3(MIN_X + World.ballRadius, SURFACE_POSITION_Y + World.ballRadius, MIN_Z + World.ballRadius);
-            headDelimiters[1] = new Vector3(MAX_X - World.ballRadius, SURFACE_POSITION_Y + World.ballRadius, MAX_Z - World.ballRadius);
+            headDelimiters[0] = new Vector3(MIN_X + World.ballRadius + float.Epsilon, SURFACE_POSITION_Y + World.ballRadius, MIN_Z + World.ballRadius + float.Epsilon);
+            headDelimiters[1] = new Vector3(MAX_X - World.ballRadius - float.Epsilon, SURFACE_POSITION_Y + World.ballRadius, MAX_Z - World.ballRadius - float.Epsilon);
 
             cueBallStartPosition = new Vector3(MIN_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, 0.0f);
+            maximumBallsInPocket = 2;
         }
 
         public override void BuildPockets()
@@ -238,7 +239,7 @@ namespace XNA_PoolGame.PoolTables
             //planes[5] = new Plane(railsNormals[5], -Vector3.Dot((rails[5].Min + railsNormals[5] * World.ballRadius), railsNormals[5]));
 
 
-            
+            ballstuckposition = new Vector3(0, 0, 0);
             BuildPockets();
 
             

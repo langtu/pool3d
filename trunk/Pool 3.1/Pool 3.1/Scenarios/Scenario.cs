@@ -80,8 +80,14 @@ namespace XNA_PoolGame.Scenarios
             }
         }
 
+        /// <summary>
+        /// Initialize lights from the scene.
+        /// </summary>
         public abstract void LoadLights();
 
+        /// <summary>
+        /// Set particles settings before drawing them.
+        /// </summary>
         public abstract void SetParticleSettings();
 
         protected override void Dispose(bool disposing)
