@@ -198,6 +198,11 @@ namespace XNA_PoolGame.Screens
             PoolGame.game.PrepareRenderStates();
             RenderTarget2D result = null;
 
+            //if (World.dofType != DOFType.None)
+            //    PostProcessManager.depthTIU.Use();
+            if (World.BloomPostProcessing)
+            { PostProcessManager.halfHorTIU.Use(); PostProcessManager.halfVertTIU.Use(); }
+            
             #region SHADOW MAPPING
 
             if (World.displayShadows)
@@ -231,36 +236,52 @@ namespace XNA_PoolGame.Screens
             #endregion
 
             #region PARTICLES
-
+            PostProcessManager.ChangeRenderMode(RenderMode.ParticleSystem);
             World.scenario.SetParticleSettings();
             World.scenario.Draw(gameTime);
+            #endregion
 
+            #region DISTORTION PARTICLES
+            if (World.doDistortion)
+            {
+                PostProcessManager.ChangeRenderMode(RenderMode.DistortionParticleSystem);
+                PostProcessManager.DistorionParticles();
+                World.scenario.SetDistortionParticleSettings();
+                World.scenario.Draw(gameTime);
+            }
+            #endregion
+
+            result = PostProcessManager.mainRT;
             PoolGame.device.SetRenderTarget(0, null);
             if (!(World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None))
             {
                 PoolGame.device.SetRenderTarget(1, null);
                 PoolGame.device.SetRenderTarget(2, null);
             }
-            
 
-            #endregion
+            if (World.doDistortion)
+            {
+                PostProcessManager.DistortionParticlesCombine(PostProcessManager.GBlurVRT);
+                result = PostProcessManager.GBlurVRT;
+                PostProcessManager.mainTIU.DontUse();
+            }
 
-            #region MOTION BLUR & DOF
+            #region MOTION BLUR AND DOF
 
             if (World.motionblurType != MotionBlurType.None)
             {
                 if (World.dofType != DOFType.None)
                 {
                     PostProcessManager.ChangeRenderMode(RenderMode.MotionBlur);
-                    PostProcessManager.RenderMotionBlur(PostProcessManager.mainRT, PostProcessManager.GBlurVRT);
+                    PostProcessManager.RenderMotionBlur(result, PostProcessManager.GBlurHRT);
 
                     PostProcessManager.ChangeRenderMode(RenderMode.DoF);
-                    PostProcessManager.DOF(PostProcessManager.GBlurVRT, PostProcessManager.GBlurHRT);
+                    PostProcessManager.DOF(PostProcessManager.GBlurHRT, PostProcessManager.GBlurVRT);
                 }
                 else
                 {
                     PostProcessManager.ChangeRenderMode(RenderMode.MotionBlur);
-                    PostProcessManager.RenderMotionBlur(PostProcessManager.mainRT, PostProcessManager.GBlurHRT);
+                    PostProcessManager.RenderMotionBlur(result, PostProcessManager.GBlurHRT);
                 }
                 result = PostProcessManager.GBlurHRT;
             }
@@ -269,12 +290,8 @@ namespace XNA_PoolGame.Screens
                 if (World.dofType != DOFType.None)
                 {
                     PostProcessManager.ChangeRenderMode(RenderMode.DoF);
-                    PostProcessManager.DOF(PostProcessManager.mainRT, PostProcessManager.GBlurHRT);
+                    PostProcessManager.DOF(result, PostProcessManager.GBlurHRT);
                     result = PostProcessManager.GBlurHRT;
-                }
-                else
-                {
-                    result = PostProcessManager.mainRT;
                 }
             }
 
@@ -299,6 +316,11 @@ namespace XNA_PoolGame.Screens
             }
 
             #endregion
+
+            PostProcessManager.halfVertTIU.DontUse(); PostProcessManager.halfHorTIU.DontUse();
+            PostProcessManager.depthTIU.DontUse();
+            PostProcessManager.velocityTIU.DontUse(); PostProcessManager.velocityLastFrameTIU.DontUse();
+            if (PostProcessManager.distortionsample != null) PostProcessManager.distortionsample.DontUse();
 
             if (World.motionblurType != MotionBlurType.None)
             {

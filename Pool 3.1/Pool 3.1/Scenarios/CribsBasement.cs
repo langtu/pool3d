@@ -40,6 +40,9 @@ namespace XNA_PoolGame.Scenarios
         public ParticleSystem fireParticles = null;
         public ParticleSystem smokeParticles = null;
 
+        // Distortion
+        public ParticleSystem heatParticles = null;
+
         private ParticlesCore core;
         public CribsBasement(Game game)
             : base(game)
@@ -49,23 +52,30 @@ namespace XNA_PoolGame.Scenarios
 
         public override void Initialize()
         {
-            // PARTICLES
+            /////////// PARTICLES /////////// 
             fireParticles = new SmokeStackFireParticleSystem(Game, PoolGame.content);
             fireParticles.DrawOrder = 2;
-            
             PoolGame.game.Components.Add(fireParticles);
 
             smokeParticles = new SmokePlumeParticleSystem(Game, PoolGame.content);
             smokeParticles.DrawOrder = 1;
-
             PoolGame.game.Components.Add(smokeParticles);
-
+            ////////////////////////////////
             particles.Add(fireParticles);
             particles.Add(smokeParticles);
 
+            ////// DISTORTION PARTICLES ///// 
+            heatParticles = new HeatParticleSystem(Game, PoolGame.content);
+            heatParticles.DrawOrder = 3;
+            PoolGame.game.Components.Add(heatParticles);
+
+            distortionparticles.Add(heatParticles);
+
+            ////////////////////////////////
             core = new ParticlesCore(Game);
             core.Scenario = this;
             core.AddParticlesFromMultiMap(particles);
+            core.AddParticlesFromMultiMap(distortionparticles);
             core.BuildThread(true);
 
             smokestack = new Entity(PoolGame.game, "Models\\Cribs\\smokestack");
@@ -373,10 +383,7 @@ namespace XNA_PoolGame.Scenarios
         {
             base.LoadContent();
         }
-        public override void Draw(GameTime gameTime)
-        {
-            base.Draw(gameTime);
-        }
+
 
         public override void Update(GameTime gameTime)
         {
@@ -393,6 +400,11 @@ namespace XNA_PoolGame.Scenarios
                 fireParticles.AddParticle(center, Vector3.Zero);
             }
             fireParticles.AddParticle(center + new Vector3(0, 20, 0), Vector3.Zero);
+            for (int i = 0; i < 5; ++i)
+            {
+                heatParticles.AddParticle(center + new Vector3(-35.0f + (float)PoolGame.random.NextDouble() * 85, 60, -15.0f + (float)PoolGame.random.NextDouble() * 35), Vector3.Zero);
+            }
+
 
             const int smokeParticlesPerFrame = 20;
 
@@ -409,13 +421,6 @@ namespace XNA_PoolGame.Scenarios
         }
 
         
-
-        public override void SetParticleSettings()
-        {
-            fireParticles.SetCamera(World.camera.View, World.camera.Projection);
-            smokeParticles.SetCamera(World.camera.View, World.camera.Projection);
-        }
-
         #region Dispose
         protected override void Dispose(bool disposing)
         {
@@ -467,6 +472,11 @@ namespace XNA_PoolGame.Scenarios
 
             if (fireParticles != null) fireParticles.Dispose();
             if (smokeParticles != null) smokeParticles.Dispose();
+            if (heatParticles != null) heatParticles.Dispose();
+
+            fireParticles = null;
+            smokeParticles = null;
+            heatParticles = null;
 
             if (stairs != null) stairs.Dispose();
             if (rooflamps != null)

@@ -88,6 +88,7 @@
     <Compile Include="Graphics\DepthOfField.cs" />
     <Compile Include="Graphics\FullQuad.cs" />
     <Compile Include="Graphics\MotionBlur.cs" />
+    <Compile Include="Graphics\Particles\Fire\HeatParticleSystem.cs" />
     <Compile Include="Graphics\Shadows\ScreenSpaceShadowMapping.cs" />
     <Compile Include="Graphics\Shadows\Shadow.cs" />
     <Compile Include="Graphics\Shadows\PSMShadowMapping.cs" />

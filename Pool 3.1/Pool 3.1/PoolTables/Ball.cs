@@ -1036,7 +1036,7 @@ namespace XNA_PoolGame
                 {
                     float intersectValue = (float)intersectPos;
 
-                    if ((intersectValue >= 0.0f) && (intersectValue < vLength2))
+                    if ((intersectValue > 0.0f) && (intersectValue < vLength2))
                     {
                         float angle = (float)Maths.AngleBetweenVectors(table.planes[i].Normal, this.direction);
                         Vector3 tmp = this.Position + intersectValue * this.direction;

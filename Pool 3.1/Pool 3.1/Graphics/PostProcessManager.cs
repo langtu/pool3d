@@ -36,7 +36,8 @@ namespace XNA_PoolGame.Graphics
         public static Effect GBlurH;
         public static Effect GBlurV;
         public static Effect Depth;
-        public static Effect DoFCombine;
+        public static Effect distortionCombineEffect;
+
         public static BasicEffect basicEffect;
 
         // EFFECTS PARAMETERS
@@ -67,7 +68,9 @@ namespace XNA_PoolGame.Graphics
         public static RenderTarget2D depthRT;
         public static RenderTarget2D velocityRT, velocityRTLastFrame;
         public static List<TextureInUse> renderTargets;
-        
+
+        public static TextureInUse velocityTIU, velocityLastFrameTIU, depthTIU, halfVertTIU, halfHorTIU, mainTIU;
+        public static TextureInUse distortionsample;
         //
         public static Texture2D whiteTexture;
 
@@ -109,7 +112,7 @@ namespace XNA_PoolGame.Graphics
             gaussianBlurEffect = PoolGame.content.Load<Effect>("Effects\\GaussianBlur");
             saturation = PoolGame.content.Load<Effect>("Effects\\Saturate");
             modelEffect = PoolGame.content.Load<Effect>("Effects\\ModelEffect_MRT");
-            DoFCombine = PoolGame.content.Load<Effect>("Effects\\DofCombine");
+            distortionCombineEffect = PoolGame.content.Load<Effect>("Effects\\DistortionCombine");
             Depth = PoolGame.content.Load<Effect>("Effects\\Depth");
             PCFShadowMap = PoolGame.content.Load<Effect>("Effects\\PCFSM");
             GBlurH = PoolGame.content.Load<Effect>("Effects\\GBlurH");
@@ -124,6 +127,8 @@ namespace XNA_PoolGame.Graphics
             scalingEffect = PoolGame.content.Load<Effect>("Effects\\Scale");
             whiteTexture = PoolGame.content.Load<Texture2D>("Textures\\white");
 
+            distortionCombineEffect.Parameters["texelx"].SetValue(1.0f / (float)PoolGame.device.PresentationParameters.BackBufferWidth);
+            distortionCombineEffect.Parameters["texely"].SetValue(1.0f / (float)PoolGame.device.PresentationParameters.BackBufferHeight);
 
             basicEffect = new BasicEffect(PoolGame.device, null);
 
@@ -229,6 +234,7 @@ namespace XNA_PoolGame.Graphics
             }
             else
             {
+                depthTIU.Use();
                 PoolGame.device.SetRenderTarget(1, depthRT);
                 PoolGame.device.SetRenderTarget(2, velocityRT);
 
@@ -258,24 +264,6 @@ namespace XNA_PoolGame.Graphics
             depthOfField.DOF(source, result, depthRT, World.dofType);
 
         }
-        public static void CombineDOF()
-        {
-            PoolGame.device.ResolveBackBuffer(PostProcessManager.resolveTarget);
-
-            //Gaussian Blur H
-            PoolGame.device.SetRenderTarget(0, GBlurHRT);
-            DrawQuad(resolveTarget, GBlurH);
-
-            //Guassian Blur V
-            PoolGame.device.SetRenderTarget(0, GBlurVRT);
-            DrawQuad(GBlurHRT.GetTexture(), GBlurV);
-
-            PoolGame.device.SetRenderTarget(0, null);
-            PoolGame.device.Textures[0] = resolveTarget;
-            PoolGame.device.Textures[1] = GBlurVRT.GetTexture();
-            PoolGame.device.Textures[2] = depthRT.GetTexture();
-            DrawQuad(resolveTarget, DoFCombine);
-        }
         #endregion
         
         #region Initialize Render Targets
@@ -296,15 +284,16 @@ namespace XNA_PoolGame.Graphics
                 format, pp.MultiSampleType,
                 pp.MultiSampleQuality);
 
-            renderTargets.Add(new TextureInUse(halfRTHor, false));
+            halfHorTIU = new TextureInUse(halfRTHor, false);
+            renderTargets.Add(halfHorTIU);
 
             halfRTVert = new RenderTarget2D(PoolGame.device,
                 renderTargetWidth, renderTargetHeight, 1,
                 format, pp.MultiSampleType, pp.MultiSampleQuality);
 
 
-            //shadowMapTIU = new TextureInUse(halfRTVert, false);
-            renderTargets.Add(new TextureInUse(halfRTVert, false));
+            halfVertTIU = new TextureInUse(halfRTVert, false);
+            renderTargets.Add(halfVertTIU);
             
 
             
@@ -318,6 +307,9 @@ namespace XNA_PoolGame.Graphics
             depthRT = new RenderTarget2D(PoolGame.device, pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Single, pp.MultiSampleType,
                 pp.MultiSampleQuality, RenderTargetUsage.DiscardContents);
 
+            depthTIU = new TextureInUse(depthRT, false);
+            renderTargets.Add(depthTIU);
+
             velocityRT = new RenderTarget2D(PoolGame.device,
                                                 pp.BackBufferWidth,
                                                 pp.BackBufferHeight,
@@ -326,6 +318,9 @@ namespace XNA_PoolGame.Graphics
                                                 pp.MultiSampleType,
                                                 pp.MultiSampleQuality,
                                                 RenderTargetUsage.DiscardContents);
+
+            velocityTIU = new TextureInUse(velocityRT, false);
+            renderTargets.Add(velocityTIU);
 
             velocityRTLastFrame = new RenderTarget2D(PoolGame.device,
                                                 pp.BackBufferWidth,
@@ -336,10 +331,15 @@ namespace XNA_PoolGame.Graphics
                                                 pp.MultiSampleQuality,
                                                 RenderTargetUsage.DiscardContents);
 
+
+            velocityLastFrameTIU = new TextureInUse(velocityRTLastFrame, false);
+            renderTargets.Add(velocityLastFrameTIU);
+
             mainRT = new RenderTarget2D(PoolGame.device, pp.BackBufferWidth, pp.BackBufferHeight, 1, format, pp.MultiSampleType,
                 pp.MultiSampleQuality, RenderTargetUsage.DiscardContents);
-            
-            //renderTargets.Add(new TextureInUse(mainRT, false));
+
+            mainTIU = new TextureInUse(mainRT, false);
+            renderTargets.Add(mainTIU);
 
             
             resolveTarget = new ResolveTexture2D(PoolGame.device, width, height, 1, format);
@@ -488,6 +488,7 @@ namespace XNA_PoolGame.Graphics
             spriteBatch.Dispose();
 
             // EFFECT'S DISPOSING
+            distortionCombineEffect.Dispose();
             motionblurEffect.Dispose();
             bloomExtractEffect.Dispose();
             bloomCombineEffect.Dispose();
@@ -533,9 +534,9 @@ namespace XNA_PoolGame.Graphics
         public static void DrawBloomPostProcessing(RenderTarget2D input, RenderTarget2D result, GameTime gameTime)
         {
             bloomExtractEffect.Parameters["BloomThreshold"].SetValue(bloomSettings.BloomThreshold);
-
-
             //PoolGame.device.ResolveBackBuffer(PostProcessManager.resolveTarget);
+
+            PostProcessManager.halfHorTIU.Use(); PostProcessManager.halfVertTIU.Use();
 
             PoolGame.device.SetRenderTarget(0, halfRTHor);
             DrawQuad(input.GetTexture(), bloomExtractEffect, IntermediateBuffer.PreBloom);
@@ -566,16 +567,24 @@ namespace XNA_PoolGame.Graphics
             PoolGame.device.Textures[1] = tex;
 
             DrawQuad(halfRTHor.GetTexture(), PostProcessManager.bloomCombineEffect, IntermediateBuffer.FinalResult);
-
+            PoolGame.device.Textures[1] = null;
         }
 
         #endregion
 
+        public static void DistorionParticles()
+        {
+            PoolGame.device.RenderState.DepthBufferEnable = true;
+            PoolGame.device.RenderState.DepthBufferWriteEnable = false;
+            distortionsample = GetIntermediateTexture();
+            PoolGame.device.SetRenderTarget(0, distortionsample.renderTarget);
+            PoolGame.device.Clear(Color.Black);
+        }
 
         public static void RenderMotionBlur(RenderTarget2D source, RenderTarget2D result)
         {
 
-
+            velocityTIU.Use(); velocityLastFrameTIU.Use();
             motionBlur.DoMotionBlur(source, result, depthRT,
                     velocityRT, velocityRTLastFrame, World.camera, World.camera.PrevView * World.camera.Projection,
                     World.motionblurType);
@@ -584,6 +593,12 @@ namespace XNA_PoolGame.Graphics
             RenderTarget2D temp = velocityRTLastFrame;
             velocityRTLastFrame = velocityRT;
             velocityRT = temp;
+        }
+
+        public static TextureInUse GetIntermediateTexture()
+        {
+            PresentationParameters pp = PoolGame.device.PresentationParameters;
+            return GetIntermediateTexture(pp.BackBufferWidth, pp.BackBufferHeight, pp.BackBufferFormat, pp.MultiSampleType, pp.MultiSampleQuality);
         }
 
         public static TextureInUse GetIntermediateTexture(int width, int height, SurfaceFormat format)
@@ -620,6 +635,7 @@ namespace XNA_PoolGame.Graphics
             newTexture.inUse = true;
             return newTexture;
         }
+        
 
         public class TextureInUse
         {
@@ -639,6 +655,16 @@ namespace XNA_PoolGame.Graphics
             {
                 inUse = false;
             }
+        }
+
+
+
+        public static void DistortionParticlesCombine(RenderTarget2D result)
+        {
+            PoolGame.device.SetRenderTarget(0, result);
+            distortionCombineEffect.Parameters["DistortionMap"].SetValue(distortionsample.renderTarget.GetTexture());
+
+            DrawQuad(mainRT.GetTexture(), distortionCombineEffect);
         }
     }
 }

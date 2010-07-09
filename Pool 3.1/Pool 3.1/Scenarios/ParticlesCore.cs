@@ -22,12 +22,13 @@ namespace XNA_PoolGame.Scenarios
             : base(_game)
         {
             particles = new List<ParticleSystem>();
+            World.scenario.Enabled = false;
             UseThread = true;
         }
 
         public void AddParticlesFromMultiMap(MultiMap<int, ParticleSystem> map)
         {
-            World.scenario.Enabled = false;
+            
             foreach (ParticleSystem particle in map)
             {
                 particle.Enabled = false;
@@ -38,9 +39,8 @@ namespace XNA_PoolGame.Scenarios
         {
             scenario.Update(gameTime);
             for (int i = 0; i < particles.Count; ++i)
-            {
                 particles[i].Update(gameTime);
-            }
+            
             base.Update(gameTime);
         }
     }

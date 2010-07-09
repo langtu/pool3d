@@ -297,12 +297,7 @@ technique NonRotatingParticles
 technique RotatingParticles
 {
     pass P0
-    {
-		//ZEnable = true; 
-		//ZWriteEnable = false; 
-		//CullMode = cw; 
-		//AlphaBlendEnable = true;
-		
+    {		
         VertexShader = compile vs_3_0 VertexShader();
         PixelShader = compile ps_3_0 RotatingPixelShader();
     }

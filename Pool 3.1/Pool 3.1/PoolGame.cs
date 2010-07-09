@@ -90,8 +90,8 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 600;
-            graphics.PreferredBackBufferHeight = 480;
+            graphics.PreferredBackBufferWidth = 1280;
+            graphics.PreferredBackBufferHeight = 720;
             graphics.SynchronizeWithVerticalRetrace = false;
             //graphics.PreferMultiSampling = true;
             
@@ -494,21 +494,21 @@ namespace XNA_PoolGame
             if (World.displayShadows && World.displayShadowsTextures)
             {
                 Texture2D endTexture = PostProcessManager.shadows.ShadowMapRT[0].GetTexture();
-                //Texture2D endTexture = PostProcessManager.depthRT.GetTexture();
+                //Texture2D endTexture = PostProcessManager.distortionsample.renderTarget.GetTexture();
                 //Texture2D endTexture = PostProcessManager.motionBlur.RT.GetTexture();
-                Rectangle rect = new Rectangle(0, 0, 128, 128);
+                Rectangle rect = new Rectangle(0, 0, 256, 256);
 
                 batch.Begin(SpriteBlendMode.None);
                 //batch.Begin();
                 batch.Draw(endTexture, rect, Color.White);
 
 
-                endTexture = PostProcessManager.shadows.ShadowMapRT[1].GetTexture();
+                /*endTexture = PostProcessManager.shadows.ShadowMapRT[1].GetTexture();
                 //endTexture = PostProcessManager.shadows.ShadowRT.GetTexture();
                 rect = new Rectangle(0, 128, 128, 128);
                 //rect = new Rectangle(0, 0, Width, Height);
                 batch.Draw(endTexture, rect, Color.White);
-
+                */
                 
                 //endTexture = PostProcessManager.GBlurVRT.GetTexture();
                 //rect = new Rectangle(0, 128*2, 128, 128);
