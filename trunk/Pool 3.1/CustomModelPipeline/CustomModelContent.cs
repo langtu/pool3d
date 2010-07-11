@@ -36,14 +36,14 @@ namespace CustomModelPipeline
     {
         // Internally our custom model is made up from a list of model parts.
         [ContentSerializer]
-        List<ModelPart> modelParts = new List<ModelPart>();
+        List<CustomModelPart> modelParts = new List<CustomModelPart>();
 
 
         // Each model part represents a piece of geometry that uses one single
         // effect. Multiple parts are needed to represent models that use more
         // than one effect.
-        [ContentSerializerRuntimeType("XNA_PoolGame.Graphics.Models.CustomModel+ModelPart, XNA_PoolGame")]
-        public class ModelPart
+        [ContentSerializerRuntimeType("XNA_PoolGame.Graphics.Models.CustomModelPart, XNA_PoolGame")]
+        public class CustomModelPart
         {
             public BoundingBox AABox;
             public BoundingSphere Sphere;
@@ -65,7 +65,7 @@ namespace CustomModelPipeline
             public VertexBufferContent VertexBufferContent;
             public IndexCollection IndexCollection;
             //public VertexBuffer pp;
-            // A single material instance may be shared by more than one ModelPart,
+            // A single material instance may be shared by more than one CustomModelPart,
             // in which case we only want to write a single copy of the material
             // data into the XNB file. The SharedResource attribute tells the
             // serializer to take care of this merging for us.
@@ -76,7 +76,7 @@ namespace CustomModelPipeline
 
         /// <summary>
         /// Helper function used by the CustomModelProcessor
-        /// to add new ModelPart information.
+        /// to add new CustomModelPart information.
         /// </summary>
         public void AddModelPart(int triangleCount, int vertexCount, int vertexStride,
                                  VertexElement[] vertexElements,
@@ -84,7 +84,7 @@ namespace CustomModelPipeline
                                  IndexCollection indexCollection,
                                  MaterialContent materialContent, BoundingBox bbox)
         {
-            ModelPart modelPart = new ModelPart();
+            CustomModelPart modelPart = new CustomModelPart();
             Vector3 center = (bbox.Max + bbox.Min) / 2.0f;
             Vector3 radius = (bbox.Max - bbox.Min) / 2.0f;
 
