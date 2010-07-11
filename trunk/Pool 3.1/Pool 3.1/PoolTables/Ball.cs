@@ -1036,7 +1036,7 @@ namespace XNA_PoolGame
                 {
                     float intersectValue = (float)intersectPos;
 
-                    if ((intersectValue > 0.0f) && (intersectValue < vLength2))
+                    if ((intersectValue >= 0.0f) && (intersectValue < vLength2))
                     {
                         float angle = (float)Maths.AngleBetweenVectors(table.planes[i].Normal, this.direction);
                         Vector3 tmp = this.Position + intersectValue * this.direction;
@@ -1113,9 +1113,9 @@ namespace XNA_PoolGame
                 lock (this.syncObject)
                 {
                     Vector3 normal = new Vector3(-(this.Position.X + point.X) + table.pockets[this.pocketWhereAt].bounds.Center.X, 0.0f, -(this.Position.Z + point.Z) + table.pockets[this.pocketWhereAt].bounds.Center.Z);
-                    
-                    //normal.X += (float)PoolGame.random.NextDouble() * 50.0f;
-                    //normal.Z += (float)PoolGame.random.NextDouble() * 50.0f;
+
+                    //normal.X += (float)Maths.random.NextDouble() * 50.0f;
+                    //normal.Z += (float)Maths.random.NextDouble() * 50.0f;
                     if (normal.LengthSquared() > 0.0f)
                     {
                         normal.Normalize();

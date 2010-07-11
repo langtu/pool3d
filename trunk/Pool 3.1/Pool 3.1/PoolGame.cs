@@ -60,7 +60,6 @@ namespace XNA_PoolGame
 
         private static int width, height;
         public static PoolGame game;
-        public static Random random;
 
         //public static BloomComponent bloom;
 
@@ -90,8 +89,8 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 1280;
-            graphics.PreferredBackBufferHeight = 720;
+            graphics.PreferredBackBufferWidth = 600;
+            graphics.PreferredBackBufferHeight = 480;
             graphics.SynchronizeWithVerticalRetrace = false;
             //graphics.PreferMultiSampling = true;
             
@@ -115,13 +114,7 @@ namespace XNA_PoolGame
 
             this.IsFixedTimeStep = false;
             //this.TargetElapsedTime = TimeSpan.FromMilliseconds(16);
-
-            random = new Random();
-
-            
-
-
-            
+           
         }
 
         void graphics_PreparingDeviceSettings(object sender, PreparingDeviceSettingsEventArgs e)
@@ -311,7 +304,15 @@ namespace XNA_PoolGame
 
             if (kb.IsKeyDown(Keys.L) && lastkb.IsKeyUp(Keys.L) && World.playerInTurn != -1)
             {
+                if (World.motionblurType == MotionBlurType.None)
+                {
+                    PostProcessManager.velocityRTLastFrame = PostProcessManager.velocityRT;
+                    foreach (Entity e in World.scenario.objects)
+                        e.SetPreviousWorld();
 
+                    World.camera.PrevViewProjection = World.camera.ViewProjection;
+                    World.camera.PrevView = World.camera.View;
+                }
                 World.motionblurType = (MotionBlurType)(((int)World.motionblurType + 1) % 10);
 
             }
@@ -493,14 +494,17 @@ namespace XNA_PoolGame
             // Show Shadow Map Texture (depth) 
             if (World.displayShadows && World.displayShadowsTextures)
             {
-                Texture2D endTexture = PostProcessManager.shadows.ShadowMapRT[0].GetTexture();
-                //Texture2D endTexture = PostProcessManager.distortionsample.renderTarget.GetTexture();
-                //Texture2D endTexture = PostProcessManager.motionBlur.RT.GetTexture();
+                Texture2D endTexture = null;
+                //endTexture = PostProcessManager.shadows.ShadowMapRT[0].GetTexture();
+                //endTexture = PostProcessManager.distortionsample.renderTarget.GetTexture();
+                //endTexture = PostProcessManager.motionBlur.RT.GetTexture();
+                if (World.dofType != DOFType.None || World.motionblurType != MotionBlurType.None) endTexture = PostProcessManager.depthRT.GetTexture();
                 Rectangle rect = new Rectangle(0, 0, 256, 256);
 
+                
                 batch.Begin(SpriteBlendMode.None);
                 //batch.Begin();
-                batch.Draw(endTexture, rect, Color.White);
+                if (endTexture != null) batch.Draw(endTexture, rect, Color.White);
 
 
                 /*endTexture = PostProcessManager.shadows.ShadowMapRT[1].GetTexture();

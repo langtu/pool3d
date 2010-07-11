@@ -207,7 +207,6 @@ namespace XNA_PoolGame
                 table.roundInfo.cueballPotted = false;
                 table.roundInfo.cueBallInHand = false;
 
-                stick.ballTarget.isMotionBlurred = true;
                 Vector3 force = new Vector3(stick.Direction.X, 0.0f, stick.Direction.Z) * stick.Power * 2.5f;
                 //stick.ballTarget.acceleration = force / stick.ballTarget.Mass;
 

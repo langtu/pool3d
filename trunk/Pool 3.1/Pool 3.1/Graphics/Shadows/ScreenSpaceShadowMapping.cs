@@ -56,13 +56,13 @@ namespace XNA_PoolGame.Graphics.Shadows
             PostProcessManager.ChangeRenderMode(RenderMode.ShadowMapRender);
 
             oldBuffer = PoolGame.device.DepthStencilBuffer;
-            World.lightpass = 0;
+            lightpass = 0;
             for (int i = 0; i < LightManager.totalLights; ++i)
             {
                 RenderShadowMap(i);
                 shadowMapTIU[i].Use();
                 World.scenario.DrawScene(gameTime);
-                World.lightpass++;
+                lightpass++;
             }
 
             ///////////////// PASS 2 ////////////////////

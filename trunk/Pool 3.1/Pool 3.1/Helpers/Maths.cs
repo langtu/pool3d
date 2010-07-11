@@ -7,8 +7,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace XNA_PoolGame.Helpers
 {
+    
     public static class Maths
     {
+        public static Random random = new Random(Environment.TickCount);
         public static double AngleBetweenVectors(Vector3 first, Vector3 second)
         {
             float dot = Vector3.Dot(first, second);
@@ -20,7 +22,7 @@ namespace XNA_PoolGame.Helpers
             const float radius = 100;
             const float height = 400;
 
-            double angle = PoolGame.random.NextDouble() * Math.PI * 2;
+            double angle = random.NextDouble() * Math.PI * 2;
 
             float x = (float)Math.Cos(angle);
             float y = (float)Math.Sin(angle);
@@ -30,15 +32,20 @@ namespace XNA_PoolGame.Helpers
 
         public static Vector3 RandomPointOnCube(Vector3 center, float side)
         {
-            float signX = PoolGame.random.NextDouble() < 0.5 ? -1 : 1;
-            float signY = PoolGame.random.NextDouble() < 0.5 ? -1 : 1;
-            float signZ = PoolGame.random.NextDouble() < 0.5 ? -1 : 1;
+            float signX = random.NextDouble() < 0.5 ? -1 : 1;
+            float signY = random.NextDouble() < 0.5 ? -1 : 1;
+            float signZ = random.NextDouble() < 0.5 ? -1 : 1;
 
-            float x = signX * (float)PoolGame.random.NextDouble() * side;
-            float y = signY * (float)PoolGame.random.NextDouble() * side;
-            float z = signZ * (float)PoolGame.random.NextDouble() * side;
+            float x = signX * (float)random.NextDouble() * side;
+            float y = signY * (float)random.NextDouble() * side;
+            float z = signZ * (float)random.NextDouble() * side;
 
             return new Vector3(x + center.X, y + center.Y, z + center.Z);
+        }
+        public static float RamdomNumberBetween(float fmin, float fmax)
+        {
+
+            return fmin + ((float)random.NextDouble() * (fmax - fmin));
         }
         public static Matrix CalcLightProjection(Vector3 lightPos, BoundingSphere bounds, Viewport viewport)
         {

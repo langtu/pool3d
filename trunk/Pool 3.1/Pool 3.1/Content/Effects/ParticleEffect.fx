@@ -198,7 +198,8 @@ VertexShaderOutput VertexShader(VertexShaderInput input)
     output.Color = ComputeParticleColor(output.Position, input.Random.z, normalizedAge);
     output.Rotation = ComputeParticleRotation(input.Random.w, age);
     output.PositionViewS = mul(pos, View);
-    //output.PositionViewS = 0;
+    //output.PositionViewS = pos.z / pos.w;
+    
     return output;
 }
 
@@ -223,7 +224,7 @@ PS_MRT_Output NonRotatingPixelShader(NonRotatingPixelShaderInput input)
 {
 	PS_MRT_Output output;
 	output.Color = tex2D(Sampler, input.TextureCoordinate) * input.Color;
-	output.DepthColor = 0;//float4(-input.PositionViewS.z / MaxDepth, 1.0f, 1.0f, 1.0f);
+	output.DepthColor = 0;//float4((-input.PositionViewS.z / MaxDepth)*output.Color.a, 1.0f, 1.0f, 1.0f);
 	output.Velocity = 0;
     return output;
 }
@@ -276,7 +277,7 @@ PS_MRT_Output RotatingPixelShader(RotatingPixelShaderInput input)
     textureCoordinate += 0.5;
 
 	output.Color = tex2D(Sampler, textureCoordinate) * input.Color;
-	output.DepthColor = 0;//float4((-input.PositionViewS.z / MaxDepth) * input.Color.a, 1.0f, 1.0f, 1.0f);
+	output.DepthColor = 0;//float4((-input.PositionViewS.z / MaxDepth)*output.Color.a, 1.0f, 1.0f, 1.0f);
 	output.Velocity = 0;
     return output;
 }

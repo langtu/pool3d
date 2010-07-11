@@ -9,6 +9,7 @@ using XNA_PoolGame.Graphics.Particles;
 using XNA_PoolGame.Graphics.Particles.Fire;
 using XNA_PoolGame.Graphics.Models;
 using XNA_PoolGame.Graphics.Shadows;
+using XNA_PoolGame.Helpers;
 
 namespace XNA_PoolGame.Scenarios
 {
@@ -65,17 +66,20 @@ namespace XNA_PoolGame.Scenarios
             particles.Add(smokeParticles);
 
             ////// DISTORTION PARTICLES ///// 
-            heatParticles = new HeatParticleSystem(Game, PoolGame.content);
-            heatParticles.DrawOrder = 3;
-            PoolGame.game.Components.Add(heatParticles);
+            if (World.doDistortion)
+            {
+                heatParticles = new HeatParticleSystem(Game, PoolGame.content);
+                heatParticles.DrawOrder = 3;
+                PoolGame.game.Components.Add(heatParticles);
 
-            distortionparticles.Add(heatParticles);
+                distortionparticles.Add(heatParticles);
+            }
 
             ////////////////////////////////
             core = new ParticlesCore(Game);
             core.Scenario = this;
             core.AddParticlesFromMultiMap(particles);
-            core.AddParticlesFromMultiMap(distortionparticles);
+            if (World.doDistortion) core.AddParticlesFromMultiMap(distortionparticles);
             core.BuildThread(true);
 
             smokestack = new Entity(PoolGame.game, "Models\\Cribs\\smokestack");
@@ -83,6 +87,11 @@ namespace XNA_PoolGame.Scenarios
             //smokestack.InitialRotation = Matrix.CreateRotationY(MathHelper.PiOver2);
             smokestack.SpecularColor = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
             smokestack.DrawOrder = 3;
+            Light light1 = new Light(smokestack.Position + Vector3.Up * 20.0f);
+            light1.LightType = LightType.PointLight;
+            light1.DiffuseColor = new Vector4(0.5f, .15f, .075f, 1.0f);
+            light1.Radius = 300.0f;
+            smokestack.AddLight(light1);
 
             PoolGame.game.Components.Add(smokestack);
 
@@ -90,7 +99,7 @@ namespace XNA_PoolGame.Scenarios
             smokeStackFireWood.Position = smokestack.Position + new Vector3(0, 40.0f, -40.0f);
             smokeStackFireWood.PreRotation = Matrix.CreateRotationY(-MathHelper.PiOver2);
             smokeStackFireWood.SpecularColor = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
-            //smokeStackFireWood.DrawOrder = -1;
+            smokeStackFireWood.AditionalLights = smokestack.AditionalLights;
 
             PoolGame.game.Components.Add(smokeStackFireWood);
 
@@ -146,12 +155,12 @@ namespace XNA_PoolGame.Scenarios
             for (int i = 0; i < poolBallsOnCueRack.Length; ++i)
             {
                 int randomNumber;
-                while (ballsOnUse[randomNumber = PoolGame.random.Next(0, 15)]) ;
+                while (ballsOnUse[randomNumber = Maths.random.Next(0, 15)]) ;
 
                 poolBallsOnCueRack[i] = new Entity(PoolGame.game, "Models\\Balls\\newball", "Textures\\Balls\\ball " + (randomNumber + 1));
                 poolBallsOnCueRack[i].Position = cueRack.Position + new Vector3((ballDiameter * (float)(i - 3)), 101.09f + (16.229f + 11.275f), 0);
-                poolBallsOnCueRack[i].Rotation = Matrix.CreateRotationY(MathHelper.Pi * (float)PoolGame.random.NextDouble())
-                    * Matrix.CreateRotationZ(MathHelper.Pi * (float)PoolGame.random.NextDouble());
+                poolBallsOnCueRack[i].Rotation = Matrix.CreateRotationY(MathHelper.Pi * (float)Maths.random.NextDouble())
+                    * Matrix.CreateRotationZ(MathHelper.Pi * (float)Maths.random.NextDouble());
 
                 ballsOnUse[randomNumber] = true;
                 PoolGame.game.Components.Add(poolBallsOnCueRack[i]);
@@ -170,8 +179,8 @@ namespace XNA_PoolGame.Scenarios
                 else
                     sticksOnCueRack[i].Position = cueRack.Position + new Vector3((stickDiameter * (float)(i - 3)) + 124.425f, 42.369f, 0);
 
-                sticksOnCueRack[i].Rotation = Matrix.CreateRotationY(MathHelper.Pi * (float)PoolGame.random.NextDouble());
-                //* Matrix.CreateRotationZ(MathHelper.Pi * (float)PoolGame.random.NextDouble());
+                sticksOnCueRack[i].Rotation = Matrix.CreateRotationY(MathHelper.Pi * (float)Maths.random.NextDouble());
+                //* Matrix.CreateRotationZ(MathHelper.Pi * (float)Maths.random.NextDouble());
 
                 PoolGame.game.Components.Add(sticksOnCueRack[i]);
             }
@@ -212,14 +221,6 @@ namespace XNA_PoolGame.Scenarios
                 PoolGame.game.Components.Add(col);    
             }
 
-
-            /////////////// ROLLUP DOOR
-            //rollupDoor = new BasicModel(PoolGame.game, "Models\\Cribs\\rollup door");
-            //rollupDoor.Position = new Vector3(1250, 0.0f, 0.0f);
-            //rollupDoor.InitialRotation = Matrix.CreateRotationY(-MathHelper.PiOver2);
-
-            //PoolGame.game.Components.Add(rollupDoor);
-
             /////////////// SNOW WALL'S PAINTING
             snowPainting = new Entity(PoolGame.game, "Models\\Painting\\snow painting");
             snowPainting.Position = new Vector3(0, 350, -1092);
@@ -248,7 +249,7 @@ namespace XNA_PoolGame.Scenarios
             floor.normalMapAsset = "Textures\\Cribs\\floor_tile_ceramic2_N";
             //floor.normalMapAsset = "Textures\\Cribs\\PlanksNew0026_9_L2_N";
             floor.DrawOrder = 1;
-
+            floor.AditionalLights = smokestack.AditionalLights;
 
             PoolGame.game.Components.Add(floor);
 
@@ -274,6 +275,7 @@ namespace XNA_PoolGame.Scenarios
             {
                 wall.SpecularColor = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
                 wall.DrawOrder = 1;
+                //wall.MaterialDiffuse = new Vector4(0.7f, 1.0f, 1.0f, 1.0f);
                 //wall.TextureAsset = "Textures\\Cribs\\floor_tile_stoneIrregular";
 
                 //wall.normalMapAsset = "Textures\\Cribs\\ConcreteNew0003_S2_N";
@@ -383,11 +385,8 @@ namespace XNA_PoolGame.Scenarios
         {
             base.LoadContent();
         }
-
-
-        public override void Update(GameTime gameTime)
+        public override void UpdateParticles(GameTime gameTime)
         {
-            base.Update(gameTime);
             const int fireParticlesPerFrame = 13;
             //////const int fireParticlesPerFrame = 10;
 
@@ -400,9 +399,12 @@ namespace XNA_PoolGame.Scenarios
                 fireParticles.AddParticle(center, Vector3.Zero);
             }
             fireParticles.AddParticle(center + new Vector3(0, 20, 0), Vector3.Zero);
-            for (int i = 0; i < 5; ++i)
+            if (World.doDistortion)
             {
-                heatParticles.AddParticle(center + new Vector3(-35.0f + (float)PoolGame.random.NextDouble() * 85, 60, -15.0f + (float)PoolGame.random.NextDouble() * 35), Vector3.Zero);
+                for (int i = 0; i < 5; ++i)
+                {
+                    heatParticles.AddParticle(center + new Vector3(-35.0f + (float)Maths.random.NextDouble() * 85, 35, -15.0f + (float)Maths.random.NextDouble() * 35), Vector3.Zero);
+                }
             }
 
 
@@ -413,11 +415,23 @@ namespace XNA_PoolGame.Scenarios
                 smokeParticles.AddParticle(center + Vector3.Up * 10.0f, Vector3.Zero);
             }
 
-            
+
             //smokeParticles.AddParticle(new Vector3(0, 200, 0), Vector3.Zero);
             //smokeParticles.AddParticle(new Vector3(0, 200, 0), Vector3.Zero);
-            
+
             //smokeParticles.AddParticle(Maths.RandomPointOnCube(center + Vector3.Up * 60.0f, 90.0f), Vector3.Zero);
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            smokestack.AditionalLights[0].Position = smokestack.Position + new Vector3(Maths.RamdomNumberBetween(-5.0f, 50.0f), Maths.RamdomNumberBetween(20.0f, 45.0f), Maths.RamdomNumberBetween(-40.0f, 40.0f));
+            smokestack.AditionalLights[0].Radius = Maths.RamdomNumberBetween(200, 350);
+
+            smokestack.UpdateLightsProperties();
+            smokeStackFireWood.UpdateLightsProperties();
+            floor.UpdateLightsProperties();
+            base.Update(gameTime);
+            
         }
 
         
@@ -482,10 +496,12 @@ namespace XNA_PoolGame.Scenarios
             if (rooflamps != null)
                 foreach (Entity lamp in rooflamps)
                     lamp.Dispose();
-                
-            core.Dispose();
+
+            if (core != null) core.Dispose();
+            core = null;
             base.Dispose(disposing);
         }
         #endregion
+
     }
 }

@@ -21,6 +21,8 @@ namespace XNA_PoolGame.Scenarios
         /// </summary>
         public MultiMap<int, Entity> objects;
 
+        private Vector4 ambientColor;
+
         /// <summary>
         /// Lights from the scene
         /// </summary>
@@ -36,6 +38,11 @@ namespace XNA_PoolGame.Scenarios
         /// </summary>
         public MultiMap<int, ParticleSystem> distortionparticles;
 
+        public Vector4 AmbientColor
+        {
+            get { return ambientColor; }
+            set { ambientColor = value; }
+        }
         public Scenario(Game game)
             : base(game)
         {
@@ -43,7 +50,8 @@ namespace XNA_PoolGame.Scenarios
             particles = new MultiMap<int, ParticleSystem>();
             distortionparticles = new MultiMap<int, ParticleSystem>();
             lights = new List<Light>();
-            
+
+            this.ambientColor = new Vector4(0, 0, 0, 1);
             
             LoadLights();
         }
@@ -115,6 +123,8 @@ namespace XNA_PoolGame.Scenarios
             foreach (ParticleSystem particle in distortionparticles)
                 particle.SetCamera(World.camera.View, World.camera.Projection);
         }
+
+        public abstract void UpdateParticles(GameTime gameTime);
 
         protected override void Dispose(bool disposing)
         {

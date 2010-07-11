@@ -15,6 +15,7 @@ using XNA_PoolGame.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using XNA_PoolGame.Graphics.Models;
 using XNA_PoolGame.Graphics.Shadows;
+using TextureInUse = XNA_PoolGame.Graphics.PostProcessManager.TextureInUse;
 
 namespace XNA_PoolGame.Screens
 {
@@ -196,13 +197,16 @@ namespace XNA_PoolGame.Screens
         public override void Draw(GameTime gameTime)
         {
             PoolGame.game.PrepareRenderStates();
-            RenderTarget2D result = null;
+            TextureInUse resultTIU = null;
 
-            //if (World.dofType != DOFType.None)
-            //    PostProcessManager.depthTIU.Use();
+            List<TextureInUse> useless = new List<TextureInUse>();
+            TextureInUse distortionTIU;
+            /*if (World.dofType != DOFType.None)
+                PostProcessManager.depthTIU.Use();
             if (World.BloomPostProcessing)
             { PostProcessManager.halfHorTIU.Use(); PostProcessManager.halfVertTIU.Use(); }
-            
+            */
+
             #region SHADOW MAPPING
 
             if (World.displayShadows)
@@ -251,47 +255,63 @@ namespace XNA_PoolGame.Screens
             }
             #endregion
 
-            result = PostProcessManager.mainRT;
+            resultTIU = PostProcessManager.mainTIU;
             PoolGame.device.SetRenderTarget(0, null);
             if (!(World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None))
             {
                 PoolGame.device.SetRenderTarget(1, null);
                 PoolGame.device.SetRenderTarget(2, null);
             }
-
             if (World.doDistortion)
             {
-                PostProcessManager.DistortionParticlesCombine(PostProcessManager.GBlurVRT);
-                result = PostProcessManager.GBlurVRT;
-                PostProcessManager.mainTIU.DontUse();
+                distortionTIU = PostProcessManager.GetIntermediateTexture();
+                PostProcessManager.DistortionParticlesCombine(resultTIU.renderTarget, distortionTIU.renderTarget);
+                resultTIU.DontUse();
+                resultTIU = distortionTIU;
+                useless.Add(distortionTIU);
+
+                PostProcessManager.distortionsample.DontUse();
             }
 
-            #region MOTION BLUR AND DOF
+            #region MOTION BLUR AND DEPTH OF FIELD
 
             if (World.motionblurType != MotionBlurType.None)
             {
                 if (World.dofType != DOFType.None)
                 {
+                    TextureInUse texturetemp1 = PostProcessManager.GetIntermediateTexture();
                     PostProcessManager.ChangeRenderMode(RenderMode.MotionBlur);
-                    PostProcessManager.RenderMotionBlur(result, PostProcessManager.GBlurHRT);
+                    PostProcessManager.RenderMotionBlur(resultTIU.renderTarget, texturetemp1.renderTarget);
+                    resultTIU.DontUse();
 
+                    TextureInUse texturetemp2 = PostProcessManager.GetIntermediateTexture();
                     PostProcessManager.ChangeRenderMode(RenderMode.DoF);
-                    PostProcessManager.DOF(PostProcessManager.GBlurHRT, PostProcessManager.GBlurVRT);
+                    PostProcessManager.DOF(texturetemp1.renderTarget, texturetemp2.renderTarget);
+
+                    texturetemp1.DontUse();
+                    useless.Add(texturetemp2);
+                    resultTIU = texturetemp2;
                 }
                 else
                 {
+                    TextureInUse texturetemp = PostProcessManager.GetIntermediateTexture();
                     PostProcessManager.ChangeRenderMode(RenderMode.MotionBlur);
-                    PostProcessManager.RenderMotionBlur(result, PostProcessManager.GBlurHRT);
+                    PostProcessManager.RenderMotionBlur(resultTIU.renderTarget, texturetemp.renderTarget);
+
+                    useless.Add(texturetemp);
+                    resultTIU = texturetemp;
                 }
-                result = PostProcessManager.GBlurHRT;
             }
             else
             {
                 if (World.dofType != DOFType.None)
                 {
+                    TextureInUse texturetemp = PostProcessManager.GetIntermediateTexture();
                     PostProcessManager.ChangeRenderMode(RenderMode.DoF);
-                    PostProcessManager.DOF(result, PostProcessManager.GBlurHRT);
-                    result = PostProcessManager.GBlurHRT;
+                    PostProcessManager.DOF(resultTIU.renderTarget, texturetemp.renderTarget);
+                    resultTIU.DontUse();
+                    useless.Add(texturetemp);
+                    resultTIU = texturetemp;
                 }
             }
 
@@ -302,24 +322,25 @@ namespace XNA_PoolGame.Screens
             if (World.BloomPostProcessing)
             {
                 PostProcessManager.ChangeRenderMode(RenderMode.Bloom);
-                PostProcessManager.DrawBloomPostProcessing(result, null, gameTime);
+                PostProcessManager.DrawBloomPostProcessing(resultTIU.renderTarget, null, gameTime);
             }
             else
             {
-                
                 PoolGame.device.SetRenderTarget(0, null);
 
                 PostProcessManager.spriteBatch.Begin(SpriteBlendMode.None, SpriteSortMode.Immediate, SaveStateMode.SaveState);
-                PostProcessManager.spriteBatch.Draw(result.GetTexture(), Vector2.Zero, Color.White);
+                PostProcessManager.spriteBatch.Draw(resultTIU.renderTarget.GetTexture(), Vector2.Zero, Color.White);
                 PostProcessManager.spriteBatch.End();
-                
             }
 
             #endregion
 
+            for (int k = 0; k < useless.Count; ++k) useless[k].DontUse();
+            useless.Clear(); useless = null;
+            resultTIU.DontUse();
             PostProcessManager.halfVertTIU.DontUse(); PostProcessManager.halfHorTIU.DontUse();
             PostProcessManager.depthTIU.DontUse();
-            PostProcessManager.velocityTIU.DontUse(); PostProcessManager.velocityLastFrameTIU.DontUse();
+            //if (World.motionblurType == MotionBlurType.None) { PostProcessManager.velocityTIU.DontUse(); PostProcessManager.velocityLastFrameTIU.DontUse(); }
             if (PostProcessManager.distortionsample != null) PostProcessManager.distortionsample.DontUse();
 
             if (World.motionblurType != MotionBlurType.None)

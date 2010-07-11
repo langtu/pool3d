@@ -179,6 +179,7 @@ namespace CustomModelPipeline
             int triangleCount = geometry.Indices.Count / 3;
             int vertexCount = geometry.Vertices.VertexCount;
 
+            // Calculate boundingbox
             Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
             Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
 

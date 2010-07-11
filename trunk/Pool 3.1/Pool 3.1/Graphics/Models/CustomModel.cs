@@ -9,6 +9,9 @@ using XNA_PoolGame.Helpers;
 
 namespace XNA_PoolGame.Graphics.Models
 {
+    /// <summary>
+    /// Custom model loaded from the pipeline.
+    /// </summary>
     public class CustomModel
     {
         #region Fields
