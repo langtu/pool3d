@@ -300,8 +300,17 @@ namespace XNA_PoolGame
             if (kb.IsKeyDown(Keys.F2) && lastkb.IsKeyUp(Keys.F2))
             {
                 lock (World.scenario.syncobject)
-                World.doDistortion = !World.doDistortion;
+                    World.doDistortion = !World.doDistortion;
             }
+            if (kb.IsKeyDown(Keys.F3) && lastkb.IsKeyUp(Keys.F3))
+            {
+                int next = (((int)World.instancingTech) + 1);
+                if (next > (int)InstancingTechnique.NoInstancingOrStateBatching) World.instancingTech = 0;
+                else World.instancingTech = (InstancingTechnique)next;
+
+                ((CribsBasement)World.scenario).ballsinstanced.SetInstancingTechnique(World.instancingTech);
+            }
+            
 
             if (kb.IsKeyDown(Keys.K) && lastkb.IsKeyUp(Keys.K))
             {
@@ -485,10 +494,10 @@ namespace XNA_PoolGame
             {
                 Texture2D endTexture = null;
                 //endTexture = PostProcessManager.shadows.ShadowMapRT[0].GetTexture();
-                //endTexture = PostProcessManager.distortionsample.renderTarget.GetTexture();
+                endTexture = PostProcessManager.shadows.ShadowRT.GetTexture();
                 //endTexture = PostProcessManager.motionBlur.RT.GetTexture();
-                if (World.dofType != DOFType.None || World.motionblurType != MotionBlurType.None) endTexture = PostProcessManager.depthRT.GetTexture();
-                Rectangle rect = new Rectangle(0, 0, 256, 256);
+                //if (World.dofType != DOFType.None || World.motionblurType != MotionBlurType.None) endTexture = PostProcessManager.depthRT.GetTexture();
+                Rectangle rect = new Rectangle(0, 0, 128, 128);
 
                 
                 batch.Begin(SpriteBlendMode.None);
@@ -496,12 +505,12 @@ namespace XNA_PoolGame
                 if (endTexture != null) batch.Draw(endTexture, rect, Color.White);
 
 
-                /*endTexture = PostProcessManager.shadows.ShadowMapRT[1].GetTexture();
+                //endTexture = PostProcessManager.shadows.ShadowMapRT[1].GetTexture();
                 //endTexture = PostProcessManager.shadows.ShadowRT.GetTexture();
-                rect = new Rectangle(0, 128, 128, 128);
+                //rect = new Rectangle(0, 128, 512, 512);
                 //rect = new Rectangle(0, 0, Width, Height);
-                batch.Draw(endTexture, rect, Color.White);
-                */
+                //batch.Draw(endTexture, rect, Color.White);
+                
                 
                 //endTexture = PostProcessManager.GBlurVRT.GetTexture();
                 //rect = new Rectangle(0, 128*2, 128, 128);
@@ -575,7 +584,8 @@ namespace XNA_PoolGame
             text += "\nFarPlane: " + LightManager.lights[currentlight].LightFarPlane + " (KEYS: Z, X)";
             text += "\nFOV: " + LightManager.lights[currentlight].LightFOV + " (KEYS: +, -)";
             text += "\nPosition: " + LightManager.lights[currentlight].Position;
-            text += "\nDistortion: (F2)" + World.doDistortion;
+            text += "\nDistortion: " + World.doDistortion + " (F2)";
+            text += "\nInstancing technique: " + World.instancingTech.ToString() + " (F3)";
 
             batch.DrawString(spriteFont, text, new Vector2(18, height - 316), Color.Black);
             batch.DrawString(spriteFont, text, new Vector2(17, height - 317), Color.Tomato);

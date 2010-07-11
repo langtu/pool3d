@@ -1,6 +1,11 @@
 //-----------------------------------------
 //	ShadowMap
 //-----------------------------------------
+#define MAX_SHADER_MATRICES 60
+
+
+// Array of instance transforms used by the VFetch and ShaderInstancing techniques.
+float4x4 InstanceTransforms[MAX_SHADER_MATRICES];
 
 //------------------
 //--- Parameters ---
@@ -10,10 +15,10 @@ float4x4 ViewProj;
 //LIGHTS
 float4x4 LightViewProjs[2];
 float MaxDepths[2];
+float depthBias[2];
 int totalLights;
 
 float2 PCFSamples[9];
-float depthBias[2];
 
 Texture ShadowMap0;
 sampler ShadowMapSampler0 = sampler_state
@@ -51,13 +56,11 @@ struct VertexShaderOutput
 	float4 Position			: POSITION;
 	float4 ShadowMapPos[2]		: TEXCOORD0;
 	float4 RealDistance[2]     : TEXCOORD2;
-	//float4 ShadowMapPos1		: TEXCOORD2;
-	//float4 RealDistance1     : TEXCOORD3;
 };
 
 //--------------------
 //--- VertexShader ---
-VertexShaderOutput VertexShader(VertexShaderInput input)
+VertexShaderOutput PCFSM_VS(VertexShaderInput input)
 {
 	VertexShaderOutput output;
 	float4 worldPosition = mul(input.Position, World);
@@ -73,7 +76,7 @@ VertexShaderOutput VertexShader(VertexShaderInput input)
 
 //-------------------
 //--- PixelShader ---
-float4 PixelShader(VertexShaderOutput input) : COLOR
+float4 PCFSM_PS(VertexShaderOutput input) : COLOR
 {
     float2 ProjectedTexCoords;
     float4 wt[2];//= {{1.0f,1.0f,1.0f,1.0f}, {1.0f,1.0f,1.0f,1.0f}};
@@ -112,6 +115,61 @@ float4 PixelShader(VertexShaderOutput input) : COLOR
     return saturate(wt[0]*wt[1]);
 }
 
+////////////////////////////////////////////////////////////
+
+// Vertex shader helper function shared between the different instancing techniques.
+VertexShaderOutput VertexShaderCommon(VertexShaderInput input,
+                                      float4x4 instanceTransform)
+{
+	VertexShaderOutput output;
+	float4 worldPosition = mul(input.Position, instanceTransform);
+	output.Position = mul(worldPosition, ViewProj);
+	for (int light_i = 0; light_i < totalLights; ++light_i)
+    {
+		output.ShadowMapPos[light_i] = mul(worldPosition, LightViewProjs[light_i]);
+		output.RealDistance[light_i] = output.ShadowMapPos[light_i].z / MaxDepths[light_i];
+	}
+	return output;
+}
+
+// On Windows, we can use an array of shader constants to implement
+// instancing. The instance index is passed in as part of the vertex
+// buffer data, and we use that to decide which world transform should apply.
+VertexShaderOutput ShaderInstancingVertexShader(VertexShaderInput input,
+                                                float instanceIndex : TEXCOORD1)
+{
+    return VertexShaderCommon(input, InstanceTransforms[instanceIndex]);
+}
+
+// On Windows shader 3.0 cards, we can use hardware instancing, reading
+// the per-instance world transform directly from a secondary vertex stream.
+VertexShaderOutput HardwareInstancingVertexShader(VertexShaderInput input,
+                                                float4x4 instanceTransform : TEXCOORD1)
+{
+    return VertexShaderCommon(input, transpose(instanceTransform));
+}
+
+// Windows instancing technique for shader 2.0 cards.
+technique ShaderInstancingPCFSMTechnique
+{
+    pass P0
+    {
+        VertexShader = compile vs_2_0 ShaderInstancingVertexShader();
+        PixelShader = compile ps_3_0 PCFSM_PS();
+    }
+}
+
+// Windows instancing technique for shader 3.0 cards.
+technique HardwareInstancingPCFSMTechnique
+{
+    pass P0
+    {
+        VertexShader = compile vs_3_0 HardwareInstancingVertexShader();
+        PixelShader = compile ps_3_0 PCFSM_PS();
+    }
+}
+
+//#endif
 
 //------------------
 //--- Techniques ---
@@ -119,7 +177,8 @@ technique PCFSMTechnique
 {
     pass P0
     {
-          VertexShader = compile vs_3_0 VertexShader();
-          PixelShader = compile ps_3_0 PixelShader();
+          VertexShader = compile vs_3_0 PCFSM_VS();
+          PixelShader = compile ps_3_0 PCFSM_PS();
     }
 }
+

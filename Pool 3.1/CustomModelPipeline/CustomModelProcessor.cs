@@ -176,7 +176,8 @@ namespace CustomModelPipeline
         /// </summary>
         void ProcessGeometry(GeometryContent geometry)
         {
-            int triangleCount = geometry.Indices.Count / 3;
+            int indexCount = geometry.Indices.Count;
+            //int triangleCount = geometry.Indices.Count / 3;
             int vertexCount = geometry.Vertices.VertexCount;
 
             // Calculate boundingbox
@@ -205,7 +206,7 @@ namespace CustomModelPipeline
             MaterialContent material = ProcessMaterial(geometry.Material);
 
             // Add the new piece of geometry to our output model.
-            outputModel.AddModelPart(triangleCount, vertexCount, vertexStride,
+            outputModel.AddModelPart(indexCount, vertexCount, vertexStride,
                                      vertexElements, vertexBufferContent,
                                      geometry.Indices, material, new BoundingBox(min, max));
             

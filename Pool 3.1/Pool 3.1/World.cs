@@ -47,7 +47,6 @@ namespace XNA_PoolGame
         // NORMAL MAPPING
         public static DisplacementType displacementType = DisplacementType.None;
         
-
         // BLOOM
         public static bool BloomPostProcessing = true;
 
@@ -57,5 +56,8 @@ namespace XNA_PoolGame
 
         // DISTORTION
         public static bool doDistortion = true;
+
+        // INSTANCING MODELS
+        public static InstancingTechnique instancingTech = InstancingTechnique.HardwareInstancing;
     }
 }

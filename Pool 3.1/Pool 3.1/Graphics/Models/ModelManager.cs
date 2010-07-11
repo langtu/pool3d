@@ -49,7 +49,7 @@ namespace XNA_PoolGame.Graphics
             models.Add("Models\\poolTable2");
             models.Add("Models\\Sticks\\stick");
             models.Add("Models\\Sticks\\stick_universal");
-            models.Add("Models\\Balls\\test");
+            models.Add("Models\\Cribs\\rooflamp");
 
             foreach (String str in models)
                 LoadModel(str);
