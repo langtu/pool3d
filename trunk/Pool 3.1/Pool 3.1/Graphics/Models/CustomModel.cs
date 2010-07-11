@@ -23,29 +23,15 @@ namespace XNA_PoolGame.Graphics.Models
 
         // Internally our custom model is made up from a list of model parts.
         [ContentSerializer]
-        public List<ModelPart> modelParts;
-
+        public List<CustomModelPart> modelParts;
 
         // Each model part represents a piece of geometry that uses one
         // single effect. Multiple parts are needed for models that use
         // more than one effect.
+        // See CustomModelPart..
 
-        public class ModelPart
-        {
-            public BoundingBox AABox;
-            public BoundingSphere Sphere;
-            public int TriangleCount;
-            public int VertexCount;
-            public int VertexStride;
-
-            public VertexDeclaration VertexDeclaration;
-            public VertexBuffer VertexBuffer;
-            public IndexBuffer IndexBuffer;
-
-            [ContentSerializer(SharedResource = true)]
-            public Effect Effect;
-        }
-
+        // Keep track of what graphics device we are using.
+        GraphicsDevice graphicsDevice;
 
 #pragma warning restore 649
 
@@ -59,13 +45,96 @@ namespace XNA_PoolGame.Graphics.Models
         }
 
         /// <summary>
+        /// Initializes the instancing data.
+        /// </summary>
+        public void Initialize(GraphicsDevice device)
+        {
+            graphicsDevice = device;
+            foreach (CustomModelPart modelPart in modelParts)
+            {
+                BasicEffect be = (BasicEffect)modelPart.Effect;
+                modelPart.Initialize(device, be.Texture);
+            }
+            // Choose the best available instancing technique.
+            // For default is NoInstancing
+            InstancingTechnique technique = InstancingTechnique.NoInstancing;
+
+            SetInstancingTechnique(technique);
+        }
+
+        /// <summary>
+        /// Initializes the instancing data.
+        /// </summary>
+        public void Initialize(GraphicsDevice device, InstancingTechnique instancetech)
+        {
+            graphicsDevice = device;
+            foreach (CustomModelPart modelPart in modelParts)
+            {
+                BasicEffect be = (BasicEffect)modelPart.Effect;
+                modelPart.Initialize(device, be.Texture);
+            }
+            
+            SetInstancingTechnique(instancetech);
+        }
+
+        #region Technique Selection
+
+
+        /// <summary>
+        /// Gets the current instancing technique.
+        /// </summary>
+        public InstancingTechnique InstancingTechnique
+        {
+            get { return instancingTechnique; }
+        }
+
+        InstancingTechnique instancingTechnique;
+
+
+        /// <summary>
+        /// Changes which instancing technique we are using.
+        /// </summary>
+        public void SetInstancingTechnique(InstancingTechnique technique)
+        {
+            instancingTechnique = technique;
+
+            foreach (CustomModelPart modelPart in modelParts)
+            {
+                modelPart.SetInstancingTechnique(technique);
+            }
+        }
+
+
+        /// <summary>
+        /// Checks whether the specified instancing technique
+        /// is supported by the current graphics device.
+        /// </summary>
+        public bool IsTechniqueSupported(InstancingTechnique technique)
+        {
+#if !XBOX360
+            // Hardware instancing is only supported on pixel shader 3.0 devices.
+            if (technique == InstancingTechnique.HardwareInstancing)
+            {
+                return graphicsDevice.GraphicsDeviceCapabilities
+                                     .PixelShaderVersion.Major >= 3;
+            }
+#endif
+
+            // Otherwise, everything is good.
+            return true;
+        }
+
+
+        #endregion
+
+        /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
         public List<Texture2D> GetTextures()
         {
             List<Texture2D> list = new List<Texture2D>();
-            foreach (ModelPart modelPart in modelParts)
+            foreach (CustomModelPart modelPart in modelParts)
             {
                 BasicEffect be = (BasicEffect)modelPart.Effect;
                 list.Add(be.Texture);
@@ -76,19 +145,57 @@ namespace XNA_PoolGame.Graphics.Models
         public BoundingBox GetBoundingBox()
         {
             BoundingBox box = new BoundingBox();
-            foreach (ModelPart modelPart in modelParts)
+            foreach (CustomModelPart modelPart in modelParts)
             {
                 box = BoundingBox.CreateMerged(box, modelPart.AABox);
             }
             return box;
         }
 
+        /// <summary>
+        /// Draws a batch of instanced models.
+        /// </summary>
+        public void DrawInstances(Matrix[] instanceTransforms,
+                                  Matrix view, Matrix projection, Effect customEffect)
+        {
+            if (graphicsDevice == null)
+            {
+                throw new InvalidOperationException(
+                    "InstanceModel.Initialize must be called before DrawInstances.");
+            }
 
-        //public void Draw(Matrix world, Effect thisEffect, VolumeType volume, BoundingFrustum frustum, bool cull, bool drawvolume, int tin, out int ou)
-        //{
-        //    
-        //}
-        
+            if (instanceTransforms.Length == 0)
+                return;
+
+            foreach (CustomModelPart modelPart in modelParts)
+            {
+                modelPart.Draw(instancingTechnique, instanceTransforms,
+                               view, projection, customEffect, null);
+            }
+        }
+
+        /// <summary>
+        /// Draws a batch of instanced models.
+        /// </summary>
+        public void DrawInstances(Matrix[] instanceTransforms,
+                                  Matrix view, Matrix projection, Effect customEffect, Texture2D anotherTexture)
+        {
+            if (graphicsDevice == null)
+            {
+                throw new InvalidOperationException(
+                    "InstanceModel.Initialize must be called before DrawInstances.");
+            }
+
+            if (instanceTransforms.Length == 0)
+                return;
+
+            foreach (CustomModelPart modelPart in modelParts)
+            {
+                modelPart.Draw(instancingTechnique, instanceTransforms,
+                               view, projection, customEffect, anotherTexture);
+            }
+        }
+
         /// <summary>
         /// Draws the model using the specified camera matrices.
         /// </summary>
@@ -96,7 +203,7 @@ namespace XNA_PoolGame.Graphics.Models
         {
             objectsDrawnThisFrame = currentObjectsDrawn;
             int i = 0, j = 0;
-            foreach (ModelPart modelPart in modelParts)
+            foreach (CustomModelPart modelPart in modelParts)
             {
                 #region Culling
                 if (cull)
@@ -138,8 +245,8 @@ namespace XNA_PoolGame.Graphics.Models
 
                 if (textureenabled)
                 {
-                    if (customTexture == null) thisEffect.Parameters["TexColor"].SetValue(textures[i]);
-                    else thisEffect.Parameters["TexColor"].SetValue(customTexture);   
+                    if (customTexture == null) thisEffect.Parameters["Texture"].SetValue(textures[i]);
+                    else thisEffect.Parameters["Texture"].SetValue(customTexture);   
                 }
                 thisEffect.Parameters["World"].SetValue(world);
 
@@ -164,7 +271,7 @@ namespace XNA_PoolGame.Graphics.Models
                     // Draw the geometry.
                     device.DrawIndexedPrimitives(PrimitiveType.TriangleList,
                                                  0, 0, modelPart.VertexCount,
-                                                 0, modelPart.TriangleCount);
+                                                 0, modelPart.IndexCount);
 
                     thisEffect.CurrentTechnique.Passes[0].End();
                 }

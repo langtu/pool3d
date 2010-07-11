@@ -45,7 +45,7 @@ namespace CustomModelPipeline
                 }
             }
             
-            input.GenerateMipmaps(false);
+            input.GenerateMipmaps(true);
 
             // Compress the output texture.
             input.ConvertBitmapType(typeof(Dxt1BitmapContent));

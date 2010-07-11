@@ -44,7 +44,12 @@ namespace XNA_PoolGame.Scenarios
         // Distortion
         public ParticleSystem heatParticles = null;
 
+        //
         private ParticlesCore core;
+
+        //
+        public InstancedModel ballsinstanced;
+
         public CribsBasement(Game game)
             : base(game)
         {
@@ -53,6 +58,12 @@ namespace XNA_PoolGame.Scenarios
 
         public override void Initialize()
         {
+            ///////// INSTANCED MODEL ///////
+            ballsinstanced = new InstancedModel(PoolGame.game, "Models\\Balls\\newball");
+            ballsinstanced.DrawOrder = 5;
+            ballsinstanced.delegateupdate = delegate { UpdateInstanceWorldMatrix(); };
+            PoolGame.game.Components.Add(ballsinstanced);
+
             /////////// PARTICLES /////////// 
             fireParticles = new SmokeStackFireParticleSystem(Game, PoolGame.content);
             fireParticles.DrawOrder = 2;
@@ -159,6 +170,7 @@ namespace XNA_PoolGame.Scenarios
                     * Matrix.CreateRotationZ(MathHelper.Pi * (float)Maths.random.NextDouble());
 
                 ballsOnUse[randomNumber] = true;
+                poolBallsOnCueRack[i].Visible = false;
                 PoolGame.game.Components.Add(poolBallsOnCueRack[i]);
             }
 
@@ -304,6 +316,7 @@ namespace XNA_PoolGame.Scenarios
 
 
             ////////////////////////////////////////////////
+            World.scenario.Objects.Add(ballsinstanced);
             World.scenario.Objects.Add(smokestack);
             World.scenario.Objects.Add(smokeStackFireWood);
             
@@ -375,7 +388,15 @@ namespace XNA_PoolGame.Scenarios
             LightManager.Load();
         }
 
-        
+        private void UpdateInstanceWorldMatrix()
+        {
+            ballsinstanced.totalinstances = poolBallsOnCueRack.Length;
+            Array.Resize(ref ballsinstanced.transforms, ballsinstanced.totalinstances);
+            for (int i = 0; i < ballsinstanced.totalinstances; ++i)
+            {
+                ballsinstanced.transforms[i] = poolBallsOnCueRack[i].LocalWorld;
+            }
+        }
 
         public override void LoadContent()
         {
@@ -399,7 +420,7 @@ namespace XNA_PoolGame.Scenarios
             {
                 if (World.doDistortion)
                 {
-                    for (int i = 0; i < 7; ++i)
+                    for (int i = 0; i < 15; ++i)
                     {
                         heatParticles.AddParticle(center + new Vector3(-35.0f + (float)Maths.random.NextDouble() * 85, 45.0f, -35.0f + (float)Maths.random.NextDouble() * 70), Vector3.Zero);
                     }
@@ -498,6 +519,9 @@ namespace XNA_PoolGame.Scenarios
 
             if (core != null) core.Dispose();
             core = null;
+
+            if (ballsinstanced != null) ballsinstanced.Dispose();
+            ballsinstanced = null;
             base.Dispose(disposing);
         }
         #endregion

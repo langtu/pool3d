@@ -248,6 +248,7 @@ namespace XNA_PoolGame.Screens
                 PoolGame.device.SetRenderTarget(2, null);
             }
 
+            #region DISTORTION COMBINE
             if (World.doDistortion)
             {
                 distortionTIU = PostProcessManager.GetIntermediateTexture();
@@ -258,6 +259,7 @@ namespace XNA_PoolGame.Screens
 
                 PostProcessManager.distortionsample.DontUse();
             }
+            #endregion
 
             #region MOTION BLUR AND DEPTH OF FIELD
 

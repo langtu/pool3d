@@ -38,11 +38,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Balls\ball 13 1024.bmp">
-      <Name>ball 13 1024</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
     <Compile Include="Models\felt red 1024.bmp">
       <Name>felt red 1024</Name>
       <Importer>TextureImporter</Importer>
@@ -430,93 +425,8 @@
       <Importer>FontDescriptionImporter</Importer>
       <Processor>FontDescriptionProcessor</Processor>
     </Compile>
-    <Compile Include="Models\Balls\ball1.X">
-      <Name>ball1</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Balls\ball10.X">
-      <Name>ball10</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Balls\ball11.X">
-      <Name>ball11</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Balls\ball12.X">
-      <Name>ball12</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Balls\ball13.X">
-      <Name>ball13</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Balls\ball14.X">
-      <Name>ball14</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Balls\ball15.X">
-      <Name>ball15</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Balls\ball2.X">
-      <Name>ball2</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Balls\ball3.X">
-      <Name>ball3</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Balls\ball4.X">
-      <Name>ball4</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Balls\ball5.X">
-      <Name>ball5</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Balls\ball6.X">
-      <Name>ball6</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Balls\ball7.X">
-      <Name>ball7</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Balls\ball8.X">
-      <Name>ball8</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Balls\ball9.X">
-      <Name>ball9</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Balls\bola_blanca.X">
-      <Name>bola_blanca</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
     <Compile Include="Models\Balls\newball.X">
       <Name>newball</Name>
-      <Importer>XImporter</Importer>
-      <Processor>CustomModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Balls\test.X">
-      <Name>test</Name>
       <Importer>XImporter</Importer>
       <Processor>CustomModelProcessor</Processor>
     </Compile>
@@ -557,11 +467,6 @@
     </Compile>
     <Compile Include="Models\Cribs\floor.X">
       <Name>floor</Name>
-      <Importer>XImporter</Importer>
-      <Processor>CustomModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Cribs\floor2.X">
-      <Name>floor2</Name>
       <Importer>XImporter</Importer>
       <Processor>CustomModelProcessor</Processor>
     </Compile>
@@ -637,11 +542,6 @@
     </Compile>
     <Compile Include="Models\Garage\floor.X">
       <Name>floor</Name>
-      <Importer>XImporter</Importer>
-      <Processor>ModelProcessor</Processor>
-    </Compile>
-    <Compile Include="Models\Garage\floor2.X">
-      <Name>floor2</Name>
       <Importer>XImporter</Importer>
       <Processor>ModelProcessor</Processor>
     </Compile>
@@ -926,6 +826,78 @@
   <ItemGroup>
     <Compile Include="Textures\Balls\ball 2.jpg">
       <Name>ball 2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Balls\ball 1.jpg">
+      <Name>ball 1</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Balls\ball 10.jpg">
+      <Name>ball 10</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Balls\ball 11.jpg">
+      <Name>ball 11</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Balls\ball 12.jpg">
+      <Name>ball 12</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Balls\ball 13.jpg">
+      <Name>ball 13</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Balls\ball 14.jpg">
+      <Name>ball 14</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Balls\ball 15.jpg">
+      <Name>ball 15</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Balls\ball 3.jpg">
+      <Name>ball 3</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Balls\ball 4.jpg">
+      <Name>ball 4</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Balls\ball 5.jpg">
+      <Name>ball 5</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Balls\ball 6.jpg">
+      <Name>ball 6</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Balls\ball 7.jpg">
+      <Name>ball 7</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Balls\ball 8.jpg">
+      <Name>ball 8</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Balls\ball 9.jpg">
+      <Name>ball 9</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

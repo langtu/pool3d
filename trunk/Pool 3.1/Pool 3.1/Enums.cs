@@ -5,6 +5,21 @@ using System.Text;
 
 namespace XNA_PoolGame
 {
+    /// <summary>
+    /// Enum describes the various possible techniques
+    /// that can be chosen to implement instancing.
+    /// </summary>
+    public enum InstancingTechnique
+    {
+#if XBOX360
+        VFetchInstancing,
+#else
+        HardwareInstancing,
+        ShaderInstancing,
+#endif
+        NoInstancing,
+        NoInstancingOrStateBatching
+    }
     public enum LightType : int
     {
         PointLight = 0,

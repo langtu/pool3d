@@ -106,7 +106,6 @@
     <Compile Include="CustomModelMaterialProcessor.cs" />
     <Compile Include="CustomModelProcessor.cs" />
     <Compile Include="CustomTextureProcessor.cs" />
-    <Compile Include="NormalMappingModelProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

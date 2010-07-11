@@ -12,7 +12,6 @@ using XNA_PoolGame.Graphics.Shadows;
 using XNA_PoolGame.Helpers;
 using System.Threading;
 using System.Collections;
-using ModelPart = XNA_PoolGame.Graphics.Models.CustomModel.ModelPart;
 #endregion
 
 namespace XNA_PoolGame.Graphics.Models
@@ -24,8 +23,8 @@ namespace XNA_PoolGame.Graphics.Models
     {
         #region Variables
 
-        private CustomModel model = null;
-        private String modelName = null;
+        protected CustomModel model = null;
+        protected String modelName = null;
         protected String textureAsset = null;
         protected bool drawboundingvolume = false;
 
@@ -83,14 +82,14 @@ namespace XNA_PoolGame.Graphics.Models
 
         #region //// MODEL RELATED ////
 
-        private Matrix localWorld;
+        protected Matrix localWorld;
         private Vector3 position;
         private Matrix rotation;
         private Matrix preRotation;
         private Vector3 scale;
-        private List<Texture2D> textures;
-        private List<BoundingBox> boxes;
-        private Matrix prelocalWorld;
+        protected List<Texture2D> textures;
+        protected List<BoundingBox> boxes;
+        protected Matrix prelocalWorld;
 
         private bool worldDirty = true;
 
@@ -245,7 +244,7 @@ namespace XNA_PoolGame.Graphics.Models
         {
             GC.Collect();
             model = PoolGame.content.Load<CustomModel>(modelName);
-                        
+            
             // Load custom texture
             if (textureAsset != null) useTexture = PoolGame.content.Load<Texture2D>(textureAsset);
 
@@ -262,7 +261,7 @@ namespace XNA_PoolGame.Graphics.Models
             worldDirty = false;
             if (isObjectAtScenario)
             {
-                foreach (ModelPart modelPart in model.modelParts)
+                foreach (CustomModelPart modelPart in model.modelParts)
                 {
                     Vector3[] corners = modelPart.AABox.GetCorners();
                     Vector3 pointrotated = Vector3.Transform(corners[0], localWorld);
@@ -288,7 +287,7 @@ namespace XNA_PoolGame.Graphics.Models
 
         #region Update
 
-        private void updateLocalWorld()
+        protected virtual void updateLocalWorld()
         {
             if (worldDirty)
             {
@@ -299,7 +298,7 @@ namespace XNA_PoolGame.Graphics.Models
                 if (volume == VolumeType.BoundingBoxes)
                 {
                     int i = 0;
-                    foreach (ModelPart modelPart in model.modelParts)
+                    foreach (CustomModelPart modelPart in model.modelParts)
                     {
                         Vector3[] corners = modelPart.AABox.GetCorners();
                         Vector3 pointrotated = Vector3.Transform(corners[0], localWorld);
@@ -375,11 +374,6 @@ namespace XNA_PoolGame.Graphics.Models
                         //DrawModel(true, LightManager.lights, PostProcessManager.SSSoftShadow, "SSSTechnique", delegate { SetParametersSoftShadow(LightManager.lights); });
                     }
                     break;
-
-
-                case RenderMode.MotionBlur:
-                    
-                    break;
                 case RenderMode.BasicRender:
                     {
                         frustum = World.camera.FrustumCulling;
@@ -403,7 +397,7 @@ namespace XNA_PoolGame.Graphics.Models
         }
 
 
-        public void DrawModel(bool enableTexture, Effect effect, String technique, RenderHandler setParameter)
+        public virtual void DrawModel(bool enableTexture, Effect effect, string technique, RenderHandler setParameter)
         {
             if (setParameter != null) { setParameter.Invoke(); }
 
@@ -419,7 +413,7 @@ namespace XNA_PoolGame.Graphics.Models
             drawvolume &= drawboundingvolume;
 #endif
             int i = 0, j = 0;
-            foreach (ModelPart modelPart in model.modelParts)
+            foreach (CustomModelPart modelPart in model.modelParts)
             {
                 #region (1) Culling
 
@@ -461,7 +455,7 @@ namespace XNA_PoolGame.Graphics.Models
                     // Draw the geometry.
                     device.DrawIndexedPrimitives(PrimitiveType.TriangleList,
                                                  0, 0, modelPart.VertexCount,
-                                                 0, modelPart.TriangleCount);
+                                                 0, modelPart.IndexCount / 3);
 
                     pass.End();
                 }
@@ -563,7 +557,7 @@ namespace XNA_PoolGame.Graphics.Models
                                 
             }
         }
-        public bool ModelPartInFrustumVolume(ModelPart modelPart, int i)
+        public bool ModelPartInFrustumVolume(CustomModelPart modelPart, int i)
         {
             if (World.camera.EnableFrustumCulling && frustum != null)
             {
@@ -631,53 +625,7 @@ namespace XNA_PoolGame.Graphics.Models
             
             return true;
         }
-        public void BasicDraw()
-        {
-            BasicEffect basicEffect = PostProcessManager.basicEffect;
-
-            basicEffect.View = World.camera.View;
-            basicEffect.Projection = World.camera.Projection;
-
-            basicEffect.EnableDefaultLighting();
-            basicEffect.PreferPerPixelLighting = true;
-            Vector3 light0Direction = Vector3.Normalize(-LightManager.lights[0].Position);
-            basicEffect.DirectionalLight0.Direction = light0Direction;
-            basicEffect.DirectionalLight0.DiffuseColor = Vector3.One;
-            
-            basicEffect.AmbientLightColor = Vector3.Zero;
-
-            // Override the default specular color to make it nice and bright,
-            // so we'll get some decent glints that the bloom can key off.
-            basicEffect.SpecularColor = Vector3.One * 0.4f;
-            basicEffect.DiffuseColor = Vector3.One;
-
-            {
-                PoolGame.device.SamplerStates[0].AddressU = TEXTURE_ADDRESS_MODE;
-                PoolGame.device.SamplerStates[0].AddressV = TEXTURE_ADDRESS_MODE;
-            }
-
-            /*foreach (ModelMesh mesh in model.Meshes)
-            {
-                if (!ModelInFrustumVolume())
-                    continue;
-
-                foreach (ModelMeshPart part in mesh.MeshParts)
-                {
-                    basicEffect.World = bonetransforms[mesh.ParentBone.Index] * localWorld;
-                    basicEffect.TextureEnabled = true;
-
-                    if (textureAsset != null) basicEffect.Texture = useTexture;
-                    else basicEffect.Texture = effectMapping[part].texture;
-                    
-                    part.Effect = basicEffect;
-                }
-
-                mesh.Draw();
-                
-            }*/
-
-            
-        }
+        
 
 
         #endregion
@@ -805,20 +753,17 @@ namespace XNA_PoolGame.Graphics.Models
 
         public void SetParametersShadowMap(Light light)
         {
-            {
-                PostProcessManager.Depth.Parameters["ViewProj"].SetValue(light.LightViewProjection);
-            }
+            PostProcessManager.Depth.Parameters["ViewProj"].SetValue(light.LightViewProjection);
             PostProcessManager.Depth.Parameters["MaxDepth"].SetValue(light.LightFarPlane);
         }
 
         public void AddLight(Light light)
         {
             aditionalLights.Add(light);
-            lightsradius = null; lightscolors = null; lightspositions = null; lightstype = null;
-            lightsradius = new float[aditionalLights.Count];
-            lightscolors = new  Vector4[aditionalLights.Count];
-            lightspositions = new Vector4[aditionalLights.Count];
-            lightstype = new int[aditionalLights.Count];
+            Array.Resize(ref lightsradius, aditionalLights.Count);
+            Array.Resize(ref lightscolors, aditionalLights.Count);
+            Array.Resize(ref lightspositions, aditionalLights.Count);
+            Array.Resize(ref lightstype, aditionalLights.Count);
 
             UpdateLightsProperties();
         }

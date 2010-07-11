@@ -17,10 +17,10 @@ float4 vDiffuseColor = {1.0f, 1.0f, 1.0f, 1.0f};
 sampler ColorSampler : register(s0);
 
 
-/*Texture TexColor;
+/*Texture Texture;
 sampler ColorSampler = sampler_state
 {
-    Texture = <TexColor>;
+    Texture = <Texture>;
 
     MinFilter = ANISOTROPIC;
     MagFilter = ANISOTROPIC;

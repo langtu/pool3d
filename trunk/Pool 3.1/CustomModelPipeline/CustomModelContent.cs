@@ -47,7 +47,7 @@ namespace CustomModelPipeline
         {
             public BoundingBox AABox;
             public BoundingSphere Sphere;
-            public int TriangleCount;
+            public int IndexCount;
             public int VertexCount;
             public int VertexStride;
             
@@ -78,7 +78,7 @@ namespace CustomModelPipeline
         /// Helper function used by the CustomModelProcessor
         /// to add new CustomModelPart information.
         /// </summary>
-        public void AddModelPart(int triangleCount, int vertexCount, int vertexStride,
+        public void AddModelPart(int indexCount, int vertexCount, int vertexStride,
                                  VertexElement[] vertexElements,
                                  VertexBufferContent vertexBufferContent,
                                  IndexCollection indexCollection,
@@ -92,7 +92,7 @@ namespace CustomModelPipeline
 
             modelPart.AABox = bbox;
             modelPart.Sphere = sphere;
-            modelPart.TriangleCount = triangleCount;
+            modelPart.IndexCount = indexCount;
             modelPart.VertexCount = vertexCount;
             modelPart.VertexStride = vertexStride;
             modelPart.VertexElements = vertexElements;
