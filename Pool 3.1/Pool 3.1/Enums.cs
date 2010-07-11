@@ -5,6 +5,11 @@ using System.Text;
 
 namespace XNA_PoolGame
 {
+    public enum LightType : int
+    {
+        PointLight = 0,
+        DirectionalLight
+    }
     public enum VolumeType
     {
         BoundingBoxes,

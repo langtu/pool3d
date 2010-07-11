@@ -10,12 +10,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace XNA_PoolGame.Graphics.Shadows
 {
+    /// <summary>
+    /// Light.
+    /// </summary>
     public class Light
     {
         #region Fields
         private Vector3 position;
         private Vector3 lookAt;
-        private Vector4 ambientColor;
+        
         private Vector4 diffuseColor;
         private Vector4 specularColor;
         private float lightPower;
@@ -29,7 +32,8 @@ namespace XNA_PoolGame.Graphics.Shadows
         private float lightNearPlane = 0.01f;
         private float lightFarPlane = 1620.0f;
         private float depthBias = 0.0042f;
-
+        private LightType lightType = LightType.DirectionalLight;
+        private float radius;
         #endregion
 
         #region Dirty States
@@ -41,6 +45,16 @@ namespace XNA_PoolGame.Graphics.Shadows
         #endregion
 
         #region Properties
+        public LightType LightType
+        {
+            get { return lightType; }
+            set { lightType = value; }
+        }
+        public float Radius
+        {
+            get { return radius; }
+            set { radius = value; }
+        }
         public float DepthBias
         {
             get { return depthBias; }
@@ -153,12 +167,6 @@ namespace XNA_PoolGame.Graphics.Shadows
             set { diffuseColor = value; }
         }
 
-        public Vector4 AmbientColor
-        {
-            get { return ambientColor; }
-            set { ambientColor = value; }
-        }
-
         public Vector3 Position
         {
             get { return position; }
@@ -179,7 +187,6 @@ namespace XNA_PoolGame.Graphics.Shadows
             //this.ambientColor = new Vector4(0.1843f, 0.3098f, 0.3098f, 1);
             //this.diffuseColor = new Vector4(0.3921f, 0.5843f, 0.9294f, 1);
 
-            this.ambientColor = new Vector4(0, 0, 0, 1);
             this.diffuseColor = new Vector4(1f, 1f, 1f, 1);
             this.specularColor = new Vector4(1, 1, 1, 1);
             this.lightPower = 1f;

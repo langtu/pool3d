@@ -10,9 +10,16 @@ float4 CameraPosition;
 float Shineness = 96.0f;
 float MaxDepth;
 float4 vSpecularColor[2];// = {1.0f, 1.0f, 1.0f, 1.0f};
-float4 vAmbient[2]; //= {0.1f, 0.1f, 0.1f, 1.0f};
+float4 vAmbient; //= {0.1f, 0.1f, 0.1f, 1.0f};
 float4 vDiffuseColor[2];// = {1.0f, 1.0f, 1.0f, 1.0f};
+float4 materialDiffuseColor = {1.0f, 1.0f, 1.0f, 1.0f};
 int totalLights;
+
+float4 vaditionalLightColor[2];
+float4 vaditionalLightPositions[2];
+float vaditionalLightRadius[2];
+int vaditionalLightType[2];
+int aditionalLights = 0;
 // PARALLAX
 float    g_fHeightMapScale; 
 bool     g_bDisplayShadows = true;        
@@ -81,7 +88,6 @@ struct VS_ScreenSpaceShadow_Output
 {
     float4 Position			: POSITION;
     float2 TexCoord			: TEXCOORD0;
-    //float2 ProjCoord		: TEXCOORD1;
     float4 ScreenCoord		: TEXCOORD1;
     float4 WorldPosition	: TEXCOORD2;
     
@@ -146,13 +152,17 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output inp
 	
 	float fShadowTerm = tex2Dproj(BlurVSampler, input.ScreenCoord).x;
 	float4 totalDiffuse = float4(0,0,0,0);
-	float4 totalAmbient = float4(0,0,0,0);
 	float4 totalSpecular = float4(0,0,0,0);
+	//float totalselfshadowing = 1.0f;
 	for (int k = 0; k < totalLights; k++)
 	{
 		//
 		float3 LightDir = normalize(LightPosition[k] - input.WorldPosition);
-		float3 ViewDir = normalize(CameraPosition - input.WorldPosition);    
+		float3 ViewDir = normalize(CameraPosition - input.WorldPosition);
+		
+		// self shadowing
+	    //float selfshadow = saturate(4.0 * LightDir.z);
+	    //totalselfshadowing *= selfshadow;
 	    
 		// Calculate normal diffuse light.
 		float DiffuseLightingFactor = dot(LightDir, input.TBN[2]);
@@ -162,18 +172,39 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output inp
 		float Specular = pow(saturate(dot(Reflect, ViewDir)), Shineness); // R.V^n
 	    
 		// I = A + Dcolor * Dintensity * N.L + Scolor * Sintensity * (R.V)n
-	    totalDiffuse += vDiffuseColor[k] * DiffuseLightingFactor;
+	    totalDiffuse += (vDiffuseColor[k] * DiffuseLightingFactor);
 	    totalSpecular += vSpecularColor[k] * Specular;
-	    totalAmbient += vAmbient[k];
+	    
     }
-    
+    for (int k = 0; k < aditionalLights; ++k)
+    {
+		//
+		float3 LightDir = (vaditionalLightPositions[k] - input.WorldPosition);
+		
+		if (vaditionalLightType[k] == 0) // Point Light
+		{
+			float attenuation = saturate(1.0f - dot(LightDir / vaditionalLightRadius[k], LightDir / vaditionalLightRadius[k]));
+			
+			LightDir = normalize(LightDir);
+			float DiffuseLightingFactor = dot(LightDir, input.TBN[2]);
+			totalDiffuse += (vaditionalLightColor[k] * DiffuseLightingFactor) * attenuation;
+		} else if (vaditionalLightType[k] == 1)
+		{
+			LightDir = normalize(LightDir);
+			//float3 ViewDir = normalize(CameraPosition - input.WorldPosition);
+			
+			// Calculate normal diffuse light.
+			float DiffuseLightingFactor = dot(LightDir, input.TBN[2]);
+			totalDiffuse += (vaditionalLightColor[k] * DiffuseLightingFactor);
+		}
+    }
     //totalDiffuse /= totalLights;
     //totalAmbient /= totalLights;
     
     totalDiffuse = saturate(totalDiffuse);
     //
-    //output.Color  = (Color * (vAmbient + vDiffuseColor * DiffuseLightingFactor) + vSpecularColor * Specular) * fShadowTerm;
-    output.Color = saturate((Color * (totalAmbient + totalDiffuse) + totalSpecular)) * fShadowTerm;
+    //output.Color  = (Color * (vAmbient + vDiffuseColor * DiffuseLightingFactor * materialDiffuseColor) + vSpecularColor * Specular) * fShadowTerm;
+    output.Color = saturate((Color * (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular)) * fShadowTerm;
     
     //
     output.DepthColor = float4(-input.PositionViewS.z / MaxDepth, 1.0f, 1.0f, 1.0f);
@@ -203,13 +234,12 @@ float4 PS_ScreenSpaceShadowNoMRT(VS_ScreenSpaceShadow_Output input) : COLOR
 	
 	float fShadowTerm = tex2Dproj(BlurVSampler, input.ScreenCoord).x;
 	float4 totalDiffuse = float4(0,0,0,0);
-	float4 totalAmbient = float4(0,0,0,0);
 	float4 totalSpecular = float4(0,0,0,0);
 	for (int k = 0; k < totalLights; k++)
 	{
 		//
 		float3 LightDir = normalize(LightPosition[k] - input.WorldPosition);
-		float3 ViewDir = normalize(CameraPosition - input.WorldPosition);    
+		float3 ViewDir = normalize(CameraPosition - input.WorldPosition);
 	    
 		// Calculate normal diffuse light.
 		float DiffuseLightingFactor = dot(LightDir, input.TBN[2]);
@@ -221,17 +251,39 @@ float4 PS_ScreenSpaceShadowNoMRT(VS_ScreenSpaceShadow_Output input) : COLOR
 		// I = A + Dcolor * Dintensity * N.L + Scolor * Sintensity * (R.V)n
 	    totalDiffuse += vDiffuseColor[k] * DiffuseLightingFactor;
 	    totalSpecular += vSpecularColor[k] * Specular;
-	    totalAmbient += vAmbient[k];
     }
     
-    //totalDiffuse /= totalLights;
-    //totalAmbient /= totalLights;
-    
+    float4 totalDiffuse2 = float4(0,0,0,0);
+    for (int k = 0; k < aditionalLights; ++k)
+    {
+		//
+		float3 LightDir = (vaditionalLightPositions[k] - input.WorldPosition);
+		
+		if (vaditionalLightType[k] == 0) // Point Light
+		{
+			float attenuation = saturate(1.0f - dot(LightDir / vaditionalLightRadius[k], LightDir / vaditionalLightRadius[k]));
+			
+			LightDir = normalize(LightDir);
+			float DiffuseLightingFactor = dot(LightDir, input.TBN[2]);
+			totalDiffuse2 += (vaditionalLightColor[k] * DiffuseLightingFactor) * attenuation;
+			
+		} else if (vaditionalLightType[k] == 1)
+		{
+			LightDir = normalize(LightDir);
+			//float3 ViewDir = normalize(CameraPosition - input.WorldPosition);
+			
+			// Calculate normal diffuse light.
+			float DiffuseLightingFactor = dot(LightDir, input.TBN[2]);
+			totalDiffuse2 += (vaditionalLightColor[k] * DiffuseLightingFactor);
+		}
+    }
+    //totalDiffuse /= totalLights;    
     totalDiffuse = saturate(totalDiffuse);
-    totalAmbient = saturate(totalAmbient);
     //
     //output.Color  = (Color * (vAmbient + vDiffuseColor * DiffuseLightingFactor) + vSpecularColor * Specular) * fShadowTerm;
-    return saturate((Color * (totalAmbient + totalDiffuse) + totalSpecular)) * fShadowTerm;
+    //return saturate((Color * (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular) * fShadowTerm);
+    //return saturate((Color + (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular) * fShadowTerm);
+    return saturate(Color *  (vAmbient + totalDiffuse * materialDiffuseColor + totalSpecular) * fShadowTerm + totalDiffuse2 * totalDiffuse2.a);
     
 }
 
@@ -265,7 +317,7 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadowWithNormalMapping(VS_ScreenSpace
     // I = A + Dcolor * Dintensity * N.L + Scolor * Sintensity * (R.V)n
     
     //
-    output.Color  = (Color * (vAmbient[0] + vDiffuseColor[0] * DiffuseLightingFactor) + vSpecularColor[0] * Specular) * fShadowTerm;
+    output.Color  = (Color * (vAmbient + vDiffuseColor[0] * DiffuseLightingFactor) + vSpecularColor[0] * Specular) * fShadowTerm;
     
     //
     output.DepthColor = float4(-input.PositionViewS.z / MaxDepth, 1.0f, 1.0f, 1.0f);

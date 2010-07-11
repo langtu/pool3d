@@ -37,5 +37,10 @@ namespace XNA_PoolGame.Scenarios
         {
             throw new NotImplementedException();
         }
+
+        public override void UpdateParticles(GameTime gameTime)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

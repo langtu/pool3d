@@ -28,10 +28,6 @@ technique Technique1
 {
     pass Pass1
     {
-		//ZEnable = false;
-		//ZWriteEnable = false;
 		PixelShader = compile ps_2_0 PixelShaderFunction();
-		//ZEnable = true;
-		//ZWriteEnable = true;
     }
 }

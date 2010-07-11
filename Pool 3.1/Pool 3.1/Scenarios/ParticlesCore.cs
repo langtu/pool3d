@@ -22,7 +22,6 @@ namespace XNA_PoolGame.Scenarios
             : base(_game)
         {
             particles = new List<ParticleSystem>();
-            World.scenario.Enabled = false;
             UseThread = true;
         }
 
@@ -37,7 +36,7 @@ namespace XNA_PoolGame.Scenarios
         }
         public override void Update(GameTime gameTime)
         {
-            scenario.Update(gameTime);
+            scenario.UpdateParticles(gameTime);
             for (int i = 0; i < particles.Count; ++i)
                 particles[i].Update(gameTime);
             

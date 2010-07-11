@@ -39,7 +39,7 @@ namespace XNA_PoolGame.Graphics
 
             PostProcessManager.scalingEffect.CurrentTechnique = PostProcessManager.scalingEffect.Techniques[techniqueName];
             PostProcess(downscale1.renderTarget, result, PostProcessManager.scalingEffect);
-            downscale1.inUse = false;
+            downscale1.DontUse();
         }
         protected void GenerateDownscaleTargetHW(RenderTarget2D source, RenderTarget2D result)
         {
@@ -50,16 +50,16 @@ namespace XNA_PoolGame.Graphics
             TextureInUse downscale2 = PostProcessManager.GetIntermediateTexture(source.Width / 2, source.Height / 2, source.Format);
             PostProcessManager.scalingEffect.CurrentTechnique = PostProcessManager.scalingEffect.Techniques["ScaleHW"];
             PostProcess(downscale1.renderTarget, downscale2.renderTarget, PostProcessManager.scalingEffect);
-            downscale1.inUse = false;
+            downscale1.DontUse();
 
             TextureInUse downscale3 = PostProcessManager.GetIntermediateTexture(source.Width / 2, source.Height / 2, source.Format);
             PostProcessManager.scalingEffect.CurrentTechnique = PostProcessManager.scalingEffect.Techniques["ScaleHW"];
             PostProcess(downscale2.renderTarget, downscale3.renderTarget, PostProcessManager.scalingEffect);
-            downscale2.inUse = false;
+            downscale2.DontUse();
 
             PostProcessManager.scalingEffect.CurrentTechnique = PostProcessManager.scalingEffect.Techniques["ScaleHW"];
             PostProcess(downscale3.renderTarget, result, PostProcessManager.scalingEffect);
-            downscale3.inUse = false;
+            downscale3.DontUse();
         }
         protected void PostProcess(RenderTarget2D source, RenderTarget2D result, Effect effect)
         {
@@ -89,7 +89,7 @@ namespace XNA_PoolGame.Graphics
 
             PostProcess(blurH.renderTarget, result, PostProcessManager.blurEffect);
 
-            blurH.inUse = false;
+            blurH.DontUse();
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace XNA_PoolGame.Graphics
             sources[1] = depthTexture;
             PostProcess(blurH.renderTarget, result, PostProcessManager.blurEffect);
 
-            blurH.inUse = false;
+            blurH.DontUse();
         }
         public void DOF(RenderTarget2D source, 
                         RenderTarget2D result, 
@@ -201,7 +201,7 @@ namespace XNA_PoolGame.Graphics
 
                 PostProcess(sources, result, PostProcessManager.DOFEffect);
 
-                downscaleTexture.inUse = false;
+                downscaleTexture.DontUse();
             }
 
         }

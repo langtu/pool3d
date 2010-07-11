@@ -229,7 +229,7 @@ namespace XNA_PoolGame.PoolTables
             }
             if (IsDone) return -1;
 
-            while (ballReady[num = PoolGame.random.Next(lower_limit, 15)]) { }
+            while (ballReady[num = Maths.random.Next(lower_limit, 15)]) { }
             return num;
         }
 
@@ -258,8 +258,8 @@ namespace XNA_PoolGame.PoolTables
                     
                     for (int k = 0; k < ballsReady.Length; k++) ballsReady[k] = false;
 
-                    solidballnumber = PoolGame.random.Next(0, 7);
-                    stripeballnumber = PoolGame.random.Next(8, 15);
+                    solidballnumber = Maths.random.Next(0, 7);
+                    stripeballnumber = Maths.random.Next(8, 15);
 
                     ballsReady[solidballnumber] = true; ballsReady[stripeballnumber] = true;
                     ballsReady[7] = true;
@@ -293,7 +293,7 @@ namespace XNA_PoolGame.PoolTables
                             ballsReady[ballnumber] = true;
 
                             //add some entropy
-                            //Vector3 entropy = new Vector3(((float)PoolGame.random.NextDouble() - 0.5f) * 1.5f, 0.0f, ((float)PoolGame.random.NextDouble() - 0.5f) * 1.5f);
+                            //Vector3 entropy = new Vector3(((float)Maths.random.NextDouble() - 0.5f) * 1.5f, 0.0f, ((float)PoolGame.random.NextDouble() - 0.5f) * 1.5f);
 
                             Vector3 entropy = Vector3.Zero;
                             poolBalls[TotalBalls].Scale = new Vector3(poolballscaleFactor);
@@ -444,14 +444,20 @@ namespace XNA_PoolGame.PoolTables
         }
         #endregion
 
-        #region Get out the cue ball of any pocket
+        #region Get out the cue ball from pocket
         /// <summary>
         /// Restore cueball position. Check if cueBallStartPosition is a valid position.
         /// </summary>
         public void UnpottedcueBall()
         {
             roundInfo.cueballPotted = false;
-            if (cueBall.pocketWhereAt != -1) pockets[cueBall.pocketWhereAt].balls.Remove(cueBall);
+            if (cueBall.pocketWhereAt != -1)
+            {
+                lock (pockets[cueBall.pocketWhereAt].balls)
+                {
+                    pockets[cueBall.pocketWhereAt].balls.Remove(cueBall);
+                }
+            }
 
             cueBall.pocketWhereAt = -1;
             cueBall.currentTrajectory = Trajectory.Motion;

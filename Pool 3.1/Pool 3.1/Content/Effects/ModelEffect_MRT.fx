@@ -9,9 +9,17 @@ float4 CameraPosition;
 float MaxDepth;
 float Shineness = 96.0f;
 float4 vSpecularColor[2];// = {1.0f, 1.0f, 1.0f, 1.0f};
-float4 vAmbient[2]; //= {0.1f, 0.1f, 0.1f, 1.0f};
+float4 vAmbient; //= {0.1f, 0.1f, 0.1f, 1.0f};
 float4 vDiffuseColor[2];// = {1.0f, 1.0f, 1.0f, 1.0f};
+float4 materialDiffuseColor = {1.0f, 1.0f, 1.0f, 1.0f};
+
 int totalLights;
+
+float4 vaditionalLightColor[2];
+float4 vaditionalLightPositions[2];
+float vaditionalLightRadius[2];
+int vaditionalLightType[2];
+int aditionalLights = 0;
 
 Texture TexColor;
 sampler ColorSampler = sampler_state
@@ -76,7 +84,6 @@ PS_Model_Output PixelShaderFunction(VS_ModelOutput input)
     float4 Color = tex2D(ColorSampler, input.TexCoord);
 	
 	float4 totalDiffuse = float4(0,0,0,0);
-	float4 totalAmbient = float4(0,0,0,0);
 	float4 totalSpecular = float4(0,0,0,0);
 	for (int k = 0; k < totalLights; k++)
 	{
@@ -94,14 +101,13 @@ PS_Model_Output PixelShaderFunction(VS_ModelOutput input)
 		// I = A + Dcolor * Dintensity * N.L + Scolor * Sintensity * (R.V)n
 	    totalDiffuse += vDiffuseColor[k] * DiffuseLightingFactor;
 	    totalSpecular += vSpecularColor[k] * Specular;
-	    totalAmbient += vAmbient[k];
     }
     
     //totalDiffuse /= totalLights;
     totalDiffuse = saturate(totalDiffuse);
     //
     //output.Color  = (Color * (vAmbient + vDiffuseColor * DiffuseLightingFactor) + vSpecularColor * Specular) * fShadowTerm;
-    output.Color = saturate((Color * (totalAmbient + totalDiffuse) + totalSpecular));
+    output.Color = saturate((Color * (vAmbient + totalDiffuse) + totalSpecular));
     
     //
     output.DepthColor = float4(-input.PositionViewSpace.z / MaxDepth, 1.0f, 1.0f, 1.0f);
@@ -120,7 +126,6 @@ float4 NoMRTPixelShaderFunction(VS_ModelOutput input) : COLOR0
     float4 Color = tex2D(ColorSampler, input.TexCoord);
 	
 	float4 totalDiffuse = float4(0,0,0,0);
-	float4 totalAmbient = float4(0,0,0,0);
 	float4 totalSpecular = float4(0,0,0,0);
 	for (int k = 0; k < totalLights; k++)
 	{
@@ -138,15 +143,37 @@ float4 NoMRTPixelShaderFunction(VS_ModelOutput input) : COLOR0
 		// I = A + Dcolor * Dintensity * N.L + Scolor * Sintensity * (R.V)n
 	    totalDiffuse += vDiffuseColor[k] * DiffuseLightingFactor;
 	    totalSpecular += vSpecularColor[k] * Specular;
-	    totalAmbient += vAmbient[k];
     }
-    
+    float4 totalDiffuse2 = 0;
+	for (int k = 0; k < aditionalLights; ++k)
+    {
+		//
+		float3 LightDir = (vaditionalLightPositions[k].xyz - input.WorldPosition.xyz);
+		
+		if (vaditionalLightType[k] == 0) // Point Light
+		{
+			float attenuation = saturate(1.0f - dot(LightDir / vaditionalLightRadius[k], LightDir / vaditionalLightRadius[k]));
+			
+			LightDir = normalize(LightDir);
+			float DiffuseLightingFactor = dot(LightDir, input.Normal);
+			totalDiffuse2 += (vaditionalLightColor[k] * DiffuseLightingFactor) * attenuation;
+			
+		} else if (vaditionalLightType[k] == 1)
+		{
+			LightDir = normalize(LightDir);
+			//float3 ViewDir = normalize(CameraPosition - input.WorldPosition);
+			
+			// Calculate normal diffuse light.
+			float DiffuseLightingFactor = dot(LightDir, input.Normal);
+			totalDiffuse2 += (vaditionalLightColor[k] * DiffuseLightingFactor);
+		}
+    }    
     //totalDiffuse /= totalLights;
     totalDiffuse = saturate(totalDiffuse);
     //
     //output.Color  = (Color * (vAmbient + vDiffuseColor * DiffuseLightingFactor) + vSpecularColor * Specular) * fShadowTerm;
-    return saturate((Color * (totalAmbient + totalDiffuse) + totalSpecular));
-    
+    return saturate((Color * (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular));
+    //return Color * vAmbient + (totalDiffuse * materialDiffuseColor + totalSpecular) + totalDiffuse2 * materialDiffuseColor;
     
 }
 technique ModelTechnique
@@ -154,8 +181,8 @@ technique ModelTechnique
     pass Pass1
     {
 
-        VertexShader = compile vs_2_0 VertexShaderFunction();
-        PixelShader = compile ps_2_0 PixelShaderFunction();
+        VertexShader = compile vs_3_0 VertexShaderFunction();
+        PixelShader = compile ps_3_0 PixelShaderFunction();
     }
 }
 technique NoMRTModelTechnique
@@ -163,7 +190,7 @@ technique NoMRTModelTechnique
     pass Pass1
     {
 
-        VertexShader = compile vs_2_0 VertexShaderFunction();
-        PixelShader = compile ps_2_0 NoMRTPixelShaderFunction();
+        VertexShader = compile vs_3_0 VertexShaderFunction();
+        PixelShader = compile ps_3_0 NoMRTPixelShaderFunction();
     }
 }
