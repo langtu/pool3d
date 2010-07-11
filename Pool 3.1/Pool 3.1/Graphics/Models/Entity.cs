@@ -405,7 +405,7 @@ namespace XNA_PoolGame.Graphics.Models
 
         public void DrawModel(bool enableTexture, Effect effect, String technique, RenderHandler setParameter)
         {
-            if (setParameter != null) { setParameter.Invoke(); effect.CommitChanges(); }
+            if (setParameter != null) { setParameter.Invoke(); }
 
             if (enableTexture)
             {

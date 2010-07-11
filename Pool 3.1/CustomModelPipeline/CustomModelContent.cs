@@ -43,7 +43,7 @@ namespace CustomModelPipeline
         // effect. Multiple parts are needed to represent models that use more
         // than one effect.
         [ContentSerializerRuntimeType("XNA_PoolGame.Graphics.Models.CustomModel+ModelPart, XNA_PoolGame")]
-        class ModelPart
+        public class ModelPart
         {
             public BoundingBox AABox;
             public BoundingSphere Sphere;

@@ -24,7 +24,7 @@ namespace XNA_PoolGame.Graphics.Particles.Fire
 
             settings.MaxParticles = 40;
 
-            settings.Duration = TimeSpan.FromSeconds(2.0f);
+            settings.Duration = TimeSpan.FromSeconds(1.5f);
 
             settings.DurationRandomness = 1;
 

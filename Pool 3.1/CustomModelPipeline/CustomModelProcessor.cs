@@ -227,7 +227,7 @@ namespace CustomModelPipeline
                 // If not, process it now.
                 processedMaterials[material] =
                     context.Convert<MaterialContent,
-                                    MaterialContent>(material, "MaterialProcessor");
+                                    MaterialContent>(material, "CustomModelMaterialProcessor");
             }
 
             return processedMaterials[material];

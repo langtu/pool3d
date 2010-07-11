@@ -153,7 +153,6 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output inp
 	float fShadowTerm = tex2Dproj(BlurVSampler, input.ScreenCoord).x;
 	float4 totalDiffuse = float4(0,0,0,0);
 	float4 totalSpecular = float4(0,0,0,0);
-	//float totalselfshadowing = 1.0f;
 	for (int k = 0; k < totalLights; k++)
 	{
 		//
@@ -176,6 +175,7 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output inp
 	    totalSpecular += vSpecularColor[k] * Specular;
 	    
     }
+    float4 totalDiffuse2 = float4(0,0,0,0);
     for (int k = 0; k < aditionalLights; ++k)
     {
 		//
@@ -187,7 +187,8 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output inp
 			
 			LightDir = normalize(LightDir);
 			float DiffuseLightingFactor = dot(LightDir, input.TBN[2]);
-			totalDiffuse += (vaditionalLightColor[k] * DiffuseLightingFactor) * attenuation;
+			totalDiffuse2 += (vaditionalLightColor[k] * DiffuseLightingFactor) * attenuation;
+			
 		} else if (vaditionalLightType[k] == 1)
 		{
 			LightDir = normalize(LightDir);
@@ -195,7 +196,7 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output inp
 			
 			// Calculate normal diffuse light.
 			float DiffuseLightingFactor = dot(LightDir, input.TBN[2]);
-			totalDiffuse += (vaditionalLightColor[k] * DiffuseLightingFactor);
+			totalDiffuse2 += (vaditionalLightColor[k] * DiffuseLightingFactor);
 		}
     }
     //totalDiffuse /= totalLights;
@@ -204,7 +205,8 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output inp
     totalDiffuse = saturate(totalDiffuse);
     //
     //output.Color  = (Color * (vAmbient + vDiffuseColor * DiffuseLightingFactor * materialDiffuseColor) + vSpecularColor * Specular) * fShadowTerm;
-    output.Color = saturate((Color * (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular)) * fShadowTerm;
+    /////output.Color = saturate((Color * (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular)) * fShadowTerm;
+    output.Color = saturate(Color * (vAmbient + totalDiffuse * materialDiffuseColor + totalSpecular) * fShadowTerm + totalDiffuse2 * totalDiffuse2.a);
     
     //
     output.DepthColor = float4(-input.PositionViewS.z / MaxDepth, 1.0f, 1.0f, 1.0f);
@@ -283,7 +285,7 @@ float4 PS_ScreenSpaceShadowNoMRT(VS_ScreenSpaceShadow_Output input) : COLOR
     //output.Color  = (Color * (vAmbient + vDiffuseColor * DiffuseLightingFactor) + vSpecularColor * Specular) * fShadowTerm;
     //return saturate((Color * (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular) * fShadowTerm);
     //return saturate((Color + (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular) * fShadowTerm);
-    return saturate(Color *  (vAmbient + totalDiffuse * materialDiffuseColor + totalSpecular) * fShadowTerm + totalDiffuse2 * totalDiffuse2.a);
+    return saturate(Color * (vAmbient + totalDiffuse * materialDiffuseColor + totalSpecular) * fShadowTerm + totalDiffuse2 * totalDiffuse2.a);
     
 }
 

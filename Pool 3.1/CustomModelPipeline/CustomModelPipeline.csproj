@@ -103,7 +103,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomModelContent.cs" />
+    <Compile Include="CustomModelMaterialProcessor.cs" />
     <Compile Include="CustomModelProcessor.cs" />
+    <Compile Include="CustomTextureProcessor.cs" />
     <Compile Include="NormalMappingModelProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

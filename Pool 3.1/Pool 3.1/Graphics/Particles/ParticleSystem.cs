@@ -250,6 +250,11 @@ namespace XNA_PoolGame.Graphics.Particles
 
             // Choose the appropriate effect technique. If these particles will never
             // rotate, we can use a simpler pixel shader that requires less GPU power.
+            ChooseTechnique();
+        }
+
+        public void ChooseTechnique()
+        {
             string techniqueName;
 
             if ((settings.MinRotateSpeed == 0) && (settings.MaxRotateSpeed == 0))
@@ -257,10 +262,11 @@ namespace XNA_PoolGame.Graphics.Particles
             else
                 techniqueName = "RotatingParticles";
 
-             
-            particleEffect.CurrentTechnique = particleEffect.Techniques[techniqueName];
-        }
+            if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) techniqueName = "NoMRT" + techniqueName;
 
+            particleEffect.CurrentTechnique = particleEffect.Techniques[techniqueName];
+            particleEffect.CommitChanges();
+        }
 
         #endregion
 

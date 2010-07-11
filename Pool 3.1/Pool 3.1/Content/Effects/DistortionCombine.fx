@@ -44,7 +44,7 @@ float4 Distortion(float2 texCoord : TEXCOORD0) : COLOR0
     
     float2 tex = texCoord + GetDif(texCoord) * 0.1f;
 	float4 col = tex2D(baseSampler, tex);
-	float d = sqrt((tex.x - 0.5) * (tex.x - 0.5) + (tex.y - 0.5) * (tex.y - 0.5));
+	/*float d = sqrt((tex.x - 0.5) * (tex.x - 0.5) + (tex.y - 0.5) * (tex.y - 0.5));
 	col.rgb -= d * burn;
 	float a = col.r + col.g + col.b;
 	a /= 3.0f;
@@ -52,7 +52,7 @@ float4 Distortion(float2 texCoord : TEXCOORD0) : COLOR0
 	col.r = (col.r * saturation + a) * r;
 	col.g = (col.g * saturation + a) * g;
 	col.b = (col.b * saturation + a) * b;
-	col.rgb += brite;
+	col.rgb += brite;*/
     return col;
 }
 
@@ -60,6 +60,6 @@ technique DistortionCombine
 {
     pass P0
     {
-        PixelShader = compile ps_3_0 Distortion();
+        PixelShader = compile ps_2_0 Distortion();
     }
 }

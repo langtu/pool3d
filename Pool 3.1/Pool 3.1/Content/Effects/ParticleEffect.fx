@@ -224,11 +224,16 @@ PS_MRT_Output NonRotatingPixelShader(NonRotatingPixelShaderInput input)
 {
 	PS_MRT_Output output;
 	output.Color = tex2D(Sampler, input.TextureCoordinate) * input.Color;
-	output.DepthColor = 0;//float4((-input.PositionViewS.z / MaxDepth)*output.Color.a, 1.0f, 1.0f, 1.0f);
-	output.Velocity = 0;
+	output.DepthColor = 1.0f;//float4((-input.PositionViewS.z / MaxDepth)*output.Color.a, 1.0f, 1.0f, 1.0f);
+	output.Velocity = 1.0f;
     return output;
 }
 
+// Pixel shader for drawing particles that do not rotate (NoMRT).
+float4 NoMRTNonRotatingPixelShader(NonRotatingPixelShaderInput input) : COLOR0
+{
+    return tex2D(Sampler, input.TextureCoordinate) * input.Color;
+}
 
 // Pixel shader input structure for particles that can rotate.
 struct RotatingPixelShaderInput
@@ -281,7 +286,33 @@ PS_MRT_Output RotatingPixelShader(RotatingPixelShaderInput input)
 	output.Velocity = 0;
     return output;
 }
+// NoMRT
+float4 NoMRTRotatingPixelShader(RotatingPixelShaderInput input) : COLOR0
+{
+    float2 textureCoordinate = input.TextureCoordinate;
 
+    // We want to rotate around the middle of the particle, not the origin,
+    // so we offset the texture coordinate accordingly.
+    textureCoordinate -= 0.5;
+    
+    // Apply the rotation matrix, after rescaling it back from the packed
+    // color interpolator format into a full -1 to 1 range.
+    float4 rotation = input.Rotation * 2 - 1;
+    
+    textureCoordinate = mul(textureCoordinate, float2x2(rotation));
+    
+    // Point sprites are squares. So are textures. When we rotate one square
+    // inside another square, the corners of the texture will go past the
+    // edge of the point sprite and get clipped. To avoid this, we scale
+    // our texture coordinates to make sure the entire square can be rotated
+    // inside the point sprite without any clipping.
+    textureCoordinate *= sqrt(2);
+    
+    // Undo the offset used to control the rotation origin.
+    textureCoordinate += 0.5;
+
+    return tex2D(Sampler, textureCoordinate) * input.Color;
+}
 
 // Effect technique for drawing particles that do not rotate. Works with shader 1.1.
 technique NonRotatingParticles
@@ -301,5 +332,26 @@ technique RotatingParticles
     {		
         VertexShader = compile vs_3_0 VertexShader();
         PixelShader = compile ps_3_0 RotatingPixelShader();
+    }
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Effect technique for drawing particles that do not rotate. Works with shader 1.1.
+technique NoMRTNonRotatingParticles
+{
+    pass P0
+    {
+        VertexShader = compile vs_3_0 VertexShader();
+        PixelShader = compile ps_3_0 NoMRTNonRotatingPixelShader();
+    }
+}
+
+
+// Effect technique for drawing particles that can rotate. Requires shader 2.0.
+technique NoMRTRotatingParticles
+{
+    pass P0
+    {		
+        VertexShader = compile vs_3_0 VertexShader();
+        PixelShader = compile ps_3_0 NoMRTRotatingPixelShader();
     }
 }
