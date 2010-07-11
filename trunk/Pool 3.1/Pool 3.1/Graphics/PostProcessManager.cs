@@ -217,36 +217,6 @@ namespace XNA_PoolGame.Graphics
                            Math.Exp(-(n * n) / (2 * theta * theta)));
         }
         #endregion
-
-        #region Shadow Mapping
-        
-        #endregion
-
-        #region No Shadows
-        public static void RenderTextured()
-        {
-            PoolGame.device.SetRenderTarget(0, mainRT);
-            if (World.dofType == DOFType.None && World.motionblurType == MotionBlurType.None)
-            {
-                PoolGame.device.SetRenderTarget(1, null);
-                PoolGame.device.SetRenderTarget(2, null);
-                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target, Color.CornflowerBlue, 1.0f, 0);
-            }
-            else
-            {
-                depthTIU.Use();
-                PoolGame.device.SetRenderTarget(1, depthRT);
-                PoolGame.device.SetRenderTarget(2, velocityRT);
-
-                //PoolGame.device.Clear(ClearOptions.Target | ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
-                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
-                PostProcessManager.DrawQuad(PostProcessManager.whiteTexture, PostProcessManager.clearGBufferEffect);
-            }
-
-            
-
-        }
-        #endregion
         
         #region DOF
         public static void CreateDOFMap()
@@ -442,7 +412,8 @@ namespace XNA_PoolGame.Graphics
         public static void DrawQuad(Texture2D texture, Effect effect)
         {
             Viewport viewport = PoolGame.device.Viewport;
-            
+
+            //effect.CommitChanges();
             effect.Begin();
             spriteBatch.Begin(SpriteBlendMode.None, SpriteSortMode.Immediate, SaveStateMode.SaveState);
 
@@ -571,19 +542,10 @@ namespace XNA_PoolGame.Graphics
 
         public static void DistorionParticles()
         {
-            PoolGame.device.RenderState.DepthBufferEnable = true;
-            PoolGame.device.RenderState.DepthBufferWriteEnable = false;
             distortionsample = GetIntermediateTexture();
-            PoolGame.device.SetRenderTarget(1, null);
-            PoolGame.device.SetRenderTarget(2, null);
-
+            
             PoolGame.device.SetRenderTarget(0, distortionsample.renderTarget);
             PoolGame.device.Clear(Color.Black);
-            if (World.motionblurType != MotionBlurType.None || World.dofType != DOFType.None)
-            {
-                PoolGame.device.SetRenderTarget(1, depthRT);
-                PoolGame.device.SetRenderTarget(2, velocityRT);
-            }
         }
 
         public static void RenderMotionBlur(RenderTarget2D source, RenderTarget2D result)
@@ -670,8 +632,10 @@ namespace XNA_PoolGame.Graphics
         public static void DistortionParticlesCombine(RenderTarget2D source, RenderTarget2D result)
         {
             PoolGame.device.SetRenderTarget(0, result);
+            PoolGame.device.SetRenderTarget(1, null);
+            PoolGame.device.SetRenderTarget(2, null);
             distortionCombineEffect.Parameters["DistortionMap"].SetValue(distortionsample.renderTarget.GetTexture());
-
+            distortionCombineEffect.CommitChanges();
             DrawQuad(source.GetTexture(), distortionCombineEffect);
         }
     }

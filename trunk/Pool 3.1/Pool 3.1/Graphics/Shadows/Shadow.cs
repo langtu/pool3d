@@ -67,8 +67,42 @@ namespace XNA_PoolGame.Graphics.Shadows
 
             depthBias = null;
         }
-        
 
-        
+
+        /// <summary>
+        /// Draw the scene without shadows
+        /// </summary>
+        public void DrawTextured(GameTime gameTime)
+        {
+            World.camera.ItemsDrawn = 0;
+            PostProcessManager.ChangeRenderMode(RenderMode.BasicRender);
+
+            PostProcessManager.mainTIU.Use();
+            PoolGame.device.SetRenderTarget(0, PostProcessManager.mainRT);
+            if (World.dofType == DOFType.None && World.motionblurType == MotionBlurType.None)
+            {
+                PoolGame.device.SetRenderTarget(1, null);
+                PoolGame.device.SetRenderTarget(2, null);
+                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target, Color.CornflowerBlue, 1.0f, 0);
+            }
+            else
+            {
+                PostProcessManager.depthTIU.Use(); PostProcessManager.velocityTIU.Use(); PostProcessManager.velocityLastFrameTIU.Use();
+                PoolGame.device.SetRenderTarget(1, PostProcessManager.depthRT);
+                PoolGame.device.SetRenderTarget(2, PostProcessManager.velocityRT);
+
+                //PoolGame.device.Clear(ClearOptions.Target | ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
+                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
+                PostProcessManager.DrawQuad(PostProcessManager.whiteTexture, PostProcessManager.clearGBufferEffect);
+            }
+
+            World.scenario.DrawScene(gameTime);
+
+            if (World.motionblurType != MotionBlurType.None || World.dofType != DOFType.None)
+            {
+                PoolGame.device.SetRenderTarget(1, null);
+                PoolGame.device.SetRenderTarget(2, null);
+            }
+        }
     }
 }

@@ -43,6 +43,8 @@ namespace XNA_PoolGame.Scenarios
             get { return ambientColor; }
             set { ambientColor = value; }
         }
+
+        public object syncobject = new object();
         public Scenario(Game game)
             : base(game)
         {
@@ -124,6 +126,15 @@ namespace XNA_PoolGame.Scenarios
                 particle.SetCamera(World.camera.View, World.camera.Projection);
         }
 
+        public void SetParticleEffectTechnique()
+        {
+            foreach (ParticleSystem particle in particles)
+                particle.ChooseTechnique();
+
+            foreach (ParticleSystem particle in distortionparticles)
+                particle.ChooseTechnique();
+        }
+
         public abstract void UpdateParticles(GameTime gameTime);
 
         protected override void Dispose(bool disposing)
@@ -138,7 +149,7 @@ namespace XNA_PoolGame.Scenarios
 
             if (distortionparticles != null) distortionparticles.Clear();
             distortionparticles = null;
-
+            syncobject = null;
             PoolGame.game.Components.Remove(this);
             base.Dispose(disposing);
         }

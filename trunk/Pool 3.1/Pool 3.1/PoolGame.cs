@@ -1,4 +1,4 @@
-//#define DRAW_DEBUGTEXT
+#define DRAW_DEBUGTEXT
 
 #region Using Statements
 using XNA_PoolGame;
@@ -89,16 +89,17 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 600;
-            graphics.PreferredBackBufferHeight = 480;
+            graphics.PreferredBackBufferWidth = 1280;
+            graphics.PreferredBackBufferHeight = 720;
             graphics.SynchronizeWithVerticalRetrace = false;
             //graphics.PreferMultiSampling = true;
             
             graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
             //graphics.IsFullScreen = true;
 
-            graphics.MinimumVertexShaderProfile = ShaderProfile.VS_3_0;
-            graphics.MinimumPixelShaderProfile = ShaderProfile.PS_3_0;
+            
+            graphics.MinimumVertexShaderProfile = ShaderProfile.VS_2_0;
+            graphics.MinimumPixelShaderProfile = ShaderProfile.PS_2_0;
 
             graphics.PreparingDeviceSettings +=
                new EventHandler<PreparingDeviceSettingsEventArgs>(graphics_PreparingDeviceSettings);
@@ -110,7 +111,7 @@ namespace XNA_PoolGame
 
             //graphics.PreferMultiSampling = true;
             graphics.ApplyChanges();
-            //graphics.GraphicsDevice.Reset();
+            //GraphicsDevice.Reset();
 
             this.IsFixedTimeStep = false;
             //this.TargetElapsedTime = TimeSpan.FromMilliseconds(16);
@@ -202,7 +203,6 @@ namespace XNA_PoolGame
             spriteFont = content.Load<SpriteFont>("Fonts\\Arial");
             PostProcessManager.InitRenderTargets();
 
-            
 
             base.LoadContent();
         }
@@ -297,9 +297,16 @@ namespace XNA_PoolGame
                     World.camera.NearPlane, World.camera.FarPlane);
             }
 
+            if (kb.IsKeyDown(Keys.F2) && lastkb.IsKeyUp(Keys.F2))
+            {
+                lock (World.scenario.syncobject)
+                World.doDistortion = !World.doDistortion;
+            }
+
             if (kb.IsKeyDown(Keys.K) && lastkb.IsKeyUp(Keys.K))
             {
                 World.dofType = (DOFType)(((int)World.dofType + 1) % 4);
+                World.scenario.SetParticleEffectTechnique();
             }
 
             if (kb.IsKeyDown(Keys.L) && lastkb.IsKeyUp(Keys.L) && World.playerInTurn != -1)
@@ -314,25 +321,7 @@ namespace XNA_PoolGame
                     World.camera.PrevView = World.camera.View;
                 }
                 World.motionblurType = (MotionBlurType)(((int)World.motionblurType + 1) % 10);
-
-            }
-
-            if (kb.IsKeyDown(Keys.F2) && lastkb.IsKeyUp(Keys.F2) && World.camera is FreeCamera)
-            {
-                Vector3 position = World.camera.CameraPosition;
-                Matrix viewMatrix = World.camera.View;
-
-                Vector3 angle;
-
-                angle.X = MathHelper.PiOver2;
-                angle.Y = 0.0f;
-                angle.Z = 0.0f;
-
-                World.camera.Dispose();
-                World.camera = new FreeCamera(this, angle);
-                World.camera.CameraPosition = position;
-                World.camera.SetMouseCentered();
-                Components.Add(World.camera);
+                World.scenario.SetParticleEffectTechnique();
             }
 
             if (kb.IsKeyDown(Keys.F6) && lastkb.IsKeyUp(Keys.F6) && World.camera != null)
@@ -586,9 +575,10 @@ namespace XNA_PoolGame
             text += "\nFarPlane: " + LightManager.lights[currentlight].LightFarPlane + " (KEYS: Z, X)";
             text += "\nFOV: " + LightManager.lights[currentlight].LightFOV + " (KEYS: +, -)";
             text += "\nPosition: " + LightManager.lights[currentlight].Position;
+            text += "\nDistortion: (F2)" + World.doDistortion;
 
-            batch.DrawString(spriteFont, text, new Vector2(18, height - 306), Color.Black);
-            batch.DrawString(spriteFont, text, new Vector2(17, height - 307), Color.Tomato);
+            batch.DrawString(spriteFont, text, new Vector2(18, height - 316), Color.Black);
+            batch.DrawString(spriteFont, text, new Vector2(17, height - 317), Color.Tomato);
 
             batch.End();
         }

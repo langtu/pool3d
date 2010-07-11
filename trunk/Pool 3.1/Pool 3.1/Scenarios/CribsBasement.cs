@@ -66,20 +66,16 @@ namespace XNA_PoolGame.Scenarios
             particles.Add(smokeParticles);
 
             ////// DISTORTION PARTICLES ///// 
-            if (World.doDistortion)
-            {
-                heatParticles = new HeatParticleSystem(Game, PoolGame.content);
-                heatParticles.DrawOrder = 3;
-                PoolGame.game.Components.Add(heatParticles);
-
-                distortionparticles.Add(heatParticles);
-            }
-
+            heatParticles = new HeatParticleSystem(Game, PoolGame.content);
+            heatParticles.DrawOrder = 3; 
+            PoolGame.game.Components.Add(heatParticles);
+            distortionparticles.Add(heatParticles);            
+            
             ////////////////////////////////
             core = new ParticlesCore(Game);
             core.Scenario = this;
             core.AddParticlesFromMultiMap(particles);
-            if (World.doDistortion) core.AddParticlesFromMultiMap(distortionparticles);
+            core.AddParticlesFromMultiMap(distortionparticles);
             core.BuildThread(true);
 
             smokestack = new Entity(PoolGame.game, "Models\\Cribs\\smokestack");
@@ -399,11 +395,14 @@ namespace XNA_PoolGame.Scenarios
                 fireParticles.AddParticle(center, Vector3.Zero);
             }
             fireParticles.AddParticle(center + new Vector3(0, 20, 0), Vector3.Zero);
-            if (World.doDistortion)
+            lock (syncobject)
             {
-                for (int i = 0; i < 5; ++i)
+                if (World.doDistortion)
                 {
-                    heatParticles.AddParticle(center + new Vector3(-35.0f + (float)Maths.random.NextDouble() * 85, 35, -15.0f + (float)Maths.random.NextDouble() * 35), Vector3.Zero);
+                    for (int i = 0; i < 7; ++i)
+                    {
+                        heatParticles.AddParticle(center + new Vector3(-35.0f + (float)Maths.random.NextDouble() * 85, 45.0f, -35.0f + (float)Maths.random.NextDouble() * 70), Vector3.Zero);
+                    }
                 }
             }
 

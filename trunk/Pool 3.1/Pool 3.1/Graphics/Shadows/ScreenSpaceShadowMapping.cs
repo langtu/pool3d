@@ -84,6 +84,12 @@ namespace XNA_PoolGame.Graphics.Shadows
             for (int i = 0; i < LightManager.totalLights; ++i)
                 shadowMapTIU[i].DontUse();
             shadowTIU.DontUse();
+
+            if (World.motionblurType != MotionBlurType.None || World.dofType != DOFType.None)
+            {
+                PoolGame.device.SetRenderTarget(1, null);
+                PoolGame.device.SetRenderTarget(2, null);
+            }
         }
 
         private void RenderShadowMap(int lightindex)
@@ -133,7 +139,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             //Screen Space Shadow
             PostProcessManager.mainTIU.Use();
             PoolGame.device.SetRenderTarget(0, PostProcessManager.mainRT);
-            if (!(World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None))
+            if (World.motionblurType != MotionBlurType.None || World.dofType != DOFType.None)
             {
                 PostProcessManager.depthTIU.Use(); PostProcessManager.velocityTIU.Use(); PostProcessManager.velocityLastFrameTIU.Use();
                 PoolGame.device.SetRenderTarget(1, PostProcessManager.depthRT);
