@@ -548,6 +548,16 @@ namespace XNA_PoolGame.Graphics
             PoolGame.device.Clear(Color.Black);
         }
 
+        public static void DistortionParticlesCombine(RenderTarget2D source, RenderTarget2D result)
+        {
+            PoolGame.device.SetRenderTarget(0, result);
+            PoolGame.device.SetRenderTarget(1, null);
+            PoolGame.device.SetRenderTarget(2, null);
+            distortionCombineEffect.Parameters["DistortionMap"].SetValue(distortionsample.renderTarget.GetTexture());
+            distortionCombineEffect.CommitChanges();
+            DrawQuad(source.GetTexture(), distortionCombineEffect);
+        }
+
         public static void RenderMotionBlur(RenderTarget2D source, RenderTarget2D result)
         {
             motionBlur.DoMotionBlur(source, result, depthRT,
@@ -629,14 +639,6 @@ namespace XNA_PoolGame.Graphics
 
 
 
-        public static void DistortionParticlesCombine(RenderTarget2D source, RenderTarget2D result)
-        {
-            PoolGame.device.SetRenderTarget(0, result);
-            PoolGame.device.SetRenderTarget(1, null);
-            PoolGame.device.SetRenderTarget(2, null);
-            distortionCombineEffect.Parameters["DistortionMap"].SetValue(distortionsample.renderTarget.GetTexture());
-            distortionCombineEffect.CommitChanges();
-            DrawQuad(source.GetTexture(), distortionCombineEffect);
-        }
+        
     }
 }

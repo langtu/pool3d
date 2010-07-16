@@ -24,8 +24,8 @@ namespace XNA_PoolGame.Graphics.Models
         #region Variables
 
         protected CustomModel model = null;
-        protected String modelName = null;
-        protected String textureAsset = null;
+        protected string modelName = null;
+        protected string textureAsset = null;
         protected bool drawboundingvolume = false;
 
         #region //// MATERIAL PROPERTIES ////
@@ -45,8 +45,10 @@ namespace XNA_PoolGame.Graphics.Models
         private float shineness = 96.0f;
         private Vector4 specularColor = Vector4.One;
         private Vector4 materialDiffuseColor = Vector4.One;
-        public String normalMapAsset = null;
+        public string normalMapAsset = null;
+        public string heightMapAsset = null;
         protected Texture2D normalMapTexture = null;
+        protected Texture2D heightMapTexture = null;
         private List<Light> aditionalLights;
         private float[] lightsradius;
         private Vector4[] lightscolors;
@@ -68,7 +70,7 @@ namespace XNA_PoolGame.Graphics.Models
         BoundingBox boundingBox;
         BoundingSphere boundingSphere;
         
-        public bool isObjectAtScenario = true;
+        public bool belongsToScenario = true;
 
         #endregion
 
@@ -179,7 +181,7 @@ namespace XNA_PoolGame.Graphics.Models
             get { return scale; }
             set { worldDirty = true; scale = value; }
         }
-        public String TextureAsset
+        public string TextureAsset
         {
             set { textureAsset = value; }
         }
@@ -187,7 +189,7 @@ namespace XNA_PoolGame.Graphics.Models
 
         #region Constructor
 
-        public Entity(Game _game, String _modelName)
+        public Entity(Game _game, string _modelName)
             : base(_game)
         {
             this.modelName = _modelName;
@@ -206,19 +208,19 @@ namespace XNA_PoolGame.Graphics.Models
             worldDirty = true;
         }
 
-        public Entity(Game _game, String _modelName, String _textureAsset)
+        public Entity(Game _game, string _modelName, string _textureAsset)
             : this(_game, _modelName)
         {
             this.textureAsset = _textureAsset;
         }
 
-        public Entity(Game _game, String _modelName, VolumeType volume)
+        public Entity(Game _game, string _modelName, VolumeType volume)
             : this(_game, _modelName)
         {
             this.volume = volume;
         }
 
-        public Entity(Game _game, String _modelName, VolumeType volume, String _textureAsset)
+        public Entity(Game _game, string _modelName, VolumeType volume, string _textureAsset)
             : this(_game, _modelName)
         {
             this.volume = volume;
@@ -230,16 +232,10 @@ namespace XNA_PoolGame.Graphics.Models
 
         #region Initialize
 
-        public override void Initialize()
-        {
-            base.Initialize();
-            LoadContent();
-        }
-
         #endregion
 
         #region LoadContent
-        
+
         public override void LoadContent()
         {
             GC.Collect();
@@ -250,6 +246,7 @@ namespace XNA_PoolGame.Graphics.Models
 
             //
             if (normalMapAsset != null) normalMapTexture = PoolGame.content.Load<Texture2D>(normalMapAsset);
+            if (heightMapAsset != null) heightMapTexture = PoolGame.content.Load<Texture2D>(heightMapAsset);
 
             // Setup model.
             textures = model.GetTextures();
@@ -257,9 +254,12 @@ namespace XNA_PoolGame.Graphics.Models
             boundingBox = model.GetBoundingBox();
             boundingSphere = new BoundingSphere();
             boxes = new List<BoundingBox>();
+
             localWorld = preRotation * rotation * Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
+            this.prelocalWorld = localWorld;
             worldDirty = false;
-            if (isObjectAtScenario)
+
+            if (belongsToScenario)
             {
                 foreach (CustomModelPart modelPart in model.modelParts)
                 {
@@ -359,16 +359,23 @@ namespace XNA_PoolGame.Graphics.Models
                 case RenderMode.ScreenSpaceSoftShadowRender:
                     {
                         frustum = World.camera.FrustumCulling;
-                        String basicTechnique = "SSSTechnique";
+                        string basicTechnique = "SSSTechnique";
 
                         if (World.displacementType != DisplacementType.None && this.normalMapAsset != null)
                         {
                             basicTechnique = World.displacementType.ToString() + basicTechnique;
-                            PoolGame.device.Textures[3] = normalMapTexture;
-                            PoolGame.device.SamplerStates[3].AddressU = TEXTURE_ADDRESS_MODE;
-                            PoolGame.device.SamplerStates[3].AddressV = TEXTURE_ADDRESS_MODE;
+                            
+                            PoolGame.device.SamplerStates[2].AddressU = TEXTURE_ADDRESS_MODE;
+                            PoolGame.device.SamplerStates[2].AddressV = TEXTURE_ADDRESS_MODE;
+                            
+                            if (World.displacementType == DisplacementType.ParallaxMapping)
+                            {
+                                PoolGame.device.SamplerStates[4].AddressU = TEXTURE_ADDRESS_MODE;
+                                PoolGame.device.SamplerStates[4].AddressV = TEXTURE_ADDRESS_MODE;
+                            }
                         }
-                        if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) basicTechnique = "NoMRT" + basicTechnique;
+                        if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) 
+                            basicTechnique = "NoMRT" + basicTechnique;
                         DrawModel(true, PostProcessManager.SSSoftShadow_MRT, basicTechnique, delegate { SetParametersSoftShadowMRT(LightManager.lights); });
 
                         //DrawModel(true, LightManager.lights, PostProcessManager.SSSoftShadow, "SSSTechnique", delegate { SetParametersSoftShadow(LightManager.lights); });
@@ -377,7 +384,7 @@ namespace XNA_PoolGame.Graphics.Models
                 case RenderMode.BasicRender:
                     {
                         frustum = World.camera.FrustumCulling;
-                        String basicTechnique = "ModelTechnique";
+                        string basicTechnique = "ModelTechnique";
                         if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) basicTechnique = "NoMRT" + basicTechnique;
                         DrawModel(true, PostProcessManager.modelEffect, basicTechnique, delegate { SetParametersModelEffectMRT(LightManager.lights); });
                     }
@@ -455,7 +462,7 @@ namespace XNA_PoolGame.Graphics.Models
                     // Draw the geometry.
                     device.DrawIndexedPrimitives(PrimitiveType.TriangleList,
                                                  0, 0, modelPart.VertexCount,
-                                                 0, modelPart.IndexCount / 3);
+                                                 0, modelPart.TriangleCount);
 
                     pass.End();
                 }
@@ -712,6 +719,15 @@ namespace XNA_PoolGame.Graphics.Models
 
             PostProcessManager.SSSoftShadow_MRT.Parameters["CameraPosition"].SetValue(new Vector4(World.camera.CameraPosition.X, World.camera.CameraPosition.Y, World.camera.CameraPosition.Z, 0.0f));
 
+            if (World.displacementType != DisplacementType.None)
+            {
+                PostProcessManager.SSSoftShadow_MRT.Parameters["NormalMap"].SetValue(normalMapTexture);
+                if (World.displacementType == DisplacementType.ParallaxMapping)
+                {
+                    PostProcessManager.SSSoftShadow_MRT.Parameters["parallaxscaleBias"].SetValue(World.scaleBias);
+                    PostProcessManager.SSSoftShadow_MRT.Parameters["HeightMap"].SetValue(heightMapTexture);
+                }
+            }
         }
         public void SetParametersSoftShadow(Light light)
         {
@@ -805,12 +821,6 @@ namespace XNA_PoolGame.Graphics.Models
             }
             base.Dispose(disposing);
         }
-        #endregion
-
-        #region IDraw Members
-
-        
-
         #endregion
 
         #region IComparable Members

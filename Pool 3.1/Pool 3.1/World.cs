@@ -42,16 +42,17 @@ namespace XNA_PoolGame
         // SHADOWS SETTINGS
         public static bool displayShadows = true;
         public static bool displayShadowsTextures = false;
-        public static int shadowMapSize = 1024 * 2;
+        public static int shadowMapSize = 1024 / 2;
         public static ShadowTechnnique shadowTechnique = ShadowTechnnique.ScreenSpaceShadowMapping;
         // NORMAL MAPPING
         public static DisplacementType displacementType = DisplacementType.None;
+        public static Vector2 scaleBias = new Vector2(0.04f, -0.03f);
         
         // BLOOM
         public static bool BloomPostProcessing = true;
 
         // THREADS
-        public static bool UseThreads = true;
+        public static bool UseThreads = false;
         public static BallCollider ballcollider = null;
 
         // DISTORTION

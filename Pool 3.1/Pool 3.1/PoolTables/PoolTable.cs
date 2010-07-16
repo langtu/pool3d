@@ -106,7 +106,7 @@ namespace XNA_PoolGame.PoolTables
         internal Vector3 ballstuckposition;
 
         #region Constructor
-        public PoolTable(Game game, String modelName)
+        public PoolTable(Game game, string modelName)
             : base(game, modelName)
         {
 

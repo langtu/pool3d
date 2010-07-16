@@ -29,7 +29,7 @@ namespace XNA_PoolGame.Graphics
         }
         protected void GenerateDownscaleTargetSW(RenderTarget2D source, RenderTarget2D result)
         {
-            String techniqueName = "Downscale4";
+            string techniqueName = "Downscale4";
 
             PresentationParameters pp = PoolGame.device.PresentationParameters;
 
@@ -76,7 +76,7 @@ namespace XNA_PoolGame.Graphics
                                                                 source.MultiSampleType,
                                                                 source.MultiSampleQuality);
 
-            String baseTechniqueName = "GaussianBlur";
+            string baseTechniqueName = "GaussianBlur";
 
             // Do horizontal pass first
             PostProcessManager.blurEffect.CurrentTechnique = PostProcessManager.blurEffect.Techniques[baseTechniqueName + "H"];
@@ -110,7 +110,7 @@ namespace XNA_PoolGame.Graphics
                                                                 source.MultiSampleType,
                                                                 source.MultiSampleQuality);
 
-            String baseTechniqueName = "GaussianDepthBlur";
+            string baseTechniqueName = "GaussianDepthBlur";
 
             // Do horizontal pass first
             PostProcessManager.blurEffect.CurrentTechnique = PostProcessManager.blurEffect.Techniques[baseTechniqueName + "H"];

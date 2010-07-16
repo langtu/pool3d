@@ -26,51 +26,6 @@ namespace CustomModelPipeline
     /// </summary>
     [ContentProcessor(DisplayName = "Custom Model")]
 
-    #region Another approach
-    /*public class CustomModelProcessor : ModelProcessor
-    {
-        public override ModelContent Process(NodeContent input, ContentProcessorContext context)
-        {
-            ModelContent usualModel = base.Process(input, context);
-            List<BoundingBox> bboxes = new List<BoundingBox>();
-            bboxes = AddBoundingBox(input, bboxes);
-            usualModel.Tag = bboxes.ToArray();
-            return usualModel;
-        }
-        private List<BoundingBox> AddBoundingBox(NodeContent node, List<BoundingBox> bboxes)
-        {
-            MeshContent mesh = node as MeshContent;
-            if (mesh != null)
-            {
-                Matrix absoluteTransform = node.AbsoluteTransform;
-
-                foreach (GeometryContent geometry in mesh.Geometry)
-                {
-                    Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-                    Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
-
-                    foreach (int index in geometry.Indices)
-                    {
-                        Vector3 vertex = geometry.Vertices.Positions[index];
-                        Vector3 transformedVertex = Vector3.Transform(vertex, absoluteTransform);
-                        min = Vector3.Min(min, transformedVertex);
-                        max = Vector3.Max(max, transformedVertex);
-                    }
-
-                    bboxes.Add(new BoundingBox(min, max));
-                }
-
-                
-            }
-
-            foreach (NodeContent child in node.Children)
-                bboxes = AddBoundingBox(child, bboxes);
-
-            return bboxes;
-        }
-    }*/
-    #endregion
-
     public class CustomModelProcessor : ContentProcessor<NodeContent,
                                                          CustomModelContent>
     {
@@ -85,7 +40,7 @@ namespace CustomModelPipeline
             get { return effectFileName; }
             set { effectFileName = value; }
         }
-
+        
         ContentProcessorContext context;
         CustomModelContent outputModel;
 
@@ -176,8 +131,7 @@ namespace CustomModelPipeline
         /// </summary>
         void ProcessGeometry(GeometryContent geometry)
         {
-            int indexCount = geometry.Indices.Count;
-            //int triangleCount = geometry.Indices.Count / 3;
+            int triangleCount = geometry.Indices.Count / 3;
             int vertexCount = geometry.Vertices.VertexCount;
 
             // Calculate boundingbox
@@ -206,7 +160,7 @@ namespace CustomModelPipeline
             MaterialContent material = ProcessMaterial(geometry.Material);
 
             // Add the new piece of geometry to our output model.
-            outputModel.AddModelPart(indexCount, vertexCount, vertexStride,
+            outputModel.AddModelPart(triangleCount, vertexCount, vertexStride,
                                      vertexElements, vertexBufferContent,
                                      geometry.Indices, material, new BoundingBox(min, max));
             
@@ -225,6 +179,7 @@ namespace CustomModelPipeline
             // Have we already processed this material?
             if (!processedMaterials.ContainsKey(material))
             {
+                
                 // If not, process it now.
                 processedMaterials[material] =
                     context.Convert<MaterialContent,

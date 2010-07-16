@@ -275,7 +275,7 @@ Frame Box01 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\ConcreteNew0003_S2.bmp";
+     "..\\..\\Textures\\Cribs\\ConcreteNew0003_S2.jpg";
     }
    }
   }
@@ -1433,7 +1433,7 @@ Frame ChamferBox01 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\ConcreteNew0003_S2.bmp";
+     "..\\..\\Textures\\Cribs\\ConcreteNew0003_S2.jpg";
     }
    }
   }

@@ -5,26 +5,27 @@ using System.Text;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 
 namespace CustomModelPipeline
 {
     [ContentProcessor]
-    public class CustomTextureProcessor : ContentProcessor<TextureContent, TextureContent>
-    {
-
+    public class CustomTextureProcessor : TextureProcessor
+    {        
         public override TextureContent Process(TextureContent input, ContentProcessorContext context)
         {
             // Convert the input to standard Color format, for ease of processing.
-            input.ConvertBitmapType(typeof(PixelBitmapContent<Color>));
+            TextureContent textcont = base.Process(input, context);
+            textcont.ConvertBitmapType(typeof(PixelBitmapContent<Color>));
 
-            foreach (MipmapChain imageFace in input.Faces)
+            foreach (MipmapChain imageFace in textcont.Faces)
             {
                 for (int i = 0; i < imageFace.Count; i++)
                 {
                     PixelBitmapContent<Color> mip = (PixelBitmapContent<Color>)imageFace[i];
 
                     // Apply color keying.
-                    mip.ReplaceColor(Color.Magenta, Color.TransparentBlack);
+                    //mip.ReplaceColor(Color.Magenta, Color.TransparentBlack);
 
                     // Make sure the image is a power of two in size.
                     int width = MakePowerOfTwo(mip.Width);
@@ -32,7 +33,7 @@ namespace CustomModelPipeline
 
                     if ((width != mip.Width) || (height != mip.Height))
                     {
-                        context.Logger.LogWarning(null, input.Identity,
+                        context.Logger.LogWarning(null, textcont.Identity,
                             "Bitmap was not a power of two. Scaled from {0}x{1} to {2}x{3}.",
                             mip.Width, mip.Height, width, height);
 
@@ -44,13 +45,13 @@ namespace CustomModelPipeline
                     }
                 }
             }
-            
-            input.GenerateMipmaps(true);
+
+            textcont.GenerateMipmaps(false);
 
             // Compress the output texture.
-            input.ConvertBitmapType(typeof(Dxt1BitmapContent));
+            textcont.ConvertBitmapType(typeof(Dxt1BitmapContent));
 
-            return input;
+            return textcont;
         }
 
 

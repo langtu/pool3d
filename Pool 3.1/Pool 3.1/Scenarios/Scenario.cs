@@ -19,7 +19,7 @@ namespace XNA_PoolGame.Scenarios
         /// <summary>
         /// Object's scene
         /// </summary>
-        public MultiMap<int, Entity> objects;
+        public MultiMap<int, DrawableComponent> objects;
 
         private Vector4 ambientColor;
 
@@ -48,7 +48,7 @@ namespace XNA_PoolGame.Scenarios
         public Scenario(Game game)
             : base(game)
         {
-            objects = new MultiMap<int, Entity>();
+            objects = new MultiMap<int, DrawableComponent>();
             particles = new MultiMap<int, ParticleSystem>();
             distortionparticles = new MultiMap<int, ParticleSystem>();
             lights = new List<Light>();
@@ -58,8 +58,8 @@ namespace XNA_PoolGame.Scenarios
             LoadLights();
         }
 
-        
-        public MultiMap<int, Entity> Objects
+
+        public MultiMap<int, DrawableComponent> Objects
         {
             get { return objects; }
         }
@@ -97,7 +97,7 @@ namespace XNA_PoolGame.Scenarios
         /// <param name="gameTime"></param>
         public void DrawScene(GameTime gameTime)
         {
-            foreach (Entity bm in this.Objects)
+            foreach (DrawableComponent bm in this.Objects)
             {
                 if (bm.Visible) bm.Draw(gameTime);
             }
@@ -111,10 +111,15 @@ namespace XNA_PoolGame.Scenarios
         /// <summary>
         /// Set particles settings before drawing them.
         /// </summary>
-        public virtual void SetParticleSettings()
+        public virtual void SetParticlesSettings()
         {
             foreach (ParticleSystem particle in particles)
-                particle.SetCamera(World.camera.View, World.camera.Projection);
+            {
+                if (World.motionblurType != MotionBlurType.None)
+                    particle.SetCamera(World.camera.View, World.camera.Projection, World.camera.PrevViewProjection);
+                else 
+                    particle.SetCamera(World.camera.View, World.camera.Projection);
+            }
         }
 
         /// <summary>
@@ -123,9 +128,17 @@ namespace XNA_PoolGame.Scenarios
         public virtual void SetDistortionParticleSettings()
         {
             foreach (ParticleSystem particle in distortionparticles)
-                particle.SetCamera(World.camera.View, World.camera.Projection);
+            {
+                if (World.motionblurType != MotionBlurType.None)
+                    particle.SetCamera(World.camera.View, World.camera.Projection, World.camera.PrevViewProjection);
+                else
+                    particle.SetCamera(World.camera.View, World.camera.Projection);
+            }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void SetParticleEffectTechnique()
         {
             foreach (ParticleSystem particle in particles)

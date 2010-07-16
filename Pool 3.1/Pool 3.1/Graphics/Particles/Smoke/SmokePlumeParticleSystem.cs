@@ -23,9 +23,10 @@ namespace XNA_PoolGame.Graphics.Particles
             settings.TextureName = "smoke";
 
             //settings.MaxParticles = 600;
-            settings.MaxParticles = 10;
+            settings.MaxParticles = 40;
 
-            settings.Duration = TimeSpan.FromSeconds(10);
+            //settings.Duration = TimeSpan.FromSeconds(10);
+            settings.Duration = TimeSpan.FromSeconds(5);
 
             settings.MinHorizontalVelocity = 0;
             settings.MaxHorizontalVelocity = 15;

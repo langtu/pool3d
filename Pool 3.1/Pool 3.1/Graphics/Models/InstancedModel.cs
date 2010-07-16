@@ -2,85 +2,149 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework;
 
 namespace XNA_PoolGame.Graphics.Models
 {
-    /// <summary>
-    /// Define a InstancedModel.
-    /// </summary>
-    public class InstancedModel : Entity
+    public class InstancedModel
     {
-        public int totalinstances;
-        public Matrix[] transforms;
-        InstancingTechnique instancetech = InstancingTechnique.HardwareInstancing;
+        #region Fields
 
-        public delegate void GatherWorldMatrices();
 
-        public GatherWorldMatrices delegateupdate;
+        // Internally our custom model is made up from a list of model parts.
+        // Most of the interesting code lives in the InstancedModelPart class.
+        [ContentSerializer]
+        List<InstancedModelPart> modelParts = null;
+
+
+        // Keep track of what graphics device we are using.
+        GraphicsDevice graphicsDevice;
+
+
+        #endregion
+
+        #region Initialization
+
 
         /// <summary>
-        /// Instancing technique
+        /// Private constructor, for use by the XNB deserializer.
+        /// </summary>
+        private InstancedModel()
+        {
+        }
+
+
+        /// <summary>
+        /// Initializes the instancing data.
+        /// </summary>
+        public void Initialize(GraphicsDevice device)
+        {
+            graphicsDevice = device;
+
+            foreach (InstancedModelPart modelPart in modelParts)
+            {
+                BasicEffect be = (BasicEffect)modelPart.effect;
+                modelPart.Initialize(device, be.Texture);
+            }
+
+            // Choose the best available instancing technique.
+            InstancingTechnique technique = 0;
+
+            while (!IsTechniqueSupported(technique))
+                technique++;
+
+            SetInstancingTechnique(technique);
+        }
+
+        public void Initialize(GraphicsDevice device, InstancingTechnique instancedtech)
+        {
+            graphicsDevice = device;
+
+            foreach (InstancedModelPart modelPart in modelParts)
+            {
+                BasicEffect be = (BasicEffect)modelPart.effect;
+                modelPart.Initialize(device, be.Texture);
+            }
+
+            SetInstancingTechnique(instancedtech);
+        }
+
+
+        #endregion
+
+        #region Technique Selection
+
+
+        /// <summary>
+        /// Gets the current instancing technique.
         /// </summary>
         public InstancingTechnique InstancingTechnique
         {
-            get { return instancetech; }
+            get { return instancingTechnique; }
         }
 
+        InstancingTechnique instancingTechnique;
 
-        public InstancedModel(Game _game, string _modelName)
-            : base(_game, _modelName)
-        {
-            totalinstances = 0;
-        }
-        public override void LoadContent()
-        {
-            base.LoadContent();
-
-            model.Initialize(PoolGame.device, instancetech);
-        }
 
         /// <summary>
-        /// 
+        /// Changes which instancing technique we are using.
         /// </summary>
-        protected override void updateLocalWorld()
-        {
-            // Do nothing
-        }
-
         public void SetInstancingTechnique(InstancingTechnique technique)
         {
-            this.instancetech = technique;
-            model.SetInstancingTechnique(technique);
+            instancingTechnique = technique;
+
+            foreach (InstancedModelPart modelPart in modelParts)
+            {
+                modelPart.SetInstancingTechnique(technique);
+            }
         }
 
-        public override void DrawModel(bool enableTexture, Effect effect, string technique, RenderHandler setParameter)
+
+        /// <summary>
+        /// Checks whether the specified instancing technique
+        /// is supported by the current graphics device.
+        /// </summary>
+        public bool IsTechniqueSupported(InstancingTechnique technique)
         {
-            if (setParameter != null) { setParameter.Invoke(); }
-
-            if (enableTexture)
+#if !XBOX360
+            // Hardware instancing is only supported on pixel shader 3.0 devices.
+            if (technique == InstancingTechnique.HardwareInstancing)
             {
-                PoolGame.device.SamplerStates[0].AddressU = TEXTURE_ADDRESS_MODE;
-                PoolGame.device.SamplerStates[0].AddressV = TEXTURE_ADDRESS_MODE;
+                return graphicsDevice.GraphicsDeviceCapabilities
+                                     .PixelShaderVersion.Major >= 3;
             }
-            PoolGame.device.Textures[1] = null;
-            PoolGame.device.Textures[2] = null;
-            PoolGame.device.Textures[3] = null;
-            //Texture2D texture = null;
-            //if (enableTexture)
-            //    texture
-            string newTechnique = model.InstancingTechnique.ToString() + technique;
+#endif
 
-            if (effect.Techniques[newTechnique] == null) 
+            // Otherwise, everything is good.
+            return true;
+        }
+
+
+        #endregion
+
+
+        /// <summary>
+        /// Draws a batch of instanced models.
+        /// </summary>
+        public void DrawInstances(Matrix[] instanceTransforms, Effect customEffect)
+        {
+            if (graphicsDevice == null)
+            {
+                throw new InvalidOperationException(
+                    "InstanceModel.Initialize must be called before DrawInstances.");
+            }
+
+            if (instanceTransforms.Length == 0)
                 return;
 
-            effect.CurrentTechnique = effect.Techniques[newTechnique];
-            // Gather instance transform matrices into a single array.
-            delegateupdate.Invoke();
-
-            // Draw all the instances in a single call.
-            model.DrawInstances(transforms, World.camera.View, World.camera.Projection, effect, textures[0]);
+            foreach (InstancedModelPart modelPart in modelParts)
+            {
+                modelPart.Draw(instancingTechnique, instanceTransforms,
+                                customEffect);
+            }
         }
+
     }
 }

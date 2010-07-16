@@ -66,7 +66,7 @@
     <Compile Include="Models\Sticks\sticktex.bmp">
       <Name>sticktex</Name>
       <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
+      <Processor>CustomTextureProcessor</Processor>
     </Compile>
     <Compile Include="Particles\explosion.png">
       <Name>explosion</Name>
@@ -123,11 +123,6 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Textures\Cribs\black_leather.bmp">
-      <Name>black_leather</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
     <Compile Include="Textures\Cribs\blancoOstra.bmp">
       <Name>blancoOstra</Name>
       <Importer>TextureImporter</Importer>
@@ -135,11 +130,6 @@
     </Compile>
     <Compile Include="Textures\Cribs\BrickBrown_S.bmp">
       <Name>BrickBrown_S</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Textures\Cribs\ConcreteNew0003_S2.bmp">
-      <Name>ConcreteNew0003_S2</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
@@ -220,11 +210,6 @@
     </Compile>
     <Compile Include="Textures\Cribs\WoodPlatesOld0019_1_M2.jpg">
       <Name>WoodPlatesOld0019_1_M2</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-    <Compile Include="Textures\Garage\black_leather.bmp">
-      <Name>black_leather</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
@@ -621,6 +606,10 @@
       <Project>{D8B8F520-17C9-48B7-8A80-4B8F09104726}</Project>
       <Name>CustomModelPipeline</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\InstancedModelPipeline\InstancedModelPipeline.csproj">
+      <Project>{8536995C-CAA4-4D09-BD24-27994AD11CC5}</Project>
+      <Name>InstancedModelPipeline</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Effects\MotionBlur.fx">
@@ -684,6 +673,11 @@
     <None Include="Effects\pp_Common.fxh">
       <Name>pp_Common</Name>
     </None>
+    <Compile Include="Models\Balls\instanced_newball.X">
+      <Name>instanced_newball</Name>
+      <Importer>XImporter</Importer>
+      <Processor>InstancedModelProcessor</Processor>
+    </Compile>
     <Compile Include="Models\Cribs\rooflamp.X">
       <Name>rooflamp</Name>
       <Importer>XImporter</Importer>
@@ -720,6 +714,8 @@
       <Name>ConcreteNew0003_S2_N</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
     </Compile>
     <Compile Include="Textures\Cribs\PlanksNew0026_9_L2_N.jpg">
       <Name>PlanksNew0026_9_L2_N</Name>
@@ -786,6 +782,8 @@
       <Name>floor_tile_ceramic2_N</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -793,6 +791,8 @@
       <Name>floor_tile_ceramic2</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -807,6 +807,8 @@
       <Name>floor_tile_stoneIrregular</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -898,6 +900,67 @@
     </Compile>
     <Compile Include="Textures\Balls\ball 9.jpg">
       <Name>ball 9</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\ConcreteNew0003_S2_H.jpg">
+      <Name>ConcreteNew0003_S2_H</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\ConcreteNew0003_S2.jpg">
+      <Name>ConcreteNew0003_S2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\floor_tile_stoneIrregular_N.jpg">
+      <Name>floor_tile_stoneIrregular_N</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\floor_tile_stoneIrregular_H.jpg">
+      <Name>floor_tile_stoneIrregular_H</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\floor_tile_ceramic2_H.jpg">
+      <Name>floor_tile_ceramic2_H</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Garage\black_leather.jpg">
+      <Name>black_leather</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\black_leather.jpg">
+      <Name>black_leather</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

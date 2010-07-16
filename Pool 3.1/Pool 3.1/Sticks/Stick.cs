@@ -57,7 +57,7 @@ namespace XNA_PoolGame.Sticks
             this.playerIndex = playerIndex;
         }
 
-        public Stick(Game game, Ball balltarget, String stickName, String textureStick, int playerIndex)
+        public Stick(Game game, Ball balltarget, string stickName, string textureStick, int playerIndex)
             : base(game, stickName, textureStick)
         {
             this.ballTarget = balltarget;

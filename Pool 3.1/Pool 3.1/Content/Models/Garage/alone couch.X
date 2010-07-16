@@ -2919,7 +2919,7 @@ Frame ChamferBox01 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Garage\\black_leather.bmp";
+     "..\\..\\Textures\\Garage\\black_leather.jpg";
     }
    }
   }
@@ -6157,7 +6157,7 @@ Frame ChamferBox02 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Garage\\black_leather.bmp";
+     "..\\..\\Textures\\Garage\\black_leather.jpg";
     }
    }
   }
@@ -9395,7 +9395,7 @@ Frame ChamferBox03 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Garage\\black_leather.bmp";
+     "..\\..\\Textures\\Garage\\black_leather.jpg";
     }
    }
   }
@@ -12633,7 +12633,7 @@ Frame ChamferBox04 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Garage\\black_leather.bmp";
+     "..\\..\\Textures\\Garage\\black_leather.jpg";
     }
    }
   }
@@ -15871,7 +15871,7 @@ Frame ChamferBox05 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Garage\\black_leather.bmp";
+     "..\\..\\Textures\\Garage\\black_leather.jpg";
     }
    }
   }
@@ -19109,7 +19109,7 @@ Frame ChamferBox06 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Garage\\black_leather.bmp";
+     "..\\..\\Textures\\Garage\\black_leather.jpg";
     }
    }
   }
