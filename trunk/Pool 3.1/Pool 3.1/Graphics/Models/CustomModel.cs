@@ -53,80 +53,11 @@ namespace XNA_PoolGame.Graphics.Models
             foreach (CustomModelPart modelPart in modelParts)
             {
                 BasicEffect be = (BasicEffect)modelPart.Effect;
-                modelPart.Initialize(device, be.Texture);
-            }
-            // Choose the best available instancing technique.
-            // For default is NoInstancing
-            InstancingTechnique technique = InstancingTechnique.NoInstancing;
-
-            SetInstancingTechnique(technique);
-        }
-
-        /// <summary>
-        /// Initializes the instancing data.
-        /// </summary>
-        public void Initialize(GraphicsDevice device, InstancingTechnique instancetech)
-        {
-            graphicsDevice = device;
-            foreach (CustomModelPart modelPart in modelParts)
-            {
-                BasicEffect be = (BasicEffect)modelPart.Effect;
-                modelPart.Initialize(device, be.Texture);
-            }
-            
-            SetInstancingTechnique(instancetech);
-        }
-
-        #region Technique Selection
-
-
-        /// <summary>
-        /// Gets the current instancing technique.
-        /// </summary>
-        public InstancingTechnique InstancingTechnique
-        {
-            get { return instancingTechnique; }
-        }
-
-        InstancingTechnique instancingTechnique;
-
-
-        /// <summary>
-        /// Changes which instancing technique we are using.
-        /// </summary>
-        public void SetInstancingTechnique(InstancingTechnique technique)
-        {
-            instancingTechnique = technique;
-
-            foreach (CustomModelPart modelPart in modelParts)
-            {
-                modelPart.SetInstancingTechnique(technique);
+                modelPart.Initialize(be.Texture);
             }
         }
 
-
-        /// <summary>
-        /// Checks whether the specified instancing technique
-        /// is supported by the current graphics device.
-        /// </summary>
-        public bool IsTechniqueSupported(InstancingTechnique technique)
-        {
-#if !XBOX360
-            // Hardware instancing is only supported on pixel shader 3.0 devices.
-            if (technique == InstancingTechnique.HardwareInstancing)
-            {
-                return graphicsDevice.GraphicsDeviceCapabilities
-                                     .PixelShaderVersion.Major >= 3;
-            }
-#endif
-
-            // Otherwise, everything is good.
-            return true;
-        }
-
-
-        #endregion
-
+        #region List of texture
         /// <summary>
         /// 
         /// </summary>
@@ -142,6 +73,8 @@ namespace XNA_PoolGame.Graphics.Models
             return list;
         }
 
+        #endregion
+
         public BoundingBox GetBoundingBox()
         {
             BoundingBox box = new BoundingBox();
@@ -152,49 +85,6 @@ namespace XNA_PoolGame.Graphics.Models
             return box;
         }
 
-        /// <summary>
-        /// Draws a batch of instanced models.
-        /// </summary>
-        public void DrawInstances(Matrix[] instanceTransforms,
-                                  Matrix view, Matrix projection, Effect customEffect)
-        {
-            if (graphicsDevice == null)
-            {
-                throw new InvalidOperationException(
-                    "InstanceModel.Initialize must be called before DrawInstances.");
-            }
-
-            if (instanceTransforms.Length == 0)
-                return;
-
-            foreach (CustomModelPart modelPart in modelParts)
-            {
-                modelPart.Draw(instancingTechnique, instanceTransforms,
-                               view, projection, customEffect, null);
-            }
-        }
-
-        /// <summary>
-        /// Draws a batch of instanced models.
-        /// </summary>
-        public void DrawInstances(Matrix[] instanceTransforms,
-                                  Matrix view, Matrix projection, Effect customEffect, Texture2D anotherTexture)
-        {
-            if (graphicsDevice == null)
-            {
-                throw new InvalidOperationException(
-                    "InstanceModel.Initialize must be called before DrawInstances.");
-            }
-
-            if (instanceTransforms.Length == 0)
-                return;
-
-            foreach (CustomModelPart modelPart in modelParts)
-            {
-                modelPart.Draw(instancingTechnique, instanceTransforms,
-                               view, projection, customEffect, anotherTexture);
-            }
-        }
 
         /// <summary>
         /// Draws the model using the specified camera matrices.
@@ -271,7 +161,7 @@ namespace XNA_PoolGame.Graphics.Models
                     // Draw the geometry.
                     device.DrawIndexedPrimitives(PrimitiveType.TriangleList,
                                                  0, 0, modelPart.VertexCount,
-                                                 0, modelPart.IndexCount);
+                                                 0, modelPart.TriangleCount);
 
                     thisEffect.CurrentTechnique.Passes[0].End();
                 }

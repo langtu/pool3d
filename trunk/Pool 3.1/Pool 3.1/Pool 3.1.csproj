@@ -87,8 +87,10 @@
   <ItemGroup>
     <Compile Include="Graphics\DepthOfField.cs" />
     <Compile Include="Graphics\FullQuad.cs" />
-    <Compile Include="Graphics\Models\InstancedModel.cs" />
+    <Compile Include="Graphics\Models\InstancedEntity.cs" />
     <Compile Include="Graphics\Models\CustomModelPart.cs" />
+    <Compile Include="Graphics\Models\InstancedModel.cs" />
+    <Compile Include="Graphics\Models\InstancedModelPart.cs" />
     <Compile Include="Graphics\MotionBlur.cs" />
     <Compile Include="Graphics\Particles\Fire\HeatParticleSystem.cs" />
     <Compile Include="Graphics\Shadows\ScreenSpaceShadowMapping.cs" />

@@ -27,6 +27,12 @@ namespace XNA_PoolGame.Graphics
             visible = true;
         }
 
+        public override void Initialize()
+        {
+            base.Initialize();
+            LoadContent();
+        }
+
         #region Miembros de IDrawable
 
         public int DrawOrder

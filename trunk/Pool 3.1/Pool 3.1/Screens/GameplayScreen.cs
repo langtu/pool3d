@@ -72,7 +72,7 @@ namespace XNA_PoolGame.Screens
             //World.poolTable.UseThread = true;
 
             LightManager.sphereModel = new Entity(PoolGame.game, "Models\\Balls\\newball", VolumeType.BoundingSpheres);
-            LightManager.sphereModel.isObjectAtScenario = false;
+            LightManager.sphereModel.belongsToScenario = false;
             LightManager.sphereModel.Position = LightManager.lights[0].Position;
             LightManager.sphereModel.LoadContent();
 
@@ -226,7 +226,7 @@ namespace XNA_PoolGame.Screens
 
             #region PARTICLES
             PostProcessManager.ChangeRenderMode(RenderMode.ParticleSystem);
-            World.scenario.SetParticleSettings();
+            World.scenario.SetParticlesSettings();
             World.scenario.Draw(gameTime);
             #endregion
 
@@ -333,8 +333,10 @@ namespace XNA_PoolGame.Screens
 
             if (World.motionblurType != MotionBlurType.None)
             {
-                foreach (Entity e in World.scenario.objects)
-                    e.SetPreviousWorld();
+                foreach (DrawableComponent e in World.scenario.objects)
+                {
+                    if (e is Entity) ((Entity)e).SetPreviousWorld();
+                }
 
                 World.camera.PrevViewProjection = World.camera.ViewProjection;
                 World.camera.PrevView = World.camera.View;

@@ -416,7 +416,7 @@ Frame ChamferBox01 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Garage\\black_leather.bmp";
+     "..\\..\\Textures\\Garage\\black_leather.jpg";
     }
    }
   }
@@ -963,7 +963,7 @@ Frame Box02 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Garage\\black_leather.bmp";
+     "..\\..\\Textures\\Garage\\black_leather.jpg";
     }
    }
   }

@@ -10,7 +10,7 @@ namespace XNA_PoolGame.PoolTables
 {
     public class Classic : PoolTable
     {
-        public Classic(Game _game, String _modelName)
+        public Classic(Game _game, string _modelName)
             : base(_game, _modelName)
         {
             CommonConstructor();

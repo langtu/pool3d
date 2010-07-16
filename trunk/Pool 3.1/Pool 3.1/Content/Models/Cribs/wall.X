@@ -130,7 +130,7 @@ Material PDX01_-_Default {
  0.000000;0.000000;0.000000;;
 
  TextureFilename {
-  "..\\..\\Textures\\Cribs\\ConcreteNew0003_S2.bmp";
+  "..\\..\\Textures\\Cribs\\ConcreteNew0003_S2.jpg";
  }
 }
 

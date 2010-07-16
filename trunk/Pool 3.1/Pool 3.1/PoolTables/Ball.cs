@@ -142,7 +142,7 @@ namespace XNA_PoolGame
 
         #region Constructors
 
-        public Ball(Game game, int ballNumber, String ballModel, PoolTable table, float radius)
+        public Ball(Game game, int ballNumber, string ballModel, PoolTable table, float radius)
             : base(game, ballModel)
         {
             this.table = table;
@@ -158,7 +158,7 @@ namespace XNA_PoolGame
 #endif
         }
 
-        public Ball(Game game, int ballNumber, String ballModel, String ballTexture, PoolTable table, float radius)
+        public Ball(Game game, int ballNumber, string ballModel, string ballTexture, PoolTable table, float radius)
             : this(game, ballNumber, ballModel, table, radius)
         {
             this.textureAsset = ballTexture;
@@ -184,10 +184,10 @@ namespace XNA_PoolGame
         private void SetOBB()
         {
             float directionAngle;
-            if (direction.X == 0.0f) directionAngle = (float)Math.Atan(direction.Z);
-            else directionAngle = (float)Math.Atan(direction.Z / direction.X);
+            if (direction.Z == 0.0f) directionAngle = (float)Math.Atan(direction.X);
+            else directionAngle = (float)Math.Atan(direction.X / direction.Z);
 
-            Matrix rotation = Matrix.CreateRotationY(-directionAngle);
+            Matrix rotation = Matrix.CreateRotationY(directionAngle);
 
 
             obb = new OrientedBoundingBox(this.Position,
@@ -993,7 +993,7 @@ namespace XNA_PoolGame
 
                     float angle = (float)Maths.AngleBetweenVectors(table.pockets[i].insideNormal[j], this.direction);
 
-                    if (obb != null && obb.Intersects(table.pockets[i].insideBands[j]) && this.previousInsideHitRail != (i * 2 + j)
+                    if (obb != null && obb.Intersects(table.pockets[i].insideBands[j]) && this.previousHitRail != table.pockets.Length + (i * 2 + j)
                         && angle > MathHelper.PiOver2 && angle <= MathHelper.Pi)
                     {
                         lock (this.syncObject)
@@ -1002,8 +1002,8 @@ namespace XNA_PoolGame
                             this.Rotation = Matrix.Identity;
 
                             this.angleRotation = 0.0f;
-                            this.previousInsideHitRail = i * 2 + j;
-                            this.previousHitRail = -1;
+                            //this.previousInsideHitRail = i * 2 + j;
+                            this.previousHitRail = table.pockets.Length + (i * 2 + j);
                             this.angleRotation = 0.0f;
 
                             Vector3 normal = table.pockets[i].insideNormal[j];

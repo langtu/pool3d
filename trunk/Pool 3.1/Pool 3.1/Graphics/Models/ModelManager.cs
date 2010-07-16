@@ -14,7 +14,7 @@ namespace XNA_PoolGame.Graphics
     public static class ModelManager
     {
 
-        public static Dictionary<String, Dictionary<ModelMeshPart, ModelBoundingBoxTexture>> allEffectMapping;
+        //public static Dictionary<string, Dictionary<ModelMeshPart, ModelBoundingBoxTexture>> allEffectMapping;
         public static List<IThreadable> allthreads;
         public static int TotalMeshParts;
 
@@ -24,12 +24,11 @@ namespace XNA_PoolGame.Graphics
         }
         public static void Load()
         {
-            List<String> models = new List<String>();
+            List<string> models = new List<string>();
             allthreads = new List<IThreadable>();
 
-            allEffectMapping = new Dictionary<String, Dictionary<ModelMeshPart, ModelBoundingBoxTexture>>();
+            //allEffectMapping = new Dictionary<string, Dictionary<ModelMeshPart, ModelBoundingBoxTexture>>();
             models.Add("Models\\Balls\\newball");
-            //models.Add("Models\\Balls\\ball8");
             models.Add("Models\\Painting\\snow painting");
             models.Add("Models\\Cribs\\tabouret-design1");
             models.Add("Models\\Cribs\\couch");
@@ -51,7 +50,7 @@ namespace XNA_PoolGame.Graphics
             models.Add("Models\\Sticks\\stick_universal");
             models.Add("Models\\Cribs\\rooflamp");
 
-            foreach (String str in models)
+            foreach (string str in models)
                 LoadModel(str);
 
             
@@ -69,7 +68,7 @@ namespace XNA_PoolGame.Graphics
             }
         }
 
-        private static void LoadModel(String modelName)
+        private static void LoadModel(string modelName)
         {
             CustomModel model = PoolGame.content.Load<CustomModel>(modelName);
             
@@ -123,7 +122,7 @@ namespace XNA_PoolGame.Graphics
 
         public static void UnloadContent()
         {
-            allEffectMapping.Clear();
+            //allEffectMapping.Clear();
         }
 
         public struct VertexPosition

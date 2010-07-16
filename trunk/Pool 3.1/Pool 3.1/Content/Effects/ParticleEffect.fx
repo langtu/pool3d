@@ -10,6 +10,7 @@
 float4x4 View;
 float4x4 Projection;
 float ViewportHeight;
+float4x4 preViewProj;
 float MaxDepth;
 
 
@@ -73,6 +74,8 @@ struct VertexShaderOutput
     float4 Color : COLOR0;
     float4 Rotation : COLOR1;
     float4 PositionViewS : TEXCOORD1;
+	float4 CurrPositionCS : TEXCOORD2;
+	float4 PrevPositionCS : TEXCOORD3;
     
 };
 
@@ -198,7 +201,8 @@ VertexShaderOutput VertexShader(VertexShaderInput input)
     output.Color = ComputeParticleColor(output.Position, input.Random.z, normalizedAge);
     output.Rotation = ComputeParticleRotation(input.Random.w, age);
     output.PositionViewS = mul(pos, View);
-    //output.PositionViewS = pos.z / pos.w;
+    output.CurrPositionCS = output.Position;
+	output.PrevPositionCS = mul(input.Position, preViewProj);
     
     return output;
 }
@@ -216,6 +220,8 @@ struct NonRotatingPixelShaderInput
     float2 TextureCoordinate : TEXCOORD0;
 #endif
 	float4 PositionViewS : TEXCOORD1;
+	float4 CurrPositionCS : TEXCOORD2;
+	float4 PrevPositionCS : TEXCOORD3;
 };
 
 
@@ -224,8 +230,16 @@ PS_MRT_Output NonRotatingPixelShader(NonRotatingPixelShaderInput input)
 {
 	PS_MRT_Output output;
 	output.Color = tex2D(Sampler, input.TextureCoordinate) * input.Color;
-	output.DepthColor = 1.0f;//float4((-input.PositionViewS.z / MaxDepth)*output.Color.a, 1.0f, 1.0f, 1.0f);
-	output.Velocity = 1.0f;
+	output.DepthColor = float4(-input.PositionViewS.z / MaxDepth, 1.0f, 1.0f, 1.0f);
+	
+	// Calculate the instantaneous pixel velocity. Since clip-space coordinates are of the range [-1, 1] 
+	// with Y increasing from the bottom to the top of screen, we'll rescale x and y and flip y so that
+	// the velocity corresponds to texture coordinates (which are of the range [0,1], and y increases from top to bottom)
+	float2 vVelocity = (input.CurrPositionCS.xy / input.CurrPositionCS.w) - (input.PrevPositionCS.xy / input.PrevPositionCS.w);
+	vVelocity *= 0.5f;
+	vVelocity.y *= -1;
+	output.Velocity = float4(vVelocity, 1.0f, 1.0f);
+	
     return output;
 }
 
@@ -248,6 +262,8 @@ struct RotatingPixelShaderInput
 #endif
 
     float4 PositionViewS : TEXCOORD1;
+	float4 CurrPositionCS : TEXCOORD2;
+	float4 PrevPositionCS : TEXCOORD3;
 };
 
 
@@ -282,8 +298,16 @@ PS_MRT_Output RotatingPixelShader(RotatingPixelShaderInput input)
     textureCoordinate += 0.5;
 
 	output.Color = tex2D(Sampler, textureCoordinate) * input.Color;
-	output.DepthColor = 0;//float4((-input.PositionViewS.z / MaxDepth)*output.Color.a, 1.0f, 1.0f, 1.0f);
-	output.Velocity = 0;
+	output.DepthColor = float4(-input.PositionViewS.z / MaxDepth, 1.0f, 1.0f, 1.0f);
+	
+	// Calculate the instantaneous pixel velocity. Since clip-space coordinates are of the range [-1, 1] 
+	// with Y increasing from the bottom to the top of screen, we'll rescale x and y and flip y so that
+	// the velocity corresponds to texture coordinates (which are of the range [0,1], and y increases from top to bottom)
+	float2 vVelocity = (input.CurrPositionCS.xy / input.CurrPositionCS.w) - (input.PrevPositionCS.xy / input.PrevPositionCS.w);
+	vVelocity *= 0.5f;
+	vVelocity.y *= -1;
+	output.Velocity = float4(vVelocity, 1.0f, 1.0f);
+	
     return output;
 }
 // NoMRT

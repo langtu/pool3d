@@ -39,8 +39,8 @@ namespace XNA_PoolGame
     public enum DisplacementType
     {
         None,
-        NormalMapping//,
-        //ParallaxMapping
+        NormalMapping,
+        ParallaxMapping
     }
     public enum IntermediateBuffer
     {

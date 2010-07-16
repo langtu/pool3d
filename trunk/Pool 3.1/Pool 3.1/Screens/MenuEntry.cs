@@ -23,7 +23,7 @@ namespace XNA_PoolGame.Screens
         /// The text rendered for this entry.
         /// </summary>
         string text;
-
+        
         /// <summary>
         /// Tracks a fading selection effect on the entry.
         /// </summary>

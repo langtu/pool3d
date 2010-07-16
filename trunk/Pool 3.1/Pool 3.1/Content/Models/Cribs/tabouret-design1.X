@@ -14642,7 +14642,7 @@ Frame Surface02 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\black_leather.bmp";
+     "..\\..\\Textures\\Cribs\\black_leather.jpg";
     }
    }
   }

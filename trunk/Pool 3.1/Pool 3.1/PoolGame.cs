@@ -1,4 +1,4 @@
-#define DRAW_DEBUGTEXT
+//#define DRAW_DEBUGTEXT
 
 #region Using Statements
 using XNA_PoolGame;
@@ -89,8 +89,8 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 1280;
-            graphics.PreferredBackBufferHeight = 720;
+            graphics.PreferredBackBufferWidth = 600;
+            graphics.PreferredBackBufferHeight = 480;
             graphics.SynchronizeWithVerticalRetrace = false;
             //graphics.PreferMultiSampling = true;
             
@@ -246,7 +246,7 @@ namespace XNA_PoolGame
             // SHADOWS
             if (kb.IsKeyDown(Keys.F10) && lastkb.IsKeyUp(Keys.F10))
             {
-                World.displacementType = (DisplacementType)(((int)(World.displacementType + 1) % 2));
+                World.displacementType = (DisplacementType)(((int)(World.displacementType + 1) % 3));
             }
 
             if (kb.IsKeyDown(Keys.Y) && lastkb.IsKeyUp(Keys.Y))
@@ -323,8 +323,10 @@ namespace XNA_PoolGame
                 if (World.motionblurType == MotionBlurType.None)
                 {
                     PostProcessManager.velocityRTLastFrame = PostProcessManager.velocityRT;
-                    foreach (Entity e in World.scenario.objects)
-                        e.SetPreviousWorld();
+                    foreach (DrawableComponent e in World.scenario.objects)
+                    {
+                        if (e is Entity) ((Entity)e).SetPreviousWorld();
+                    }
 
                     World.camera.PrevViewProjection = World.camera.ViewProjection;
                     World.camera.PrevView = World.camera.View;
@@ -494,9 +496,9 @@ namespace XNA_PoolGame
             {
                 Texture2D endTexture = null;
                 //endTexture = PostProcessManager.shadows.ShadowMapRT[0].GetTexture();
-                endTexture = PostProcessManager.shadows.ShadowRT.GetTexture();
+                //endTexture = PostProcessManager.shadows.ShadowRT.GetTexture();
                 //endTexture = PostProcessManager.motionBlur.RT.GetTexture();
-                //if (World.dofType != DOFType.None || World.motionblurType != MotionBlurType.None) endTexture = PostProcessManager.depthRT.GetTexture();
+                if (World.dofType != DOFType.None || World.motionblurType != MotionBlurType.None) endTexture = PostProcessManager.depthRT.GetTexture();
                 Rectangle rect = new Rectangle(0, 0, 128, 128);
 
                 

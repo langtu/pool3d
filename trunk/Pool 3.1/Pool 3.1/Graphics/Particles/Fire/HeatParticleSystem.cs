@@ -22,14 +22,14 @@ namespace XNA_PoolGame.Graphics.Particles.Fire
         {
             settings.TextureName = "fire";
 
-            settings.MaxParticles = 40;
+            settings.MaxParticles = 100;
 
             settings.Duration = TimeSpan.FromSeconds(1.5f);
 
             settings.DurationRandomness = 1;
 
-            settings.MinHorizontalVelocity = -20;
-            settings.MaxHorizontalVelocity = 20;
+            settings.MinHorizontalVelocity = -30;
+            settings.MaxHorizontalVelocity = 30;
 
             settings.MinVerticalVelocity = -20;
             settings.MaxVerticalVelocity = 30;

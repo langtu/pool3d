@@ -33,7 +33,7 @@ namespace XNA_PoolGame.Scenarios
             base.Dispose(disposing);
         }
 
-        public override void SetParticleSettings()
+        public override void SetParticlesSettings()
         {
             throw new NotImplementedException();
         }

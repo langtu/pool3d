@@ -39,6 +39,7 @@ namespace XNA_PoolGame.Graphics.Particles
         EffectParameter effectViewportHeightParameter;
         EffectParameter effectTimeParameter;
         EffectParameter effectMaxDepthParameter;
+        EffectParameter effectpreViewProjParameter;
 
 
         // An array of particles, treated as a circular queue.
@@ -225,6 +226,7 @@ namespace XNA_PoolGame.Graphics.Particles
             effectViewportHeightParameter = parameters["ViewportHeight"];
             effectTimeParameter = parameters["CurrentTime"];
             effectMaxDepthParameter = parameters["MaxDepth"];
+            effectpreViewProjParameter = parameters["preViewProj"];
 
             // Set the values of parameters that do not change.
             parameters["Duration"].SetValue((float)settings.Duration.TotalSeconds);
@@ -527,6 +529,17 @@ namespace XNA_PoolGame.Graphics.Particles
             effectMaxDepthParameter.SetValue(World.camera.FarPlane);
         }
 
+        /// <summary>
+        /// Sets the camera view and projection matrices
+        /// that will be used to draw this particle system. Also set the previewprojection matrix
+        /// </summary>
+        public void SetCamera(Matrix view, Matrix projection, Matrix preViewProj)
+        {
+            effectViewParameter.SetValue(view);
+            effectProjectionParameter.SetValue(projection);
+            effectMaxDepthParameter.SetValue(World.camera.FarPlane);
+            effectpreViewProjParameter.SetValue(preViewProj);
+        }
 
         /// <summary>
         /// Adds a new particle to the system.
