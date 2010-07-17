@@ -116,7 +116,7 @@ namespace XNA_PoolGame
                         if (controller.LeftStick.Y != 0.0f)
                         {
                             Vector3 newPosition = stick.ballTarget.Position + controller.LeftStick.Y * stick.Direction;
-                            newPosition = Vector3.Max(table.headDelimiters[0], Vector3.Min(newPosition, table.headDelimiters[1]));
+                            //newPosition = Vector3.Max(table.headDelimiters[0], Vector3.Min(newPosition, table.headDelimiters[1]));
                             
                             stick.ballTarget.Position = newPosition;
                         }
@@ -124,7 +124,7 @@ namespace XNA_PoolGame
                         {
 
                             Vector3 newPosition = stick.ballTarget.Position - controller.LeftStick.X * stick.AxisOfRotation;
-                            newPosition = Vector3.Max(table.headDelimiters[0], Vector3.Min(newPosition, table.headDelimiters[1]));
+                            //newPosition = Vector3.Max(table.headDelimiters[0], Vector3.Min(newPosition, table.headDelimiters[1]));
 
                             stick.ballTarget.Position = newPosition;
                         }

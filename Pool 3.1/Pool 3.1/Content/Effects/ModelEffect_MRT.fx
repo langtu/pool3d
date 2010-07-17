@@ -1,7 +1,6 @@
 float4x4 World;
 float4x4 View;
 float4x4 ViewProj;
-float4x4 LightViewProj;
 float4x4 PrevWorldViewProj;
 float4 LightPosition[2];
 

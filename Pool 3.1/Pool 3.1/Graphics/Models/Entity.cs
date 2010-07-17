@@ -70,8 +70,8 @@ namespace XNA_PoolGame.Graphics.Models
         private int[] lightstype;
 
         private bool useDEM = false;
-        public RenderTargetCube refCubeMap;
-        //private TextureCube environmentMap;
+        public RenderTargetCube refCubeMap = null;
+        public TextureCube environmentMap;
         #endregion
 
         #region //// FRUSTUM CULLING ////
@@ -289,15 +289,17 @@ namespace XNA_PoolGame.Graphics.Models
 
             if (modelNameL2 != null)
             {
-                //if (DEM)
+                
                     World.scenario.dems.Add(this);
+                if (DEM)
+                    World.scenario.dems2.Add(this);
                 modelL2 = PoolGame.content.Load<CustomModel>(modelNameL2);
             }
             //else modelL2 = modelL1;
 
-            if (DEM)
+            if (DEM && refCubeMap == null)
             {
-                refCubeMap = new RenderTargetCube(PoolGame.device, 256, 1, PoolGame.device.PresentationParameters.BackBufferFormat);
+                refCubeMap = new RenderTargetCube(PoolGame.device, 2, 1, PoolGame.device.PresentationParameters.BackBufferFormat);
             }
 
             // Load custom texture
@@ -455,12 +457,25 @@ namespace XNA_PoolGame.Graphics.Models
                         //DrawModel(true, LightManager.lights, PostProcessManager.SSSoftShadow, "SSSTechnique", delegate { SetParametersSoftShadow(LightManager.lights); });
                     }
                     break;
+                case RenderMode.DEMBasicRender:
+                    {
+                        frustum = World.camera.FrustumCulling;
+                        string basicTechnique = "ModelTechnique";
+                        if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) basicTechnique = "NoMRT" + basicTechnique;
+                        CustomModel tmpmodel = modelL1;
+                        modelL1 = modelL2;
+                        DrawModel(true, PostProcessManager.modelEffect, basicTechnique, delegate { SetParametersModelEffectMRT(LightManager.lights); });
+                        modelL1 = tmpmodel;
+                    }
+                    break;
                 case RenderMode.BasicRender:
                     {
                         frustum = World.camera.FrustumCulling;
                         string basicTechnique = "ModelTechnique";
                         if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) basicTechnique = "NoMRT" + basicTechnique;
+                       
                         DrawModel(true, PostProcessManager.modelEffect, basicTechnique, delegate { SetParametersModelEffectMRT(LightManager.lights); });
+                        
                     }
                     break;
 
@@ -468,130 +483,67 @@ namespace XNA_PoolGame.Graphics.Models
                     {
                         if (DEM)
                         {
-                            PostProcessManager.ChangeRenderMode(RenderMode.BasicRender);
+                            PostProcessManager.ChangeRenderMode(RenderMode.DEMBasicRender);
                             Camera oldCamera = World.camera;
-                            //oldCamera.Enabled = false;
 
                             World.camera = World.emptycamera;
 
                             this.Visible = false;
 
                             World.emptycamera.CameraPosition = this.position;
-                            World.emptycamera.Projection = oldCamera.Projection;
+                            World.emptycamera.Projection = Matrix.CreatePerspectiveFieldOfView(
+                                    oldCamera.FieldOfView,
+                                    oldCamera.AspectRatio,
+                                    0.0000001f,
+                                    oldCamera.FarPlane);
                             // Render our cube map, once for each cube face (6 times).
-                            //for (int i = 0; i < 6; i++)
+                            for (int i = 0; i < 6; i++)
                             {
                                 // render the scene to all cubemap faces
-                                /*CubeMapFace cubeMapFace = (CubeMapFace)i;
+                                CubeMapFace cubeMapFace = (CubeMapFace)i;
 
                                 switch (cubeMapFace)
                                 {
                                     case CubeMapFace.NegativeX:
                                         {
-                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, Vector3.Left, Vector3.Up);
+                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, this.position + Vector3.Left, Vector3.Up);
                                             break;
                                         }
                                     case CubeMapFace.NegativeY:
                                         {
-                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, Vector3.Down, Vector3.Forward);
+                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, this.position + Vector3.Down, Vector3.Forward);
                                             break;
                                         }
                                     case CubeMapFace.NegativeZ:
                                         {
-                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, Vector3.Backward, Vector3.Up);
+                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, this.position + Vector3.Backward, Vector3.Up);
                                             break;
                                         }
                                     case CubeMapFace.PositiveX:
                                         {
-                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, Vector3.Right, Vector3.Up);
+                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, this.position + Vector3.Right, Vector3.Up);
                                             break;
                                         }
                                     case CubeMapFace.PositiveY:
                                         {
-                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, Vector3.Up, Vector3.Backward);
+                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, this.position + Vector3.Up, Vector3.Backward);
                                             break;
                                         }
                                     case CubeMapFace.PositiveZ:
                                         {
-                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, Vector3.Forward, Vector3.Up);
+                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, this.position + Vector3.Forward, Vector3.Up);
                                             break;
                                         }
                                 }
-                                 PoolGame.device.SetRenderTarget(0, refCubeMap, cubeMapFace);
+
+                                PoolGame.device.SetRenderTarget(0, refCubeMap, cubeMapFace);
                                 PoolGame.device.Clear(Color.White);
-                                World.scenario.DrawDEMObjects(gameTime);
-                                 */
-
-                                //Draw NegativeX
-                                PoolGame.device.SetRenderTarget(0, refCubeMap, CubeMapFace.NegativeX);
-
-                                World.emptycamera.View = Matrix.Identity;
-                                World.emptycamera.View *= Matrix.CreateTranslation(this.position);
-                                World.emptycamera.View *= Matrix.CreateRotationZ(0);
-                                World.emptycamera.View *= Matrix.CreateRotationY(-MathHelper.PiOver2);
-                                World.emptycamera.View *= Matrix.CreateRotationX(0);
-
-                                World.emptycamera.ViewProjection = World.emptycamera.View * World.emptycamera.Projection;
-                                World.scenario.DrawDEMObjects(gameTime);
-
-                                //Draw PositiveX
-                                PoolGame.device.SetRenderTarget(0, refCubeMap, CubeMapFace.PositiveX);
-                                World.emptycamera.View = Matrix.Identity;
-                                World.emptycamera.View *= Matrix.CreateTranslation(this.position);
-                                World.emptycamera.View *= Matrix.CreateRotationZ(0);
-                                World.emptycamera.View *= Matrix.CreateRotationY(MathHelper.PiOver2);
-                                World.emptycamera.View *= Matrix.CreateRotationX(0);
-
-                                World.emptycamera.ViewProjection = World.emptycamera.View * World.emptycamera.Projection;
-                                World.scenario.DrawDEMObjects(gameTime);
-
-                                //Draw NegativeY
-                                PoolGame.device.SetRenderTarget(0, refCubeMap, CubeMapFace.NegativeY);
-                                World.emptycamera.View = Matrix.Identity;
-                                World.emptycamera.View *= Matrix.CreateTranslation(this.position);
-                                World.emptycamera.View *= Matrix.CreateRotationZ(0);
-                                World.emptycamera.View *= Matrix.CreateRotationY(MathHelper.Pi);
-                                World.emptycamera.View *= Matrix.CreateRotationX(MathHelper.PiOver2);
-
-                                World.emptycamera.ViewProjection = World.emptycamera.View * World.emptycamera.Projection;
-                                World.scenario.DrawDEMObjects(gameTime);
-
-                                //Draw PositiveY
-                                PoolGame.device.SetRenderTarget(0, refCubeMap, CubeMapFace.PositiveY);
-                                World.emptycamera.View = Matrix.Identity;
-                                World.emptycamera.View *= Matrix.CreateTranslation(this.position);
-                                World.emptycamera.View *= Matrix.CreateRotationZ(0);
-                                World.emptycamera.View *= Matrix.CreateRotationY(MathHelper.Pi);
-                                World.emptycamera.View *= Matrix.CreateRotationX(-MathHelper.PiOver2);
-
-                                World.emptycamera.ViewProjection = World.emptycamera.View * World.emptycamera.Projection;
-                                World.scenario.DrawDEMObjects(gameTime);
-
-                                //Draw NegativeZ
-                                PoolGame.device.SetRenderTarget(0, refCubeMap, CubeMapFace.NegativeZ);
-                                World.emptycamera.View = Matrix.Identity;
-                                World.emptycamera.View *= Matrix.CreateTranslation(this.position);
-                                World.emptycamera.View *= Matrix.CreateRotationZ(0);
-                                World.emptycamera.View *= Matrix.CreateRotationY(0);
-                                World.emptycamera.View *= Matrix.CreateRotationX(0);
-
-                                World.emptycamera.ViewProjection = World.emptycamera.View * World.emptycamera.Projection;
-                                World.scenario.DrawDEMObjects(gameTime);
-
-                                //Draw PositiveZ
-                                PoolGame.device.SetRenderTarget(0, refCubeMap, CubeMapFace.PositiveZ);
-                                World.emptycamera.View = Matrix.Identity;
-                                World.emptycamera.View *= Matrix.CreateTranslation(this.position);
-                                World.emptycamera.View *= Matrix.CreateRotationZ(MathHelper.Pi);
-                                World.emptycamera.View *= Matrix.CreateRotationY(0);
-                                World.emptycamera.View *= Matrix.CreateRotationX(MathHelper.Pi);
-
                                 World.emptycamera.ViewProjection = World.emptycamera.View * World.emptycamera.Projection;
                                 World.scenario.DrawDEMObjects(gameTime);
                             }
                             PoolGame.device.SetRenderTarget(0, null);
+                            environmentMap = refCubeMap.GetTexture();
 
-                            //oldCamera.Enabled = true;
                             World.camera = oldCamera;
                             PostProcessManager.ChangeRenderMode(RenderMode.DEM);
                             this.Visible = true;
@@ -940,7 +892,7 @@ namespace XNA_PoolGame.Graphics.Models
             PostProcessManager.SSSoftShadow_MRT.Parameters["bDEM"].SetValue(DEM);
             if (DEM)
             {
-                PostProcessManager.SSSoftShadow_MRT.Parameters["EnvironmentMap"].SetValue(refCubeMap.GetTexture());
+                PostProcessManager.SSSoftShadow_MRT.Parameters["EnvironmentMap"].SetValue(environmentMap);
             }
         }
         public void SetParametersSoftShadow(Light light)

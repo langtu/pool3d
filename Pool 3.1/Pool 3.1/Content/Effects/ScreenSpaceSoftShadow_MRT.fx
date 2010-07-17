@@ -95,18 +95,10 @@ sampler2D ssaoSampler = sampler_state
 	MINFILTER = Linear;
 	MIPFILTER = Linear;
 };
-
 texture EnvironmentMap;
-sampler EnvironmentMapSampler = sampler_state
-{
-    Texture = (EnvironmentMap);
-
-    MinFilter = Linear;
-    MagFilter = Linear;
-    MipFilter = Linear;
-    
-    AddressU = Wrap;
-    AddressV = Wrap;
+samplerCUBE EnvironmentMapSampler = sampler_state 
+{ 
+    texture = <EnvironmentMap>;     
 };
 
 struct VS_ScreenSpaceShadow_Input
@@ -128,7 +120,6 @@ struct VS_ScreenSpaceShadow_Output
     float4 CurrPositionCS	: TEXCOORD4;
     float4 PositionViewS	: TEXCOORD5;
     float3x3 TBN				: TEXCOORD6;
-    
     
 };
 
@@ -168,7 +159,6 @@ VS_ScreenSpaceShadow_Output VS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Input inpu
 	output.TBN[0] = mul(input.Tangent, World);
     output.TBN[1] = mul(input.Binormal, World);
     output.TBN[2] = mul(input.Normal, World);
-    
     return output;
 }
 
@@ -328,6 +318,7 @@ float4 PS_ScreenSpaceShadowNoMRT(VS_ScreenSpaceShadow_Output input, uniform bool
 		float3 envmap = texCUBE(EnvironmentMapSampler, Reflection);
 		float3 ccolor = tex2D(ColorSampler, texCoord);
 		Color = float4(lerp(ccolor, envmap, Fresnel), 1.0f);
+		//Color = float4(envmap, 1.0f);
     }
     
 	for (int k = 0; k < totalLights; k++)
@@ -376,7 +367,7 @@ float4 PS_ScreenSpaceShadowNoMRT(VS_ScreenSpaceShadow_Output input, uniform bool
     //
     
     return (saturate((Color * (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular) * fShadowTerm + totalDiffuse2 * totalDiffuse2.a)) * ssaoterm;
-    
+    //return saturate(Color);
 }
 
 
