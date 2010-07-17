@@ -45,7 +45,7 @@ namespace XNA_PoolGame.Graphics
             models.Add("Models\\Cribs\\roof");
             models.Add("Models\\Cribs\\rollup door");
             models.Add("Models\\Cribs\\tv");
-            models.Add("Models\\poolTable2");
+            models.Add("Models\\classic");
             models.Add("Models\\Sticks\\stick");
             models.Add("Models\\Sticks\\stick_universal");
             models.Add("Models\\Cribs\\rooflamp");

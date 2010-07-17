@@ -16,7 +16,7 @@ namespace XNA_PoolGame.PoolTables
             CommonConstructor();
         }
         public Classic(Game _game)
-            : base(_game, "Models\\poolTable2")
+            : base(_game, "Models\\classic")
         {
             CommonConstructor();
         }

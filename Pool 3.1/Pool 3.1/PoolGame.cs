@@ -216,6 +216,7 @@ namespace XNA_PoolGame
             PostProcessManager.UnloadContent();
             content.Unload();
             ModelManager.UnloadContent();
+            World.emptycamera.Dispose();
             base.UnloadContent();
         }
         #endregion
@@ -310,8 +311,16 @@ namespace XNA_PoolGame
 
                 ((CribsBasement)World.scenario).ballsinstanced.SetInstancingTechnique(World.instancingTech);
             }
-            
 
+            if (kb.IsKeyDown(Keys.F7) && lastkb.IsKeyUp(Keys.F7))
+            {
+                World.useSSAO = !World.useSSAO;
+            }
+
+            if (kb.IsKeyDown(Keys.F8) && lastkb.IsKeyUp(Keys.F8))
+            {
+                World.useDynamicEnvironmentMapping = !World.useDynamicEnvironmentMapping;
+            }
             if (kb.IsKeyDown(Keys.K) && lastkb.IsKeyUp(Keys.K))
             {
                 World.dofType = (DOFType)(((int)World.dofType + 1) % 4);
@@ -403,7 +412,11 @@ namespace XNA_PoolGame
 
 
             ////////////////////////////////////////// FRUSTUM
-            if (kb.IsKeyDown(Keys.P) && lastkb.IsKeyUp(Keys.P)) World.camera.EnableFrustumCulling = !World.camera.EnableFrustumCulling;
+            if (kb.IsKeyDown(Keys.P) && lastkb.IsKeyUp(Keys.P))
+            {
+                World.camera.EnableFrustumCulling = !World.camera.EnableFrustumCulling;
+                World.emptycamera.EnableFrustumCulling = World.camera.EnableFrustumCulling;
+            }
 
             ////////////////////////////////////////// LIGHTS
 
@@ -497,9 +510,9 @@ namespace XNA_PoolGame
                 Texture2D endTexture = null;
                 //endTexture = PostProcessManager.shadows.ShadowMapRT[0].GetTexture();
                 //endTexture = PostProcessManager.shadows.ShadowRT.GetTexture();
-                //endTexture = PostProcessManager.motionBlur.RT.GetTexture();
+                //endTexture = World.poolTable.cueBall.refCubeMap.GetTexture();
                 if (World.dofType != DOFType.None || World.motionblurType != MotionBlurType.None) endTexture = PostProcessManager.depthRT.GetTexture();
-                Rectangle rect = new Rectangle(0, 0, 128, 128);
+                Rectangle rect = new Rectangle(0, 0, 256, 256);
 
                 
                 batch.Begin(SpriteBlendMode.None);

@@ -52,7 +52,7 @@ namespace XNA_PoolGame.Graphics.Shadows
 
         public override void Draw(GameTime gameTime)
         {
-            ///////////////// PASS 1 ////////////////////
+            ///////////////// PASS 1 - Depth Map ////////
             PostProcessManager.ChangeRenderMode(RenderMode.ShadowMapRender);
 
             oldBuffer = PoolGame.device.DepthStencilBuffer;
@@ -65,14 +65,21 @@ namespace XNA_PoolGame.Graphics.Shadows
                 lightpass++;
             }
 
-            ///////////////// PASS 2 ////////////////////
+            ///////////////// PASS 2 - PCF //////////////
             PostProcessManager.ChangeRenderMode(RenderMode.PCFShadowMapRender);
             RenderPCFShadowMap();
             shadowTIU.Use();
 
             World.scenario.DrawScene(gameTime);
 
-            ///////////////// PASS 3 ////////////////////
+            ///////////////// PASS 3 - DEM //////////////
+            PostProcessManager.ChangeRenderMode(RenderMode.DEM);
+            RenderDEM();
+
+            World.poolTable.cueBall.Draw(gameTime);
+            //World.scenario.DrawScene(gameTime);
+
+            ///////////////// PASS 4 - SSSS /////////////
             World.camera.ItemsDrawn = 0;
             PostProcessManager.ChangeRenderMode(RenderMode.ScreenSpaceSoftShadowRender);
             RenderSoftShadow();
@@ -91,7 +98,15 @@ namespace XNA_PoolGame.Graphics.Shadows
                 PoolGame.device.SetRenderTarget(2, null);
             }
         }
+        private void RenderDEM()
+        {
+            PoolGame.device.RenderState.DepthBufferEnable = true;
+            PoolGame.device.RenderState.DepthBufferWriteEnable = false;
+            PoolGame.device.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
+            PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
 
+            PoolGame.device.SetRenderTarget(0, null);
+        }
         private void RenderShadowMap(int lightindex)
         {
             PoolGame.device.RenderState.DepthBufferEnable = true;

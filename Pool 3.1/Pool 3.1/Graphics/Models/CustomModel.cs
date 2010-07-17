@@ -10,7 +10,8 @@ using XNA_PoolGame.Helpers;
 namespace XNA_PoolGame.Graphics.Models
 {
     /// <summary>
-    /// Custom model loaded from the pipeline.
+    /// Custom model loaded from the pipeline. It have a list of bounding boxes per meshpart.
+    /// See CustomModelPart for more information.
     /// </summary>
     public class CustomModel
     {

@@ -40,6 +40,7 @@ namespace XNA_PoolGame.Screens
             World.camera = new ChaseCamera(PoolGame.game);
             World.camera.CameraPosition = Vector3.Zero;
             World.camera.FarPlane = 5500.0f;
+            if (World.emptycamera == null) World.emptycamera = new EmptyCamera(PoolGame.game);
 
             // SET SHADOW TECHNIQUE
             if (PostProcessManager.shadows != null) PostProcessManager.shadows.Dispose();
@@ -127,7 +128,7 @@ namespace XNA_PoolGame.Screens
             World.scenario.Dispose();
             World.poolTable.Dispose();
             World.camera.Dispose();
-
+            
             GC.Collect();
             GC.WaitForPendingFinalizers();
             //GC.Collect();

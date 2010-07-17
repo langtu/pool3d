@@ -85,6 +85,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cameras\EmptyCamera.cs" />
     <Compile Include="Graphics\DepthOfField.cs" />
     <Compile Include="Graphics\FullQuad.cs" />
     <Compile Include="Graphics\Models\InstancedEntity.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="Graphics\Shadows\ScreenSpaceShadowMapping.cs" />
     <Compile Include="Graphics\Shadows\Shadow.cs" />
     <Compile Include="Graphics\Shadows\PSMShadowMapping.cs" />
+    <Compile Include="Graphics\Skybox.cs" />
     <Compile Include="Helpers\Tuple.cs" />
     <Compile Include="PoolTables\BallCollider.cs" />
     <Compile Include="Scenarios\ParticlesCore.cs" />

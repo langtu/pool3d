@@ -12,6 +12,7 @@ using XNA_PoolGame.Graphics.Shadows;
 using XNA_PoolGame.Helpers;
 using System.Threading;
 using System.Collections;
+using XNA_PoolGame.Cameras;
 #endregion
 
 namespace XNA_PoolGame.Graphics.Models
@@ -23,10 +24,19 @@ namespace XNA_PoolGame.Graphics.Models
     {
         #region Variables
 
-        protected CustomModel model = null;
-        protected string modelName = null;
+        /// <summary>
+        /// 3D object. (1st level detail)
+        /// </summary>
+        protected CustomModel modelL1 = null;
+        protected string modelNameL1 = null;
         protected string textureAsset = null;
         protected bool drawboundingvolume = false;
+
+        /// <summary>
+        /// 3D object. (2nd level detail)
+        /// </summary>
+        protected CustomModel modelL2 = null;
+        protected string modelNameL2 = null;
 
         #region //// MATERIAL PROPERTIES ////
 
@@ -47,13 +57,21 @@ namespace XNA_PoolGame.Graphics.Models
         private Vector4 materialDiffuseColor = Vector4.One;
         public string normalMapAsset = null;
         public string heightMapAsset = null;
+        public string ssaoMapAsset = null;
+        
         protected Texture2D normalMapTexture = null;
         protected Texture2D heightMapTexture = null;
+        protected Texture2D ssaoMapTexture = null;
+        
         private List<Light> aditionalLights;
         private float[] lightsradius;
         private Vector4[] lightscolors;
         private Vector4[] lightspositions;
         private int[] lightstype;
+
+        private bool useDEM = false;
+        public RenderTargetCube refCubeMap;
+        //private TextureCube environmentMap;
         #endregion
 
         #region //// FRUSTUM CULLING ////
@@ -114,9 +132,14 @@ namespace XNA_PoolGame.Graphics.Models
         {
             get { return localWorld; }
         }
-        public CustomModel Model
+        public CustomModel ModelL1
         {
-            get { return model; }
+            get { return modelL1; }
+        }
+
+        public CustomModel ModelL2
+        {
+            get { return modelNameL2 == null ? null : modelL2; }
         }
         public Vector4 MaterialDiffuse
         {
@@ -127,6 +150,12 @@ namespace XNA_PoolGame.Graphics.Models
         {
             get { return specularColor; }
             set { specularColor = value; }
+        }
+
+        public bool DEM
+        {
+            get { return useDEM; }
+            set { useDEM = value; }
         }
 
         public float Shinennes
@@ -189,18 +218,16 @@ namespace XNA_PoolGame.Graphics.Models
 
         #region Constructor
 
-        public Entity(Game _game, string _modelName)
+        public Entity(Game _game, string _modelNameL1)
             : base(_game)
         {
-            this.modelName = _modelName;
+            this.modelNameL1 = _modelNameL1;
 
             scale = Vector3.One;
             localWorld = Matrix.Identity;
             rotation = Matrix.Identity;
             preRotation = Matrix.Identity;
             position = Vector3.Zero;
-            textureAsset = null;
-            useTexture = null;
             volume = VolumeType.BoundingBoxes;
             prelocalWorld = Matrix.Identity;
 
@@ -208,25 +235,44 @@ namespace XNA_PoolGame.Graphics.Models
             worldDirty = true;
         }
 
-        public Entity(Game _game, string _modelName, string _textureAsset)
-            : this(_game, _modelName)
+        public Entity(Game _game, string _modelNameL1, bool loadLOD2)
+            : this(_game, _modelNameL1)
+        {
+            if (loadLOD2) this.modelNameL2 = this.modelNameL1 + "_LOD2";
+        }
+
+        public Entity(Game _game, string _modelNameL1, string _textureAsset)
+            : this(_game, _modelNameL1)
         {
             this.textureAsset = _textureAsset;
         }
 
-        public Entity(Game _game, string _modelName, VolumeType volume)
-            : this(_game, _modelName)
+        public Entity(Game _game, string _modelNameL1, bool loadLOD2, string _textureAsset)
+            : this(_game, _modelNameL1)
+        {
+            this.textureAsset = _textureAsset;
+            if (loadLOD2) this.modelNameL2 = this.modelNameL1 + "_LOD2";
+        }
+
+        public Entity(Game _game, string _modelNameL1, VolumeType volume)
+            : this(_game, _modelNameL1)
         {
             this.volume = volume;
         }
 
-        public Entity(Game _game, string _modelName, VolumeType volume, string _textureAsset)
-            : this(_game, _modelName)
+        public Entity(Game _game, string _modelNameL1, VolumeType volume, string _textureAsset)
+            : this(_game, _modelNameL1)
         {
             this.volume = volume;
             this.textureAsset = _textureAsset;
         }
-
+        public Entity(Game _game, string _modelNameL1, bool loadLOD2, VolumeType volume, string _textureAsset)
+            : this(_game, _modelNameL1)
+        {
+            this.volume = volume;
+            this.textureAsset = _textureAsset;
+            if (loadLOD2) this.modelNameL2 = this.modelNameL1 + "_LOD2";
+        }
 
         #endregion
 
@@ -239,19 +285,33 @@ namespace XNA_PoolGame.Graphics.Models
         public override void LoadContent()
         {
             GC.Collect();
-            model = PoolGame.content.Load<CustomModel>(modelName);
-            
+            modelL1 = PoolGame.content.Load<CustomModel>(modelNameL1);
+
+            if (modelNameL2 != null)
+            {
+                //if (DEM)
+                    World.scenario.dems.Add(this);
+                modelL2 = PoolGame.content.Load<CustomModel>(modelNameL2);
+            }
+            //else modelL2 = modelL1;
+
+            if (DEM)
+            {
+                refCubeMap = new RenderTargetCube(PoolGame.device, 256, 1, PoolGame.device.PresentationParameters.BackBufferFormat);
+            }
+
             // Load custom texture
             if (textureAsset != null) useTexture = PoolGame.content.Load<Texture2D>(textureAsset);
 
             //
             if (normalMapAsset != null) normalMapTexture = PoolGame.content.Load<Texture2D>(normalMapAsset);
             if (heightMapAsset != null) heightMapTexture = PoolGame.content.Load<Texture2D>(heightMapAsset);
+            if (ssaoMapAsset != null) ssaoMapTexture = PoolGame.content.Load<Texture2D>(ssaoMapAsset);
 
             // Setup model.
-            textures = model.GetTextures();
+            textures = modelL1.GetTextures();
 
-            boundingBox = model.GetBoundingBox();
+            boundingBox = modelL1.GetBoundingBox();
             boundingSphere = new BoundingSphere();
             boxes = new List<BoundingBox>();
 
@@ -261,7 +321,7 @@ namespace XNA_PoolGame.Graphics.Models
 
             if (belongsToScenario)
             {
-                foreach (CustomModelPart modelPart in model.modelParts)
+                foreach (CustomModelPart modelPart in modelL1.modelParts)
                 {
                     Vector3[] corners = modelPart.AABox.GetCorners();
                     Vector3 pointrotated = Vector3.Transform(corners[0], localWorld);
@@ -298,7 +358,7 @@ namespace XNA_PoolGame.Graphics.Models
                 if (volume == VolumeType.BoundingBoxes)
                 {
                     int i = 0;
-                    foreach (CustomModelPart modelPart in model.modelParts)
+                    foreach (CustomModelPart modelPart in modelL1.modelParts)
                     {
                         Vector3[] corners = modelPart.AABox.GetCorners();
                         Vector3 pointrotated = Vector3.Transform(corners[0], localWorld);
@@ -342,20 +402,21 @@ namespace XNA_PoolGame.Graphics.Models
             switch (renderMode)
             {
                 case RenderMode.ShadowMapRender:
-                    if (!occluder) return;
-                    
-                    frustum = LightManager.lights[PostProcessManager.shadows.lightpass].Frustum;
-                    DrawModel(false, PostProcessManager.Depth, "DepthMap", delegate { SetParametersShadowMap(LightManager.lights[PostProcessManager.shadows.lightpass]); });
+                    {
+                        if (!occluder) return;
 
+                        frustum = LightManager.lights[PostProcessManager.shadows.lightpass].Frustum;
+                        DrawModel(false, PostProcessManager.Depth, "DepthMap", delegate { SetParametersShadowMap(LightManager.lights[PostProcessManager.shadows.lightpass]); });
+                    }
                     break;
-
                 case RenderMode.PCFShadowMapRender:
-                    if (!occluder) return;
+                    {
+                        if (!occluder) return;
 
-                    frustum = World.camera.FrustumCulling;
-                    DrawModel(false, PostProcessManager.PCFShadowMap, "PCFSMTechnique", delegate { SetParametersPCFShadowMap(LightManager.lights); });
+                        frustum = World.camera.FrustumCulling;
+                        DrawModel(false, PostProcessManager.PCFShadowMap, "PCFSMTechnique", delegate { SetParametersPCFShadowMap(LightManager.lights); });
+                    }
                     break;
-
                 case RenderMode.ScreenSpaceSoftShadowRender:
                     {
                         frustum = World.camera.FrustumCulling;
@@ -370,9 +431,22 @@ namespace XNA_PoolGame.Graphics.Models
                             
                             if (World.displacementType == DisplacementType.ParallaxMapping)
                             {
-                                PoolGame.device.SamplerStates[4].AddressU = TEXTURE_ADDRESS_MODE;
-                                PoolGame.device.SamplerStates[4].AddressV = TEXTURE_ADDRESS_MODE;
+                                PoolGame.device.SamplerStates[3].AddressU = TEXTURE_ADDRESS_MODE;
+                                PoolGame.device.SamplerStates[3].AddressV = TEXTURE_ADDRESS_MODE;
                             }
+
+                            
+                        }
+
+                        if (ssaoMapAsset != null && World.useSSAO)
+                        {
+                            PoolGame.device.SamplerStates[4].AddressU = TEXTURE_ADDRESS_MODE;
+                            PoolGame.device.SamplerStates[4].AddressV = TEXTURE_ADDRESS_MODE;
+                            PostProcessManager.SSSoftShadow_MRT.Parameters["SSAOMap"].SetValue(ssaoMapTexture);
+                        }
+                        else
+                        {
+                            PostProcessManager.SSSoftShadow_MRT.Parameters["SSAOMap"].SetValue(PostProcessManager.whiteTexture);
                         }
                         if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) 
                             basicTechnique = "NoMRT" + basicTechnique;
@@ -387,6 +461,141 @@ namespace XNA_PoolGame.Graphics.Models
                         string basicTechnique = "ModelTechnique";
                         if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) basicTechnique = "NoMRT" + basicTechnique;
                         DrawModel(true, PostProcessManager.modelEffect, basicTechnique, delegate { SetParametersModelEffectMRT(LightManager.lights); });
+                    }
+                    break;
+
+                case RenderMode.DEM:
+                    {
+                        if (DEM)
+                        {
+                            PostProcessManager.ChangeRenderMode(RenderMode.BasicRender);
+                            Camera oldCamera = World.camera;
+                            //oldCamera.Enabled = false;
+
+                            World.camera = World.emptycamera;
+
+                            this.Visible = false;
+
+                            World.emptycamera.CameraPosition = this.position;
+                            World.emptycamera.Projection = oldCamera.Projection;
+                            // Render our cube map, once for each cube face (6 times).
+                            //for (int i = 0; i < 6; i++)
+                            {
+                                // render the scene to all cubemap faces
+                                /*CubeMapFace cubeMapFace = (CubeMapFace)i;
+
+                                switch (cubeMapFace)
+                                {
+                                    case CubeMapFace.NegativeX:
+                                        {
+                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, Vector3.Left, Vector3.Up);
+                                            break;
+                                        }
+                                    case CubeMapFace.NegativeY:
+                                        {
+                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, Vector3.Down, Vector3.Forward);
+                                            break;
+                                        }
+                                    case CubeMapFace.NegativeZ:
+                                        {
+                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, Vector3.Backward, Vector3.Up);
+                                            break;
+                                        }
+                                    case CubeMapFace.PositiveX:
+                                        {
+                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, Vector3.Right, Vector3.Up);
+                                            break;
+                                        }
+                                    case CubeMapFace.PositiveY:
+                                        {
+                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, Vector3.Up, Vector3.Backward);
+                                            break;
+                                        }
+                                    case CubeMapFace.PositiveZ:
+                                        {
+                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, Vector3.Forward, Vector3.Up);
+                                            break;
+                                        }
+                                }
+                                 PoolGame.device.SetRenderTarget(0, refCubeMap, cubeMapFace);
+                                PoolGame.device.Clear(Color.White);
+                                World.scenario.DrawDEMObjects(gameTime);
+                                 */
+
+                                //Draw NegativeX
+                                PoolGame.device.SetRenderTarget(0, refCubeMap, CubeMapFace.NegativeX);
+
+                                World.emptycamera.View = Matrix.Identity;
+                                World.emptycamera.View *= Matrix.CreateTranslation(this.position);
+                                World.emptycamera.View *= Matrix.CreateRotationZ(0);
+                                World.emptycamera.View *= Matrix.CreateRotationY(-MathHelper.PiOver2);
+                                World.emptycamera.View *= Matrix.CreateRotationX(0);
+
+                                World.emptycamera.ViewProjection = World.emptycamera.View * World.emptycamera.Projection;
+                                World.scenario.DrawDEMObjects(gameTime);
+
+                                //Draw PositiveX
+                                PoolGame.device.SetRenderTarget(0, refCubeMap, CubeMapFace.PositiveX);
+                                World.emptycamera.View = Matrix.Identity;
+                                World.emptycamera.View *= Matrix.CreateTranslation(this.position);
+                                World.emptycamera.View *= Matrix.CreateRotationZ(0);
+                                World.emptycamera.View *= Matrix.CreateRotationY(MathHelper.PiOver2);
+                                World.emptycamera.View *= Matrix.CreateRotationX(0);
+
+                                World.emptycamera.ViewProjection = World.emptycamera.View * World.emptycamera.Projection;
+                                World.scenario.DrawDEMObjects(gameTime);
+
+                                //Draw NegativeY
+                                PoolGame.device.SetRenderTarget(0, refCubeMap, CubeMapFace.NegativeY);
+                                World.emptycamera.View = Matrix.Identity;
+                                World.emptycamera.View *= Matrix.CreateTranslation(this.position);
+                                World.emptycamera.View *= Matrix.CreateRotationZ(0);
+                                World.emptycamera.View *= Matrix.CreateRotationY(MathHelper.Pi);
+                                World.emptycamera.View *= Matrix.CreateRotationX(MathHelper.PiOver2);
+
+                                World.emptycamera.ViewProjection = World.emptycamera.View * World.emptycamera.Projection;
+                                World.scenario.DrawDEMObjects(gameTime);
+
+                                //Draw PositiveY
+                                PoolGame.device.SetRenderTarget(0, refCubeMap, CubeMapFace.PositiveY);
+                                World.emptycamera.View = Matrix.Identity;
+                                World.emptycamera.View *= Matrix.CreateTranslation(this.position);
+                                World.emptycamera.View *= Matrix.CreateRotationZ(0);
+                                World.emptycamera.View *= Matrix.CreateRotationY(MathHelper.Pi);
+                                World.emptycamera.View *= Matrix.CreateRotationX(-MathHelper.PiOver2);
+
+                                World.emptycamera.ViewProjection = World.emptycamera.View * World.emptycamera.Projection;
+                                World.scenario.DrawDEMObjects(gameTime);
+
+                                //Draw NegativeZ
+                                PoolGame.device.SetRenderTarget(0, refCubeMap, CubeMapFace.NegativeZ);
+                                World.emptycamera.View = Matrix.Identity;
+                                World.emptycamera.View *= Matrix.CreateTranslation(this.position);
+                                World.emptycamera.View *= Matrix.CreateRotationZ(0);
+                                World.emptycamera.View *= Matrix.CreateRotationY(0);
+                                World.emptycamera.View *= Matrix.CreateRotationX(0);
+
+                                World.emptycamera.ViewProjection = World.emptycamera.View * World.emptycamera.Projection;
+                                World.scenario.DrawDEMObjects(gameTime);
+
+                                //Draw PositiveZ
+                                PoolGame.device.SetRenderTarget(0, refCubeMap, CubeMapFace.PositiveZ);
+                                World.emptycamera.View = Matrix.Identity;
+                                World.emptycamera.View *= Matrix.CreateTranslation(this.position);
+                                World.emptycamera.View *= Matrix.CreateRotationZ(MathHelper.Pi);
+                                World.emptycamera.View *= Matrix.CreateRotationY(0);
+                                World.emptycamera.View *= Matrix.CreateRotationX(MathHelper.Pi);
+
+                                World.emptycamera.ViewProjection = World.emptycamera.View * World.emptycamera.Projection;
+                                World.scenario.DrawDEMObjects(gameTime);
+                            }
+                            PoolGame.device.SetRenderTarget(0, null);
+
+                            //oldCamera.Enabled = true;
+                            World.camera = oldCamera;
+                            PostProcessManager.ChangeRenderMode(RenderMode.DEM);
+                            this.Visible = true;
+                        }
                     }
                     break;
             }
@@ -420,7 +629,7 @@ namespace XNA_PoolGame.Graphics.Models
             drawvolume &= drawboundingvolume;
 #endif
             int i = 0, j = 0;
-            foreach (CustomModelPart modelPart in model.modelParts)
+            foreach (CustomModelPart modelPart in modelL1.modelParts)
             {
                 #region (1) Culling
 
@@ -728,6 +937,11 @@ namespace XNA_PoolGame.Graphics.Models
                     PostProcessManager.SSSoftShadow_MRT.Parameters["HeightMap"].SetValue(heightMapTexture);
                 }
             }
+            PostProcessManager.SSSoftShadow_MRT.Parameters["bDEM"].SetValue(DEM);
+            if (DEM)
+            {
+                PostProcessManager.SSSoftShadow_MRT.Parameters["EnvironmentMap"].SetValue(refCubeMap.GetTexture());
+            }
         }
         public void SetParametersSoftShadow(Light light)
         {
@@ -804,15 +1018,25 @@ namespace XNA_PoolGame.Graphics.Models
             {
                 ModelManager.AbortAllThreads();
                 PoolGame.game.Components.Remove(this);
-                model = null;
+                modelL1 = null; modelL2 = null;
+
                 if (boxes != null) boxes.Clear();
                 boxes = null;
-                modelName = null;
+                modelNameL1 = null;
                 textureAsset = null;
                 if (textures != null) textures.Clear();
                 textures = null;
                 if (normalMapTexture != null) normalMapTexture.Dispose();
                 normalMapTexture = null;
+
+                if (heightMapTexture != null) heightMapTexture.Dispose();
+                heightMapTexture = null;
+
+                if (ssaoMapTexture != null) ssaoMapTexture.Dispose();
+                ssaoMapTexture = null;
+
+                if (refCubeMap != null) refCubeMap.Dispose();
+                refCubeMap = null;
 
                 lightsradius = null;
                 lightscolors = null;

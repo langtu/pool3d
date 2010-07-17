@@ -580,11 +580,6 @@
       <Importer>XImporter</Importer>
       <Processor>ModelProcessor</Processor>
     </Compile>
-    <Compile Include="Models\poolTable2.X">
-      <Name>poolTable2</Name>
-      <Importer>XImporter</Importer>
-      <Processor>CustomModelProcessor</Processor>
-    </Compile>
     <Compile Include="Models\Racks\8 balls rack.X">
       <Name>8 balls rack</Name>
       <Importer>XImporter</Importer>
@@ -633,13 +628,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Textures\white.jpg">
-      <Name>white</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Effects\ModelEffect_MRT.fx">
       <Name>ModelEffect_MRT</Name>
       <Importer>EffectImporter</Importer>
@@ -673,6 +661,36 @@
     <None Include="Effects\pp_Common.fxh">
       <Name>pp_Common</Name>
     </None>
+    <Compile Include="Models\Cribs\wall_LOD2.X">
+      <Name>wall_LOD2</Name>
+      <Importer>XImporter</Importer>
+      <Processor>CustomModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Cribs\roof_LOD2.X">
+      <Name>roof_LOD2</Name>
+      <Importer>XImporter</Importer>
+      <Processor>CustomModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Balls\newball_LOD2.X">
+      <Name>newball_LOD2</Name>
+      <Importer>XImporter</Importer>
+      <Processor>CustomModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\classic.X">
+      <Name>classic</Name>
+      <Importer>XImporter</Importer>
+      <Processor>CustomModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\classic_LOD2.X">
+      <Name>classic_LOD2</Name>
+      <Importer>XImporter</Importer>
+      <Processor>CustomModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Cribs\rooflamp_LOD2.X">
+      <Name>rooflamp_LOD2</Name>
+      <Importer>XImporter</Importer>
+      <Processor>CustomModelProcessor</Processor>
+    </Compile>
     <Compile Include="Models\Balls\instanced_newball.X">
       <Name>instanced_newball</Name>
       <Importer>XImporter</Importer>
@@ -961,6 +979,45 @@
   <ItemGroup>
     <Compile Include="Textures\Cribs\black_leather.jpg">
       <Name>black_leather</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\BrickLargeBare0039_2_S.jpg">
+      <Name>BrickLargeBare0039_2_S</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\BrickLargeBare0039_2_S_H.jpg">
+      <Name>BrickLargeBare0039_2_S_H</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+    </Compile>
+    <Compile Include="Textures\Cribs\BrickLargeBare0039_2_S_N.jpg">
+      <Name>BrickLargeBare0039_2_S_N</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\floor_tile_ceramic2_AO.jpg">
+      <Name>floor_tile_ceramic2_AO</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+    </Compile>
+    <Compile Include="Textures\white.jpg">
+      <Name>white</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
