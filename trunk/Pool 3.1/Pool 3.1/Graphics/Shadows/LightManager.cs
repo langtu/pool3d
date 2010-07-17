@@ -30,7 +30,7 @@ namespace XNA_PoolGame.Graphics
 
             //Light li = lights[0];lights[0] = lights[1];lights[1] = li;
             totalLights = lights.Count;
-            totalLights = 1;
+            totalLights = World.TotalLights;
             viewprojections = new Matrix[totalLights];
             maxdepths = new float[totalLights];
             positions = new Vector4[totalLights];

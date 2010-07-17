@@ -30,11 +30,8 @@ namespace XNA_PoolGame.Cameras
             get { return viewMatrix; }
             set
             {
-                viewDirty = false;
-                invViewDirty = true;
-                viewProjDirty = true;
-
-                viewMatrix = value; 
+                viewMatrix = value;
+                frustum.Matrix = viewMatrix * projectionMatrix;
             }
         }
 
@@ -43,25 +40,28 @@ namespace XNA_PoolGame.Cameras
             get { return projectionMatrix; }
             set
             {
-                projDirty = false;
-                viewProjDirty = true;
-
                 projectionMatrix = value;
+                frustum.Matrix = viewMatrix * projectionMatrix;
             }
         }
 
         public override Matrix ViewProjection
         {
-            get { return base.ViewProjection; }
+            get { return viewProjectionMatrix; }
             set
             {
-                viewProjDirty = false;
-                invViewProjDirty = true;
-
                 viewProjectionMatrix = View * Projection;
+                frustum.Matrix = viewMatrix * projectionMatrix;
             }
         }
-
+        public override BoundingFrustum FrustumCulling
+        {
+            get
+            {
+                frustum.Matrix = viewMatrix * projectionMatrix;
+                return frustum;
+            }
+        }
         protected override void Dispose(bool disposing)
         {
             World.emptycamera = null;

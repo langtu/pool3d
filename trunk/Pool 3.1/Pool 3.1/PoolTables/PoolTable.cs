@@ -98,18 +98,18 @@ namespace XNA_PoolGame.PoolTables
         /// <summary>
         /// Maximum number of balls that supports the pocket.
         /// </summary>
-        internal int maximumBallsInPocket;
+        public int maximumBallsInPocket;
 
         /// <summary>
         /// Position of a ball after maximum number of balls supported is over.
         /// </summary>
-        internal Vector3 ballstuckposition;
+        public Vector3 ballstuckposition;
 
         #region Constructor
         public PoolTable(Game game, string modelName)
             : base(game, modelName, true)
         {
-
+            //this.DEM = true;
             loaded = false;
         }
         #endregion
@@ -137,7 +137,7 @@ namespace XNA_PoolGame.PoolTables
             
 
             cueBall = new Ball(PoolGame.game, 0, "Models\\Balls\\newball", "Textures\\Balls\\ball 3", this, World.ballRadius);
-            cueBall.DEM = true;
+            //cueBall.DEM = true;
             cueBall.DrawOrder = 2;
             if (!World.Debug)
                 cueBall.SetCenter(cueBallStartPosition);
@@ -150,11 +150,12 @@ namespace XNA_PoolGame.PoolTables
 
             BuildBallsTriangle(new Vector3(MIN_X / 3, SURFACE_POSITION_Y + World.ballRadius, -World.ballRadius), World.gameMode, World.ballRadius);
 
-            TotalBalls = 1;
+            //TotalBalls = 1;
             poolBalls[0] = cueBall;
 
             for (int i = 0; i < TotalBalls; i++)
             {
+                poolBalls[i].DEM = true;
                 poolBalls[i].UseThread = World.UseThreads;
                 PoolGame.game.Components.Add(poolBalls[i]);
                 World.scenario.Objects.Add(poolBalls[i]);

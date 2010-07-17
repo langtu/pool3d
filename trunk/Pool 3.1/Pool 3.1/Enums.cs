@@ -96,6 +96,7 @@ namespace XNA_PoolGame
         PSMRender,
         ShadowPostProcessing,
         DEM,
+        DEMBasicRender,
         MotionBlur,
         DoF,
         DOFCombine,

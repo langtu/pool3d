@@ -321,6 +321,11 @@ namespace XNA_PoolGame
             {
                 World.useDynamicEnvironmentMapping = !World.useDynamicEnvironmentMapping;
             }
+
+            if (kb.IsKeyDown(Keys.F9) && lastkb.IsKeyUp(Keys.F9))
+            {
+                World.poolTable.cueBall.Position = new Vector3(World.poolTable.cueBall.PositionX, World.poolTable.cueBall.PositionY + 150.0f, World.poolTable.cueBall.PositionZ);
+            }
             if (kb.IsKeyDown(Keys.K) && lastkb.IsKeyUp(Keys.K))
             {
                 World.dofType = (DOFType)(((int)World.dofType + 1) % 4);

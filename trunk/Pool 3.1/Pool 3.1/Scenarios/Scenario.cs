@@ -42,6 +42,8 @@ namespace XNA_PoolGame.Scenarios
         /// DEM's scene
         /// </summary>
         public MultiMap<int, Entity> dems;
+
+        public MultiMap<int, Entity> dems2;
         public Vector4 AmbientColor
         {
             get { return ambientColor; }
@@ -56,6 +58,7 @@ namespace XNA_PoolGame.Scenarios
             particles = new MultiMap<int, ParticleSystem>();
             distortionparticles = new MultiMap<int, ParticleSystem>();
             dems = new MultiMap<int, Entity>();
+            dems2 = new MultiMap<int, Entity>();
             lights = new List<Light>();
 
             this.ambientColor = new Vector4(0, 0, 0, 1);
@@ -114,6 +117,14 @@ namespace XNA_PoolGame.Scenarios
             {
                 PoolGame.device.RenderState.DepthBufferEnable = true;
                 PoolGame.device.RenderState.DepthBufferWriteEnable = false;
+                if (bm.Visible) bm.Draw(gameTime);
+            }
+        }
+
+        public void DrawDEM2Objects(GameTime gameTime)
+        {
+            foreach (Entity bm in this.dems2)
+            {
                 if (bm.Visible) bm.Draw(gameTime);
             }
         }
