@@ -205,16 +205,16 @@ namespace XNA_PoolGame.Scenarios
 
             /////////////// COLUMNS
             columns = new Entity[4];
-            columns[0] = new Entity(PoolGame.game, "Models\\Cribs\\column", "Textures\\Cribs\\floor_tile_stoneIrregular");
+            columns[0] = new Entity(PoolGame.game, "Models\\Cribs\\column", "Textures\\Cribs\\BrickLargeBare0039_2_S");
             columns[0].Position = new Vector3(1250, 0, -960);
 
-            columns[1] = new Entity(PoolGame.game, "Models\\Cribs\\column", "Textures\\Cribs\\floor_tile_stoneIrregular");
+            columns[1] = new Entity(PoolGame.game, "Models\\Cribs\\column", "Textures\\Cribs\\BrickLargeBare0039_2_S");
             columns[1].Position = new Vector3(-1150, 0, -1100);
 
-            columns[2] = new Entity(PoolGame.game, "Models\\Cribs\\column", "Textures\\Cribs\\floor_tile_stoneIrregular");
+            columns[2] = new Entity(PoolGame.game, "Models\\Cribs\\column", "Textures\\Cribs\\BrickLargeBare0039_2_S");
             columns[2].Position = new Vector3(1150, 0, 1100 - 250);
 
-            columns[3] = new Entity(PoolGame.game, "Models\\Cribs\\column", "Textures\\Cribs\\floor_tile_stoneIrregular");
+            columns[3] = new Entity(PoolGame.game, "Models\\Cribs\\column", "Textures\\Cribs\\BrickLargeBare0039_2_S");
             columns[3].Position = new Vector3(-1150, 0, 1100-250);
 
             foreach (Entity col in columns)
@@ -224,8 +224,8 @@ namespace XNA_PoolGame.Scenarios
                 col.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
                 col.DrawOrder = 1;
                 //col.normalMapAsset = "Textures\\Cribs\\BrickBrown_S_N";
-                col.normalMapAsset = "Textures\\Cribs\\floor_tile_stoneIrregular_N";
-                col.heightMapAsset = "Textures\\Cribs\\floor_tile_stoneIrregular_H";
+                col.normalMapAsset = "Textures\\Cribs\\BrickLargeBare0039_2_S_N";
+                col.heightMapAsset = "Textures\\Cribs\\BrickLargeBare0039_2_S_H";
                 
                 PoolGame.game.Components.Add(col);    
             }
@@ -240,7 +240,7 @@ namespace XNA_PoolGame.Scenarios
             
 
             /////////////// ROOF
-            roof = new Entity(PoolGame.game, "Models\\Cribs\\roof", "Textures\\Cribs\\ConcreteNew0003_S2");
+            roof = new Entity(PoolGame.game, "Models\\Cribs\\roof", true, "Textures\\Cribs\\ConcreteNew0003_S2");
 
             roof.Position = new Vector3(0, 700, 0);
             roof.Scale = new Vector3(2.0f);
@@ -258,6 +258,7 @@ namespace XNA_PoolGame.Scenarios
             floor.SpecularColor = Vector4.Zero;
             floor.normalMapAsset = "Textures\\Cribs\\floor_tile_ceramic2_N";
             floor.heightMapAsset = "Textures\\Cribs\\floor_tile_ceramic2_H";
+            floor.ssaoMapAsset = "Textures\\Cribs\\floor_tile_ceramic2_AO";
             floor.DrawOrder = 1;
             floor.AditionalLights = smokestack.AditionalLights;
 
@@ -266,17 +267,17 @@ namespace XNA_PoolGame.Scenarios
             /////////////// WALLS
             walls = new Entity[3];
 
-            walls[0] = new Entity(PoolGame.game, "Models\\Cribs\\wall");//"Textures\\Cribs\\floor_pavement_stone4_2"");
+            walls[0] = new Entity(PoolGame.game, "Models\\Cribs\\wall", true);//"Textures\\Cribs\\floor_pavement_stone4_2"");
             walls[0].Position = new Vector3(0, 0, -1100);
             walls[0].Rotation = Matrix.CreateRotationY(MathHelper.PiOver2);
             walls[0].TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;
 
-            walls[1] = new Entity(PoolGame.game, "Models\\Cribs\\wall");
+            walls[1] = new Entity(PoolGame.game, "Models\\Cribs\\wall", true);
             walls[1].Position = new Vector3(1200, 0, 0);
 
             walls[1].TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;
 
-            walls[2] = new Entity(PoolGame.game, "Models\\Cribs\\wall");
+            walls[2] = new Entity(PoolGame.game, "Models\\Cribs\\wall", true);
             walls[2].Position = new Vector3(0, 0, 850);
             walls[2].Rotation = Matrix.CreateRotationY(MathHelper.PiOver2);
             walls[2].TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;
@@ -308,10 +309,10 @@ namespace XNA_PoolGame.Scenarios
 
             //////////////// ROOF LAMPS
             rooflamps = new Entity[2];
-            rooflamps[0] = new Entity(PoolGame.game, "Models\\Cribs\\rooflamp");
+            rooflamps[0] = new Entity(PoolGame.game, "Models\\Cribs\\rooflamp", true);
             rooflamps[0].Position = new Vector3(180.0f, 392.0f, 0.0f);
 
-            rooflamps[1] = new Entity(PoolGame.game, "Models\\Cribs\\rooflamp");
+            rooflamps[1] = new Entity(PoolGame.game, "Models\\Cribs\\rooflamp", true);
             rooflamps[1].Position = new Vector3(-180.0f, 392.0f, 0.0f);
             foreach (Entity lamp in rooflamps)
             {
@@ -322,7 +323,7 @@ namespace XNA_PoolGame.Scenarios
 
 
             ////////////////////////////////////////////////
-            World.scenario.Objects.Add(ballsinstanced);
+            //World.scenario.Objects.Add(ballsinstanced);
             World.scenario.Objects.Add(smokestack);
             World.scenario.Objects.Add(smokeStackFireWood);
             

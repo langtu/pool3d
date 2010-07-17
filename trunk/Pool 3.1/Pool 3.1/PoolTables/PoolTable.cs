@@ -107,7 +107,7 @@ namespace XNA_PoolGame.PoolTables
 
         #region Constructor
         public PoolTable(Game game, string modelName)
-            : base(game, modelName)
+            : base(game, modelName, true)
         {
 
             loaded = false;
@@ -137,6 +137,7 @@ namespace XNA_PoolGame.PoolTables
             
 
             cueBall = new Ball(PoolGame.game, 0, "Models\\Balls\\newball", "Textures\\Balls\\ball 3", this, World.ballRadius);
+            cueBall.DEM = true;
             cueBall.DrawOrder = 2;
             if (!World.Debug)
                 cueBall.SetCenter(cueBallStartPosition);
@@ -149,7 +150,7 @@ namespace XNA_PoolGame.PoolTables
 
             BuildBallsTriangle(new Vector3(MIN_X / 3, SURFACE_POSITION_Y + World.ballRadius, -World.ballRadius), World.gameMode, World.ballRadius);
 
-            //TotalBalls = 4;
+            TotalBalls = 1;
             poolBalls[0] = cueBall;
 
             for (int i = 0; i < TotalBalls; i++)

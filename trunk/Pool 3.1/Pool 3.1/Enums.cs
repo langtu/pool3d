@@ -95,6 +95,7 @@ namespace XNA_PoolGame
         ScreenSpaceSoftShadowRender,
         PSMRender,
         ShadowPostProcessing,
+        DEM,
         MotionBlur,
         DoF,
         DOFCombine,

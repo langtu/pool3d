@@ -143,7 +143,7 @@ namespace XNA_PoolGame
         #region Constructors
 
         public Ball(Game game, int ballNumber, string ballModel, PoolTable table, float radius)
-            : base(game, ballModel)
+            : base(game, ballModel, true)
         {
             this.table = table;
             this.ballNumber = ballNumber;

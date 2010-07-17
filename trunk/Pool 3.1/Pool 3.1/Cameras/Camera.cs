@@ -29,7 +29,7 @@ namespace XNA_PoolGame.Cameras
         }
 
         /// <summary>
-        /// Frustum Culling.
+        /// Frustum culling.
         /// </summary>
         public BoundingFrustum FrustumCulling
         {
@@ -104,7 +104,7 @@ namespace XNA_PoolGame.Cameras
         #region Matrix Projection
 
         protected Matrix projectionMatrix;
-        public Matrix Projection
+        public virtual Matrix Projection
         {
             get
             {
@@ -124,6 +124,7 @@ namespace XNA_PoolGame.Cameras
 
                 return projectionMatrix;
             }
+            set { }
         }
 
         #endregion
@@ -132,7 +133,7 @@ namespace XNA_PoolGame.Cameras
 
         protected Matrix viewMatrix;
         protected Matrix prevviewMatrix;
-        public Matrix View
+        public virtual Matrix View
         {
             get
             {
@@ -149,6 +150,7 @@ namespace XNA_PoolGame.Cameras
                 }
                 return viewMatrix;
             }
+            set { }
         }
         public Matrix PrevView
         {
@@ -166,9 +168,9 @@ namespace XNA_PoolGame.Cameras
 
         #region Matrix ViewProjection
 
-        private Matrix viewProjectionMatrix;
+        protected Matrix viewProjectionMatrix;
         private Matrix previewProjectionMatrix;
-        public Matrix ViewProjection
+        public virtual Matrix ViewProjection
         {
             get
             {
@@ -183,6 +185,7 @@ namespace XNA_PoolGame.Cameras
                 }
                 return viewProjectionMatrix;
             }
+            set { }
         }
 
         public Matrix PrevViewProjection
@@ -374,7 +377,7 @@ namespace XNA_PoolGame.Cameras
 
         public abstract void SetMouseCentered();
 
-        public virtual void UpdateCameraMatrices() { }
+        public abstract void UpdateCameraMatrices();
 
         #endregion
 
@@ -382,7 +385,6 @@ namespace XNA_PoolGame.Cameras
 
         protected override void Dispose(bool disposing)
         {
-            World.camera = null;
             PoolGame.game.Components.Remove(this);
             base.Dispose(disposing);
         }

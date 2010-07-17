@@ -28,6 +28,8 @@ float vaditionalLightRadius[2];
 int vaditionalLightType[2];
 int aditionalLights = 0;
 
+// DEM
+bool bDEM = false;    
 // PARALLAX
 float2 parallaxscaleBias;
 
@@ -84,6 +86,29 @@ sampler2D heightSampler = sampler_state
 	MIPFILTER = Linear;
 };
 
+texture SSAOMap;
+sampler2D ssaoSampler = sampler_state
+{
+	Texture = <SSAOMap>;
+	
+	MAGFILTER = Linear;
+	MINFILTER = Linear;
+	MIPFILTER = Linear;
+};
+
+texture EnvironmentMap;
+sampler EnvironmentMapSampler = sampler_state
+{
+    Texture = (EnvironmentMap);
+
+    MinFilter = Linear;
+    MagFilter = Linear;
+    MipFilter = Linear;
+    
+    AddressU = Wrap;
+    AddressV = Wrap;
+};
+
 struct VS_ScreenSpaceShadow_Input
 {
     float4 Position : POSITION0;
@@ -99,7 +124,6 @@ struct VS_ScreenSpaceShadow_Output
     float2 TexCoord			: TEXCOORD0;
     float4 ScreenCoord		: TEXCOORD1;
     float4 WorldPosition	: TEXCOORD2;
-    
     float4 PrevPositionCS	: TEXCOORD3;
     float4 CurrPositionCS	: TEXCOORD4;
     float4 PositionViewS	: TEXCOORD5;
@@ -156,7 +180,6 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output inp
 	///////////////////////////////////////////////////////////////////////
 	float2 texCoord;
 	float3 ViewDir = normalize(CameraPosition.xyz - input.WorldPosition.xyz);
-	
 	if (bparallax == true)
     {
 		float3 ViewDirTBN = mul(ViewDir, input.TBN);
@@ -169,7 +192,6 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output inp
     else
         texCoord = input.TexCoord;
     
-	
 	float4 Color = tex2D(ColorSampler, texCoord);
 	
 	float fShadowTerm = tex2Dproj(BlurVSampler, input.ScreenCoord).x;
@@ -183,6 +205,8 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output inp
 		Normal = normalize(mul(Normal, input.TBN));
 	} else
 		Normal = input.TBN[2];
+		
+	
 	
 	for (int k = 0; k < totalLights; k++)
 	{
@@ -264,7 +288,7 @@ float4 PS_ScreenSpaceShadowNoMRT(VS_ScreenSpaceShadow_Output input, uniform bool
 
 	///////////////////////////////////////////////////////////////////////
 	float2 texCoord;
-	float3 ViewDir = normalize(CameraPosition - input.WorldPosition);
+	float3 ViewDir = normalize(CameraPosition.xyz - input.WorldPosition.xyz);
 	if (bparallax == true)
     {
 		float3 ViewDirTBN = mul(ViewDir, input.TBN);
@@ -276,12 +300,15 @@ float4 PS_ScreenSpaceShadowNoMRT(VS_ScreenSpaceShadow_Output input, uniform bool
     }
     else
         texCoord = input.TexCoord;
+        
 	float4 Color = tex2D(ColorSampler, texCoord);
 	
 	float fShadowTerm = tex2Dproj(BlurVSampler, input.ScreenCoord).x;
 	float4 totalDiffuse = float4(0,0,0,0);
 	float4 totalSpecular = float4(0,0,0,0);
 	float3 Normal;
+	float ssaoterm = tex2D(ssaoSampler, texCoord);
+	
 	if (bnormalmapping)
 	{
 		Normal = 2.0f * tex2D(normalSampler, texCoord) - 1.0f;
@@ -289,7 +316,20 @@ float4 PS_ScreenSpaceShadowNoMRT(VS_ScreenSpaceShadow_Output input, uniform bool
 		
 	} else
 		Normal = input.TBN[2];
-		
+	
+	if (bDEM)
+	{
+		float3 Reflection = reflect(input.WorldPosition.xyz - CameraPosition.xyz, Normal);
+		// Approximate a Fresnel coefficient for the environment map.
+		// This makes the surface less reflective when you are looking
+		// straight at it, and more reflective when it is viewed edge-on.
+		float3 Fresnel = saturate(1.0f + dot(-ViewDir, Normal));
+	    
+		float3 envmap = texCUBE(EnvironmentMapSampler, Reflection);
+		float3 ccolor = tex2D(ColorSampler, texCoord);
+		Color = float4(lerp(ccolor, envmap, Fresnel), 1.0f);
+    }
+    
 	for (int k = 0; k < totalLights; k++)
 	{
 		//
@@ -334,10 +374,8 @@ float4 PS_ScreenSpaceShadowNoMRT(VS_ScreenSpaceShadow_Output input, uniform bool
     //totalDiffuse /= totalLights;    
     totalDiffuse = saturate(totalDiffuse);
     //
-    //output.Color  = (Color * (vAmbient + vDiffuseColor * DiffuseLightingFactor) + vSpecularColor * Specular) * fShadowTerm;
-    //return saturate((Color * (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular) * fShadowTerm);
-    //return saturate((Color + (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular) * fShadowTerm);
-    return saturate((Color * (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular) * fShadowTerm + totalDiffuse2 * totalDiffuse2.a);
+    
+    return (saturate((Color * (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular) * fShadowTerm + totalDiffuse2 * totalDiffuse2.a)) * ssaoterm;
     
 }
 
@@ -444,6 +482,7 @@ technique NoMRTSSSTechnique
 {
     pass P0
     {
+		sampler[4] = <ssaoSampler>;
         VertexShader = compile vs_3_0 VS_ScreenSpaceShadow();
         PixelShader = compile ps_3_0 PS_ScreenSpaceShadowNoMRT(false, false);
     }
@@ -476,6 +515,7 @@ technique NoMRTParallaxMappingSSSTechnique
     {
 		sampler[2] = <normalSampler>;
 		sampler[3] = <heightSampler>;
+		sampler[4] = <ssaoSampler>;
         VertexShader = compile vs_3_0 VS_ScreenSpaceShadow();
         PixelShader = compile ps_3_0 PS_ScreenSpaceShadowNoMRT(true, true);
     }

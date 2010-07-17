@@ -113,9 +113,8 @@ namespace XNA_PoolGame.Screens.Screen_Manager
             ContentManager content = Game.Content;
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            //spriteBatch = PostProcessManager.spriteBatch;
             font = content.Load<SpriteFont>("Fonts\\MenuFont");
-            blankTexture = content.Load<Texture2D>("Textures\\blank");
+            blankTexture = PostProcessManager.whiteTexture;
 
             // Tell each of the screens to load their content.
             foreach (Screen screen in screens)
