@@ -38,6 +38,7 @@ namespace XNA_PoolGame
     {
         public static GraphicsDeviceManager graphics;
         public static ContentManager content;
+        public static ContentManager content2;
         public static GraphicsDevice device;
         public static SpriteFont spriteFont = null;
 
@@ -85,12 +86,13 @@ namespace XNA_PoolGame
         public PoolGame()
         {
             content = new ContentManager(Services, "Content");
+            content2 = new ContentManager(Services, "Content");
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 640;
-            graphics.PreferredBackBufferHeight = 480;
+            graphics.PreferredBackBufferWidth = 1280;
+            graphics.PreferredBackBufferHeight = 720;
             graphics.SynchronizeWithVerticalRetrace = false;
             //graphics.PreferMultiSampling = true;
             
@@ -125,9 +127,9 @@ namespace XNA_PoolGame
             SurfaceFormat format = adapter.CurrentDisplayMode.Format;
             DisplayMode currentmode = adapter.CurrentDisplayMode;
             
-            //e.GraphicsDeviceInformation.PresentationParameters.MultiSampleQuality = 0;
-            //e.GraphicsDeviceInformation.PresentationParameters.MultiSampleType =
-            //    MultiSampleType.FourSamples;
+            /*e.GraphicsDeviceInformation.PresentationParameters.MultiSampleQuality = 0;
+            e.GraphicsDeviceInformation.PresentationParameters.MultiSampleType =
+                MultiSampleType.FourSamples;*/
 #if XBOX
             e.GraphicsDeviceInformation.PresentationParameters.MultiSampleQuality = 0;
             e.GraphicsDeviceInformation.PresentationParameters.MultiSampleType =
@@ -516,7 +518,7 @@ namespace XNA_PoolGame
                 //endTexture = PostProcessManager.shadows.ShadowMapRT[0].GetTexture();
                 //endTexture = PostProcessManager.shadows.ShadowRT.GetTexture();
                 //endTexture = World.poolTable.cueBall.refCubeMap.GetTexture();
-                if (World.dofType != DOFType.None || World.motionblurType != MotionBlurType.None) endTexture = PostProcessManager.depthRT.GetTexture();
+                //if (World.dofType != DOFType.None || World.motionblurType != MotionBlurType.None) endTexture = PostProcessManager.depthRT.GetTexture();
                 Rectangle rect = new Rectangle(0, 0, 256, 256);
 
                 
@@ -526,10 +528,10 @@ namespace XNA_PoolGame
 
 
                 //endTexture = PostProcessManager.shadows.ShadowMapRT[1].GetTexture();
-                //endTexture = PostProcessManager.shadows.ShadowRT.GetTexture();
-                //rect = new Rectangle(0, 128, 512, 512);
+                if (PostProcessManager.distortionsample != null) endTexture = PostProcessManager.distortionsample.renderTarget.GetTexture();
+                rect = new Rectangle(0, 128, 512, 512);
                 //rect = new Rectangle(0, 0, Width, Height);
-                //batch.Draw(endTexture, rect, Color.White);
+                if (endTexture != null) batch.Draw(endTexture, rect, Color.White);
                 
                 
                 //endTexture = PostProcessManager.GBlurVRT.GetTexture();

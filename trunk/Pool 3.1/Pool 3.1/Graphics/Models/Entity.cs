@@ -311,7 +311,8 @@ namespace XNA_PoolGame.Graphics.Models
             //
             if (normalMapAsset != null) normalMapTexture = PoolGame.content.Load<Texture2D>(normalMapAsset);
             if (heightMapAsset != null) heightMapTexture = PoolGame.content.Load<Texture2D>(heightMapAsset);
-            if (ssaoMapAsset != null) ssaoMapTexture = PoolGame.content.Load<Texture2D>(ssaoMapAsset);
+            if (ssaoMapAsset != null) 
+                ssaoMapTexture = PoolGame.content.Load<Texture2D>(ssaoMapAsset);
 
             // Setup model.
             textures = modelL1.GetTextures();
@@ -397,7 +398,7 @@ namespace XNA_PoolGame.Graphics.Models
         #endregion
 
         #region Draw
-        public  override void Draw(GameTime gameTime)
+        public override void Draw(GameTime gameTime)
         {
             if (World.camera == null) return;
             RenderMode renderMode = PostProcessManager.currentRenderMode;
@@ -444,13 +445,10 @@ namespace XNA_PoolGame.Graphics.Models
                         PoolGame.device.SamplerStates[4].AddressU = TEXTURE_ADDRESS_MODE;
                         PoolGame.device.SamplerStates[4].AddressV = TEXTURE_ADDRESS_MODE;
                         if (ssaoMapAsset != null && World.useSSAO)
-                        {
                             PostProcessManager.SSSoftShadow_MRT.Parameters["SSAOMap"].SetValue(ssaoMapTexture);
-                        }
                         else
-                        {
                             PostProcessManager.SSSoftShadow_MRT.Parameters["SSAOMap"].SetValue(PostProcessManager.whiteTexture);
-                        }
+                        
                         if (DEM && World.dem != EnvironmentType.None) basicTechnique = "EM" + basicTechnique;
                         if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) 
                             basicTechnique = "NoMRT" + basicTechnique;
@@ -491,11 +489,7 @@ namespace XNA_PoolGame.Graphics.Models
                             this.Visible = false;
 
                             World.emptycamera.CameraPosition = this.position;
-                            World.emptycamera.Projection = Matrix.CreatePerspectiveFieldOfView(
-                                    oldCamera.FieldOfView,
-                                    oldCamera.AspectRatio,
-                                    0.0000001f,
-                                    oldCamera.FarPlane);
+                            World.emptycamera.Projection = oldCamera.Projection;
 
                             DepthStencilBuffer oldBuffer = PoolGame.device.DepthStencilBuffer;
                             // Render our cube map, once for each cube face (6 times).

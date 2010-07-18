@@ -924,7 +924,7 @@ Frame Cylinder05 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\lenia1.bmp";
+     "..\\..\\Textures\\Cribs\\lenia1.jpg";
     }
    }
 
@@ -935,7 +935,7 @@ Frame Cylinder05 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\BarkPine0007_1_S.bmp";
+     "..\\..\\Textures\\Cribs\\BarkPine0007_1_S.jpg";
     }
    }
   }
@@ -1861,7 +1861,7 @@ Frame Cylinder06 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\WoodEnds0022_1_S.bmp";
+     "..\\..\\Textures\\Cribs\\WoodEnds0022_1_S.jpg";
     }
    }
 
@@ -1886,7 +1886,7 @@ Frame Cylinder06 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\lenia1.bmp";
+     "..\\..\\Textures\\Cribs\\lenia1.jpg";
     }
    }
 
@@ -1897,7 +1897,7 @@ Frame Cylinder06 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\BarkPine0007_1_S.bmp";
+     "..\\..\\Textures\\Cribs\\BarkPine0007_1_S.jpg";
     }
    }
   }
@@ -2823,7 +2823,7 @@ Frame Cylinder07 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\WoodEnds0037_2_S.bmp";
+     "..\\..\\Textures\\Cribs\\WoodEnds0037_2_S.jpg";
     }
    }
 
@@ -2848,7 +2848,7 @@ Frame Cylinder07 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\lenia1.bmp";
+     "..\\..\\Textures\\Cribs\\lenia1.jpg";
     }
    }
 
@@ -2859,7 +2859,7 @@ Frame Cylinder07 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\BarkPine0003_S.bmp";
+     "..\\..\\Textures\\Cribs\\BarkPine0003_S.jpg";
     }
    }
   }
@@ -3785,7 +3785,7 @@ Frame Cylinder08 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\WoodEnds0022_1_S.bmp";
+     "..\\..\\Textures\\Cribs\\WoodEnds0022_1_S.jpg";
     }
    }
 
@@ -3810,7 +3810,7 @@ Frame Cylinder08 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\lenia1.bmp";
+     "..\\..\\Textures\\Cribs\\lenia1.jpg";
     }
    }
 
@@ -3821,7 +3821,7 @@ Frame Cylinder08 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\BarkPine0007_1_S.bmp";
+     "..\\..\\Textures\\Cribs\\BarkPine0007_1_S.jpg";
     }
    }
   }
@@ -4768,7 +4768,7 @@ Frame Cylinder09 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\lenia1.bmp";
+     "..\\..\\Textures\\Cribs\\lenia1.jpg";
     }
    }
 
@@ -4779,7 +4779,7 @@ Frame Cylinder09 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\BarkPine0007_1_S.bmp";
+     "..\\..\\Textures\\Cribs\\BarkPine0007_1_S.jpg";
     }
    }
   }
@@ -5705,7 +5705,7 @@ Frame Cylinder10 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\WoodEnds0008_S.bmp";
+     "..\\..\\Textures\\Cribs\\WoodEnds0008_S.jpg";
     }
    }
   }
@@ -6652,7 +6652,7 @@ Frame Cylinder11 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\lenia1.bmp";
+     "..\\..\\Textures\\Cribs\\lenia1.jpg";
     }
    }
 
@@ -6663,7 +6663,7 @@ Frame Cylinder11 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\BarkPine0007_1_S.bmp";
+     "..\\..\\Textures\\Cribs\\BarkPine0007_1_S.jpg";
     }
    }
   }
@@ -7621,7 +7621,7 @@ Frame Cylinder12 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\WoodEnds0008_S.bmp";
+     "..\\..\\Textures\\Cribs\\WoodEnds0008_S.jpg";
     }
    }
 
@@ -7632,7 +7632,7 @@ Frame Cylinder12 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\BarkPine0007_14_S.bmp";
+     "..\\..\\Textures\\Cribs\\BarkPine0007_14_S.jpg";
     }
    }
 
@@ -7650,7 +7650,7 @@ Frame Cylinder12 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\lenia1.bmp";
+     "..\\..\\Textures\\Cribs\\lenia1.jpg";
     }
    }
 
@@ -7661,7 +7661,7 @@ Frame Cylinder12 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\BarkPine0007_1_S.bmp";
+     "..\\..\\Textures\\Cribs\\BarkPine0007_1_S.jpg";
     }
    }
   }
@@ -8640,7 +8640,7 @@ Frame Cylinder13 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\lenia1.bmp";
+     "..\\..\\Textures\\Cribs\\lenia1.jpg";
     }
    }
 
@@ -8651,7 +8651,7 @@ Frame Cylinder13 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\BarkPine0007_1_S.bmp";
+     "..\\..\\Textures\\Cribs\\BarkPine0007_1_S.jpg";
     }
    }
   }
@@ -9577,7 +9577,7 @@ Frame Cylinder14 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\WoodEnds0022_1_S.bmp";
+     "..\\..\\Textures\\Cribs\\WoodEnds0022_1_S.jpg";
     }
    }
 
@@ -9602,7 +9602,7 @@ Frame Cylinder14 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\lenia1.bmp";
+     "..\\..\\Textures\\Cribs\\lenia1.jpg";
     }
    }
 
@@ -9613,7 +9613,7 @@ Frame Cylinder14 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\BarkPine0007_1_S.bmp";
+     "..\\..\\Textures\\Cribs\\BarkPine0007_1_S.jpg";
     }
    }
   }

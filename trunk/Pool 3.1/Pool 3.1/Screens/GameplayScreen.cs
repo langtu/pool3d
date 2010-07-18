@@ -130,7 +130,9 @@ namespace XNA_PoolGame.Screens
             World.camera.Dispose();
             
             GC.Collect();
-            GC.WaitForPendingFinalizers();
+            //GC.WaitForPendingFinalizers();
+
+            
             //GC.Collect();
             //GC.GetTotalMemory(false);
         }
