@@ -27,9 +27,7 @@ float4 vaditionalLightPositions[2];
 float vaditionalLightRadius[2];
 int vaditionalLightType[2];
 int aditionalLights = 0;
-
-// DEM
-bool bDEM = false;    
+    
 // PARALLAX
 float2 parallaxscaleBias;
 
@@ -273,7 +271,7 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output inp
 }
 
 float4 PS_ScreenSpaceShadowNoMRT(VS_ScreenSpaceShadow_Output input, uniform bool bnormalmapping,
-	uniform bool bparallax) : COLOR
+	uniform bool bparallax, uniform bool bDEM) : COLOR
 {
 
 	///////////////////////////////////////////////////////////////////////
@@ -366,8 +364,9 @@ float4 PS_ScreenSpaceShadowNoMRT(VS_ScreenSpaceShadow_Output input, uniform bool
     totalDiffuse = saturate(totalDiffuse);
     //
     
-    return (saturate((Color * (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular) * fShadowTerm + totalDiffuse2 * totalDiffuse2.a)) * ssaoterm;
-    //return saturate(Color);
+    //return (saturate((Color * (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular) * fShadowTerm + totalDiffuse2 * totalDiffuse2.a)) * ssaoterm;
+    return saturate(Color);
+    
 }
 
 
@@ -475,7 +474,17 @@ technique NoMRTSSSTechnique
     {
 		sampler[4] = <ssaoSampler>;
         VertexShader = compile vs_3_0 VS_ScreenSpaceShadow();
-        PixelShader = compile ps_3_0 PS_ScreenSpaceShadowNoMRT(false, false);
+        PixelShader = compile ps_3_0 PS_ScreenSpaceShadowNoMRT(false, false, false);
+    }
+}
+
+technique NoMRTEMSSSTechnique
+{
+    pass P0
+    {
+		sampler[4] = <ssaoSampler>;
+        VertexShader = compile vs_3_0 VS_ScreenSpaceShadow();
+        PixelShader = compile ps_3_0 PS_ScreenSpaceShadowNoMRT(false, false, true);
     }
 }
 technique NormalMappingSSSTechnique
@@ -496,7 +505,7 @@ technique NoMRTNormalMappingSSSTechnique
 		sampler[2] = <normalSampler>;
 
         VertexShader = compile vs_3_0 VS_ScreenSpaceShadow();
-        PixelShader = compile ps_3_0 PS_ScreenSpaceShadowNoMRT(true, false);
+        PixelShader = compile ps_3_0 PS_ScreenSpaceShadowNoMRT(true, false, false);
     }
 }
 
@@ -508,7 +517,7 @@ technique NoMRTParallaxMappingSSSTechnique
 		sampler[3] = <heightSampler>;
 		sampler[4] = <ssaoSampler>;
         VertexShader = compile vs_3_0 VS_ScreenSpaceShadow();
-        PixelShader = compile ps_3_0 PS_ScreenSpaceShadowNoMRT(true, true);
+        PixelShader = compile ps_3_0 PS_ScreenSpaceShadowNoMRT(true, true, false);
     }
 }
 
@@ -530,7 +539,7 @@ technique HardwareInstancingNoMRTSSSTechnique
     {
 		sampler[0] = <ColorSampler>;
         VertexShader = compile vs_3_0 HardwareInstancingVertexShader();
-        PixelShader = compile ps_3_0 PS_ScreenSpaceShadowNoMRT(false, false);
+        PixelShader = compile ps_3_0 PS_ScreenSpaceShadowNoMRT(false, false, false);
     }
 }
 

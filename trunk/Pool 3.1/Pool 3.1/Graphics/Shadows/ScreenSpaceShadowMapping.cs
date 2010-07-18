@@ -73,12 +73,15 @@ namespace XNA_PoolGame.Graphics.Shadows
             World.scenario.DrawScene(gameTime);
 
             ///////////////// PASS 3 - DEM //////////////
-            PostProcessManager.ChangeRenderMode(RenderMode.DEM);
-            RenderDEM();
+            if (World.dem != EnvironmentType.None)
+            {
+                PostProcessManager.ChangeRenderMode(RenderMode.DEM);
+                RenderDEM();
 
-            World.scenario.DrawDEM2Objects(gameTime);
-
-            ///////////////// PASS 4 - SSSS /////////////
+                World.poolTable.cueBall.Draw(gameTime);
+                //World.scenario.DrawDEM2Objects(gameTime);
+            }
+            ///////////////// PASS 4 - SSSM /////////////
             World.camera.ItemsDrawn = 0;
             PostProcessManager.ChangeRenderMode(RenderMode.ScreenSpaceSoftShadowRender);
             RenderSoftShadow();
@@ -100,7 +103,7 @@ namespace XNA_PoolGame.Graphics.Shadows
         private void RenderDEM()
         {
             PoolGame.device.RenderState.DepthBufferEnable = true;
-            PoolGame.device.RenderState.DepthBufferWriteEnable = false;
+            PoolGame.device.RenderState.DepthBufferWriteEnable = true;
             PoolGame.device.RenderState.DepthBufferFunction = CompareFunction.LessEqual;
             PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
 
