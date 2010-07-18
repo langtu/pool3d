@@ -20,6 +20,13 @@ namespace XNA_PoolGame
         NoInstancing,
         NoInstancingOrStateBatching
     }
+
+    public enum EnvironmentType
+    {
+        None,
+        Dynamic,
+        Static
+    }
     public enum LightType : int
     {
         PointLight = 0,

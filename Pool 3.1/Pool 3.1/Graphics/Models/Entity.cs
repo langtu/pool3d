@@ -72,6 +72,7 @@ namespace XNA_PoolGame.Graphics.Models
         private bool useDEM = false;
         public RenderTargetCube refCubeMap = null;
         public TextureCube environmentMap;
+        public static DepthStencilBuffer depthDEM;
         #endregion
 
         #region //// FRUSTUM CULLING ////
@@ -289,17 +290,19 @@ namespace XNA_PoolGame.Graphics.Models
 
             if (modelNameL2 != null)
             {
-                
-                    World.scenario.dems.Add(this);
+                World.scenario.dems_basicrender.Add(this);
                 if (DEM)
-                    World.scenario.dems2.Add(this);
+                    World.scenario.dems.Add(this);
                 modelL2 = PoolGame.content.Load<CustomModel>(modelNameL2);
             }
             //else modelL2 = modelL1;
 
-            if (DEM && refCubeMap == null)
+            if (DEM && refCubeMap == null && World.dem == EnvironmentType.Dynamic)
             {
-                refCubeMap = new RenderTargetCube(PoolGame.device, 2, 1, PoolGame.device.PresentationParameters.BackBufferFormat);
+                PresentationParameters pp = PoolGame.device.PresentationParameters;
+                depthDEM = new DepthStencilBuffer(PoolGame.device, PoolGame.Width, PoolGame.Height, pp.AutoDepthStencilFormat);
+
+                refCubeMap = new RenderTargetCube(PoolGame.device, 64, 1, pp.BackBufferFormat);
             }
 
             // Load custom texture
@@ -436,25 +439,22 @@ namespace XNA_PoolGame.Graphics.Models
                                 PoolGame.device.SamplerStates[3].AddressU = TEXTURE_ADDRESS_MODE;
                                 PoolGame.device.SamplerStates[3].AddressV = TEXTURE_ADDRESS_MODE;
                             }
-
-                            
                         }
 
+                        PoolGame.device.SamplerStates[4].AddressU = TEXTURE_ADDRESS_MODE;
+                        PoolGame.device.SamplerStates[4].AddressV = TEXTURE_ADDRESS_MODE;
                         if (ssaoMapAsset != null && World.useSSAO)
                         {
-                            PoolGame.device.SamplerStates[4].AddressU = TEXTURE_ADDRESS_MODE;
-                            PoolGame.device.SamplerStates[4].AddressV = TEXTURE_ADDRESS_MODE;
                             PostProcessManager.SSSoftShadow_MRT.Parameters["SSAOMap"].SetValue(ssaoMapTexture);
                         }
                         else
                         {
                             PostProcessManager.SSSoftShadow_MRT.Parameters["SSAOMap"].SetValue(PostProcessManager.whiteTexture);
                         }
+                        if (DEM && World.dem != EnvironmentType.None) basicTechnique = "EM" + basicTechnique;
                         if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) 
                             basicTechnique = "NoMRT" + basicTechnique;
                         DrawModel(true, PostProcessManager.SSSoftShadow_MRT, basicTechnique, delegate { SetParametersSoftShadowMRT(LightManager.lights); });
-
-                        //DrawModel(true, LightManager.lights, PostProcessManager.SSSoftShadow, "SSSTechnique", delegate { SetParametersSoftShadow(LightManager.lights); });
                     }
                     break;
                 case RenderMode.DEMBasicRender:
@@ -496,6 +496,8 @@ namespace XNA_PoolGame.Graphics.Models
                                     oldCamera.AspectRatio,
                                     0.0000001f,
                                     oldCamera.FarPlane);
+
+                            DepthStencilBuffer oldBuffer = PoolGame.device.DepthStencilBuffer;
                             // Render our cube map, once for each cube face (6 times).
                             for (int i = 0; i < 6; i++)
                             {
@@ -537,10 +539,11 @@ namespace XNA_PoolGame.Graphics.Models
                                 }
 
                                 PoolGame.device.SetRenderTarget(0, refCubeMap, cubeMapFace);
-                                PoolGame.device.Clear(Color.White);
+                                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target | ClearOptions.Stencil, Color.White, 1.0f, 0);
                                 World.emptycamera.ViewProjection = World.emptycamera.View * World.emptycamera.Projection;
-                                World.scenario.DrawDEMObjects(gameTime);
+                                World.scenario.DrawDEMBasicRenderObjects(gameTime);
                             }
+                            PoolGame.device.DepthStencilBuffer = oldBuffer;
                             PoolGame.device.SetRenderTarget(0, null);
                             environmentMap = refCubeMap.GetTexture();
 
@@ -580,6 +583,7 @@ namespace XNA_PoolGame.Graphics.Models
 #if !DRAW_BOUNDINGVOLUME
             drawvolume &= drawboundingvolume;
 #endif
+            effect.CommitChanges();
             int i = 0, j = 0;
             foreach (CustomModelPart modelPart in modelL1.modelParts)
             {
@@ -889,8 +893,8 @@ namespace XNA_PoolGame.Graphics.Models
                     PostProcessManager.SSSoftShadow_MRT.Parameters["HeightMap"].SetValue(heightMapTexture);
                 }
             }
-            PostProcessManager.SSSoftShadow_MRT.Parameters["bDEM"].SetValue(DEM);
-            if (DEM)
+            
+            if (DEM && World.dem != EnvironmentType.None)
             {
                 PostProcessManager.SSSoftShadow_MRT.Parameters["EnvironmentMap"].SetValue(environmentMap);
             }

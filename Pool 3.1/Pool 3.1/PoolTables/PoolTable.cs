@@ -137,7 +137,7 @@ namespace XNA_PoolGame.PoolTables
             
 
             cueBall = new Ball(PoolGame.game, 0, "Models\\Balls\\newball", "Textures\\Balls\\ball 3", this, World.ballRadius);
-            //cueBall.DEM = true;
+            cueBall.DEM = true;
             cueBall.DrawOrder = 2;
             if (!World.Debug)
                 cueBall.SetCenter(cueBallStartPosition);
@@ -155,7 +155,7 @@ namespace XNA_PoolGame.PoolTables
 
             for (int i = 0; i < TotalBalls; i++)
             {
-                poolBalls[i].DEM = true;
+                //poolBalls[i].DEM = true;
                 poolBalls[i].UseThread = World.UseThreads;
                 PoolGame.game.Components.Add(poolBalls[i]);
                 World.scenario.Objects.Add(poolBalls[i]);

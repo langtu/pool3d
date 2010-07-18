@@ -41,9 +41,12 @@ namespace XNA_PoolGame.Scenarios
         /// <summary>
         /// DEM's scene
         /// </summary>
-        public MultiMap<int, Entity> dems;
+        public MultiMap<int, Entity> dems_basicrender;
 
-        public MultiMap<int, Entity> dems2;
+        /// <summary>
+        /// DEM's Objects scene
+        /// </summary>
+        public MultiMap<int, Entity> dems;
         public Vector4 AmbientColor
         {
             get { return ambientColor; }
@@ -57,8 +60,8 @@ namespace XNA_PoolGame.Scenarios
             objects = new MultiMap<int, DrawableComponent>();
             particles = new MultiMap<int, ParticleSystem>();
             distortionparticles = new MultiMap<int, ParticleSystem>();
+            dems_basicrender = new MultiMap<int, Entity>();
             dems = new MultiMap<int, Entity>();
-            dems2 = new MultiMap<int, Entity>();
             lights = new List<Light>();
 
             this.ambientColor = new Vector4(0, 0, 0, 1);
@@ -111,19 +114,17 @@ namespace XNA_PoolGame.Scenarios
             }
         }
 
-        public void DrawDEMObjects(GameTime gameTime)
+        public void DrawDEMBasicRenderObjects(GameTime gameTime)
         {
-            foreach (Entity bm in this.dems)
+            foreach (Entity bm in this.dems_basicrender)
             {
-                PoolGame.device.RenderState.DepthBufferEnable = true;
-                PoolGame.device.RenderState.DepthBufferWriteEnable = false;
                 if (bm.Visible) bm.Draw(gameTime);
             }
         }
 
-        public void DrawDEM2Objects(GameTime gameTime)
+        public void DrawDEMObjects(GameTime gameTime)
         {
-            foreach (Entity bm in this.dems2)
+            foreach (Entity bm in this.dems)
             {
                 if (bm.Visible) bm.Draw(gameTime);
             }
@@ -190,8 +191,8 @@ namespace XNA_PoolGame.Scenarios
             distortionparticles = null;
             syncobject = null;
 
-            if (dems != null) dems.Clear();
-            dems = null;
+            if (dems_basicrender != null) dems_basicrender.Clear();
+            dems_basicrender = null;
 
             PoolGame.game.Components.Remove(this);
             base.Dispose(disposing);

@@ -89,8 +89,8 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 1280;
-            graphics.PreferredBackBufferHeight = 720;
+            graphics.PreferredBackBufferWidth = 640;
+            graphics.PreferredBackBufferHeight = 480;
             graphics.SynchronizeWithVerticalRetrace = false;
             //graphics.PreferMultiSampling = true;
             
@@ -319,7 +319,7 @@ namespace XNA_PoolGame
 
             if (kb.IsKeyDown(Keys.F8) && lastkb.IsKeyUp(Keys.F8))
             {
-                World.useDynamicEnvironmentMapping = !World.useDynamicEnvironmentMapping;
+                World.dem = (EnvironmentType)(((int)World.dem + 1) % 3);
             }
 
             if (kb.IsKeyDown(Keys.F9) && lastkb.IsKeyUp(Keys.F9))
