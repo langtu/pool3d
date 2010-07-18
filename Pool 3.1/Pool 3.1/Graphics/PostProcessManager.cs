@@ -130,6 +130,9 @@ namespace XNA_PoolGame.Graphics
             distortionCombineEffect.Parameters["texelx"].SetValue(1.0f / (float)PoolGame.device.PresentationParameters.BackBufferWidth);
             distortionCombineEffect.Parameters["texely"].SetValue(1.0f / (float)PoolGame.device.PresentationParameters.BackBufferHeight);
 
+            //distortionCombineEffect.Parameters["texelx"].SetValue(0.003f);
+            //distortionCombineEffect.Parameters["texely"].SetValue(0.003f);
+
             basicEffect = new BasicEffect(PoolGame.device, null);
 
             SetBlurEffectParameters(1.5f / PoolGame.device.Viewport.Width, 0, GBlurH);
@@ -219,14 +222,7 @@ namespace XNA_PoolGame.Graphics
         #endregion
         
         #region DOF
-        public static void CreateDOFMap()
-        {
-            PoolGame.device.SetRenderTarget(0, depthRT);
-            PoolGame.device.Clear(Color.White);
-
-            Depth.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
-            Depth.Parameters["MaxDepth"].SetValue(World.camera.FarPlane);
-        }
+        
         public static void DOF(RenderTarget2D source, RenderTarget2D result)
         {
             
@@ -545,7 +541,7 @@ namespace XNA_PoolGame.Graphics
             distortionsample = GetIntermediateTexture();
             
             PoolGame.device.SetRenderTarget(0, distortionsample.renderTarget);
-            PoolGame.device.Clear(Color.Black);
+            PoolGame.device.Clear(ClearOptions.Target | ClearOptions.Stencil, Color.Black, 1.0f, 0);
         }
 
         public static void DistortionParticlesCombine(RenderTarget2D source, RenderTarget2D result)

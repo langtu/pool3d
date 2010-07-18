@@ -303,5 +303,12 @@ namespace XNA_PoolGame.Graphics.Models
         }*/
 
         #endregion
+
+        protected override void Dispose(bool disposing)
+        {
+            model = null;
+            frustum = null;
+            base.Dispose(disposing);
+        }
     }
 }

@@ -42,5 +42,10 @@ namespace XNA_PoolGame.Scenarios
         {
             throw new NotImplementedException();
         }
+
+        public override void PrefetchData()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

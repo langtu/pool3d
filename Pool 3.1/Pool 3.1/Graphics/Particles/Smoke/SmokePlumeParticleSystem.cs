@@ -22,11 +22,11 @@ namespace XNA_PoolGame.Graphics.Particles
         {
             settings.TextureName = "smoke";
 
-            //settings.MaxParticles = 600;
-            settings.MaxParticles = 40;
+            settings.MaxParticles = 1000;
+            //settings.MaxParticles = 40;
 
             //settings.Duration = TimeSpan.FromSeconds(10);
-            settings.Duration = TimeSpan.FromSeconds(5);
+            settings.Duration = TimeSpan.FromSeconds(4.0f);
 
             settings.MinHorizontalVelocity = 0;
             settings.MaxHorizontalVelocity = 15;
@@ -37,7 +37,7 @@ namespace XNA_PoolGame.Graphics.Particles
             // Create a wind effect by tilting the gravity vector sideways.
             settings.Gravity = new Vector3(10, 6, 0);
 
-            settings.MinColor = new Color(50, 50, 50, 255);
+            settings.MinColor = new Color(160, 160, 160, 200);
             settings.MaxColor = new Color(255, 255, 255, 255);
 
             settings.EndVelocity = 0.75f;

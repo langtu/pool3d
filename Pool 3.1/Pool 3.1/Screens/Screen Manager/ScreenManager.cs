@@ -253,7 +253,7 @@ namespace XNA_PoolGame.Screens.Screen_Manager
 
             screens.Add(screen);
             GC.Collect();
-            GC.WaitForPendingFinalizers();
+            //GC.WaitForPendingFinalizers();
         }
 
 

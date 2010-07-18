@@ -78,8 +78,8 @@ namespace XNA_PoolGame.Graphics.Shadows
                 PostProcessManager.ChangeRenderMode(RenderMode.DEM);
                 RenderDEM();
 
-                World.poolTable.cueBall.Draw(gameTime);
-                //World.scenario.DrawDEM2Objects(gameTime);
+                //World.poolTable.cueBall.Draw(gameTime);
+                World.scenario.DrawDEMObjects(gameTime);
             }
             ///////////////// PASS 4 - SSSM /////////////
             World.camera.ItemsDrawn = 0;
