@@ -24,7 +24,7 @@ namespace XNA_PoolGame.Graphics.Particles.Fire
 
             settings.MaxParticles = 45;
 
-            settings.Duration = TimeSpan.FromSeconds(1.0f);
+            settings.Duration = TimeSpan.FromSeconds(1.25f);
 
             settings.DurationRandomness = 1;
 
@@ -40,7 +40,7 @@ namespace XNA_PoolGame.Graphics.Particles.Fire
             //settings.MinColor = new Color(255, 240, 240, 25);
             //settings.MaxColor = new Color(255, 240, 240, 40);
 
-            settings.MinColor = new Color(255, 0, 0, 255);
+            settings.MinColor = new Color(100, 0, 0, 255);
             settings.MaxColor = new Color(255, 0, 0, 255);
 
             settings.MinStartSize = 5 * 2;
@@ -52,6 +52,7 @@ namespace XNA_PoolGame.Graphics.Particles.Fire
             // Use additive blending.
             settings.SourceBlend = Blend.SourceAlpha;
             settings.DestinationBlend = Blend.One;
+            
         }
     }
 }

@@ -124,6 +124,7 @@ namespace XNA_PoolGame.Scenarios
             smokeFireWoodOut.PreRotation = Matrix.CreateRotationY(-MathHelper.PiOver2);
             smokeFireWoodOut.SpecularColor = Vector4.Zero;
             smokeFireWoodOut.DrawOrder = 3;
+            smokeFireWoodOut.UseModelPartBB = false;
 
             PoolGame.game.Components.Add(smokeFireWoodOut);
 
@@ -298,7 +299,7 @@ namespace XNA_PoolGame.Scenarios
             
 
             /////////////// WALLS
-            walls = new Entity[3];
+            walls = new Entity[4];
 
             walls[0] = new Entity(PoolGame.game, "Models\\Cribs\\wall", true);
             walls[0].Position = new Vector3(0, 0, -1100);
@@ -314,6 +315,10 @@ namespace XNA_PoolGame.Scenarios
             walls[2].Position = new Vector3(0, 0, 850);
             walls[2].Rotation = Matrix.CreateRotationY(MathHelper.PiOver2);
             walls[2].TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;
+
+            walls[3] = new Entity(PoolGame.game, "Models\\Cribs\\wall", true);
+            walls[3].Position = new Vector3(-1200, 0, 0);
+            walls[3].TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;
 
             foreach (Entity wall in walls)
             {
@@ -338,6 +343,7 @@ namespace XNA_PoolGame.Scenarios
             stairs.SpecularColor = Vector4.Zero;
             stairs.PreRotation = Matrix.CreateRotationY(MathHelper.ToRadians(90.0f));
             stairs.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
+            
             PoolGame.game.Components.Add(stairs);
 
             //////////////// ROOF LAMPS
@@ -361,7 +367,7 @@ namespace XNA_PoolGame.Scenarios
             World.scenario.Objects.Add(smokestack);
             World.scenario.Objects.Add(smokeStackFireWood);
             World.scenario.Objects.Add(smokeFireWoodKeeper);
-            //World.scenario.Objects.Add(smokeFireWoodOut);
+            World.scenario.Objects.Add(smokeFireWoodOut);
             
 
             for (int i = 0; i < tabourets.Length; ++i)

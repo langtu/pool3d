@@ -19,7 +19,7 @@ namespace XNA_PoolGame.Scenarios
 
         public Scenario Scenario
         {
-            set { scenario = value; scenario.Enabled = false; }
+            set { scenario = value; }
         }
         public ParticlesCore(Game _game)
             : base(_game)

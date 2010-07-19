@@ -88,7 +88,7 @@ namespace XNA_PoolGame.Graphics.Models
         protected VolumeType volume;
         BoundingBox boundingBox;
         BoundingSphere boundingSphere;
-        
+        protected bool useModelPartBB = true;
         public bool belongsToScenario = true;
 
         #endregion
@@ -109,7 +109,7 @@ namespace XNA_PoolGame.Graphics.Models
         private Matrix preRotation;
         private Vector3 scale;
         protected List<Texture2D> textures;
-        protected List<BoundingBox> boxes;
+        protected BoundingBox[] boxes;
         protected Matrix prelocalWorld;
 
         private bool worldDirty = true;
@@ -124,6 +124,12 @@ namespace XNA_PoolGame.Graphics.Models
         #endregion
 
         #region Properties
+        public bool UseModelPartBB
+        {
+            get { return useModelPartBB; }
+            set { useModelPartBB = value; }
+        }
+        
         public Vector3 Position
         {
             get { return position; }
@@ -319,7 +325,7 @@ namespace XNA_PoolGame.Graphics.Models
 
             boundingBox = modelL1.GetBoundingBox();
             boundingSphere = new BoundingSphere();
-            boxes = new List<BoundingBox>();
+            boxes = new BoundingBox[modelL1.modelParts.Count];
 
             localWorld = preRotation * rotation * Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
             this.prelocalWorld = localWorld;
@@ -327,6 +333,9 @@ namespace XNA_PoolGame.Graphics.Models
 
             if (belongsToScenario)
             {
+                int boxindex = 0;
+                Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+                Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
                 foreach (CustomModelPart modelPart in modelL1.modelParts)
                 {
                     Vector3[] corners = modelPart.AABox.GetCorners();
@@ -334,7 +343,6 @@ namespace XNA_PoolGame.Graphics.Models
                     Vector3[] points = new Vector3[2];
                     points[0] = pointrotated;
                     points[1] = pointrotated;
-
                     for (int k = 1; k < 8; ++k)
                     {
                         pointrotated = Vector3.Transform(corners[k], localWorld);
@@ -343,8 +351,13 @@ namespace XNA_PoolGame.Graphics.Models
                         points[1] = Vector3.Max(points[1], pointrotated);
                     }
 
-                    boxes.Add(new BoundingBox(points[0], points[1]));
+                    min = Vector3.Min(min, points[0]);
+                    max = Vector3.Max(max, points[1]);
+                    boxes[boxindex] = new BoundingBox(points[0], points[1]);
+                    ++boxindex;
                 }
+                boundingBox.Min = min;
+                boundingBox.Max = max;
             }
             base.LoadContent();
         }
@@ -361,7 +374,7 @@ namespace XNA_PoolGame.Graphics.Models
                 localWorld = preRotation * rotation * Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
                 if (identity) this.prelocalWorld = localWorld;
 
-                if (volume == VolumeType.BoundingBoxes)
+                if (useModelPartBB && volume == VolumeType.BoundingBoxes)
                 {
                     int i = 0;
                     foreach (CustomModelPart modelPart in modelL1.modelParts)
@@ -379,10 +392,30 @@ namespace XNA_PoolGame.Graphics.Models
                             points[0] = Vector3.Min(points[0], pointrotated);
                             points[1] = Vector3.Max(points[1], pointrotated);
                         }
-
-                        boxes[i] = new BoundingBox(points[0], points[1]);
+                        
+                        boxes[i].Min = points[0];
+                        boxes[i].Max = points[1];
+                        
                         ++i;
                     }
+                } else if (!useModelPartBB && volume == VolumeType.BoundingBoxes)
+                {
+                    Vector3[] corners = modelL1.GetBoundingBox().GetCorners();
+                    Vector3 pointrotated = Vector3.Transform(corners[0], localWorld);
+                    Vector3[] points = new Vector3[2];
+                    points[0] = pointrotated;
+                    points[1] = pointrotated;
+
+                    for (int k = 1; k < 8; ++k)
+                    {
+                        pointrotated = Vector3.Transform(corners[k], localWorld);
+
+                        points[0] = Vector3.Min(points[0], pointrotated);
+                        points[1] = Vector3.Max(points[1], pointrotated);
+                    }
+
+                    boundingBox.Min = points[0];
+                    boundingBox.Max = points[1];
                 }
                 worldDirty = false;
             }
@@ -577,13 +610,16 @@ namespace XNA_PoolGame.Graphics.Models
 #if !DRAW_BOUNDINGVOLUME
             drawvolume &= drawboundingvolume;
 #endif
-            effect.CommitChanges();
+            //effect.CommitChanges();
             int i = 0, j = 0;
+
+            if (!UseModelPartBB && !ModelInFrustumVolume()) return;
+
             foreach (CustomModelPart modelPart in modelL1.modelParts)
             {
                 #region (1) Culling
 
-                if (!ModelPartInFrustumVolume(modelPart, i))
+                if (UseModelPartBB && !ModelPartInFrustumVolume(modelPart, i))
                 {
                     ++i;
                     continue;
@@ -746,27 +782,12 @@ namespace XNA_PoolGame.Graphics.Models
         }
         public bool ModelInFrustumVolume()
         {
-            if (World.camera.EnableFrustumCulling)
+            if (World.camera.EnableFrustumCulling && frustum != null)
             {
                 switch (volume)
                 {
                     case VolumeType.BoundingBoxes:
-                        Vector3[] corners = boundingBox.GetCorners();
-
-                        Vector3 pointrotated = Vector3.Transform(corners[0], localWorld);
-                        Vector3 min = pointrotated;
-                        Vector3 max = pointrotated;
-
-                        for (int k = 1; k < 8; ++k)
-                        {
-                            pointrotated = Vector3.Transform(corners[k], localWorld);
-
-                            min = Vector3.Min(min, pointrotated);
-                            max = Vector3.Max(max, pointrotated);
-                        }
-                        //World.camera.fc.CalcuteFrustum();
-                        if (frustum.Contains(new BoundingBox(min, max)) == ContainmentType.Disjoint)
-                        //if (World.camera.fc.OBoxInFrustum(box.Min, box.Max) == FrustumTest.Outside)
+                        if (frustum.Contains(boundingBox) == ContainmentType.Disjoint)
                             return false;
                         break;
                     case VolumeType.BoundingSpheres:
@@ -775,19 +796,6 @@ namespace XNA_PoolGame.Graphics.Models
                         break;
                 }
             }
-            
-            /*if (World.camera.EnableFrustumCulling)
-            {
-                Vector3 _min = Vector3.Transform(boundingBox.Min, localWorld);
-                Vector3 _max = Vector3.Transform(boundingBox.Max, localWorld);
-                Vector3 min = Vector3.Min(_min, _max);
-                Vector3 max = Vector3.Max(_min, _max);
-                //if (frustum.boxInFrustum(min, max) == FrustumTest.Outside)
-                //BoundingSphere bs = new BoundingSphere(boundingSphere.Center, boundingSphere.Radius);
-                if (World.camera.fc.boxInFrustum(min, max) == FrustumTest.Outside)
-                    return false;
-            }*/
-
             
             return true;
         }
@@ -970,7 +978,7 @@ namespace XNA_PoolGame.Graphics.Models
                 PoolGame.game.Components.Remove(this);
                 modelL1 = null; modelL2 = null;
 
-                if (boxes != null) boxes.Clear();
+                
                 boxes = null;
                 modelNameL1 = null;
                 textureAsset = null;
