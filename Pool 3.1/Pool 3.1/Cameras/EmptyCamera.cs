@@ -58,7 +58,6 @@ namespace XNA_PoolGame.Cameras
         {
             get
             {
-                frustum.Matrix = viewMatrix * projectionMatrix;
                 return frustum;
             }
         }

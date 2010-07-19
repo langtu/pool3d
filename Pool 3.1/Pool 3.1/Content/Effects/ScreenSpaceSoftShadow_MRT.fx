@@ -195,7 +195,6 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output inp
 		Normal = input.TBN[2];
 		
 	
-	
 	for (int k = 0; k < totalLights; k++)
 	{
 		//

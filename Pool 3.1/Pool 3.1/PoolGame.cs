@@ -91,8 +91,8 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 1280;
-            graphics.PreferredBackBufferHeight = 720;
+            graphics.PreferredBackBufferWidth = 640;
+            graphics.PreferredBackBufferHeight = 480;
             graphics.SynchronizeWithVerticalRetrace = false;
             //graphics.PreferMultiSampling = true;
             
@@ -529,7 +529,7 @@ namespace XNA_PoolGame
 
                 //endTexture = PostProcessManager.shadows.ShadowMapRT[1].GetTexture();
                 if (PostProcessManager.distortionsample != null) endTexture = PostProcessManager.distortionsample.renderTarget.GetTexture();
-                rect = new Rectangle(0, 128, 512, 512);
+                rect = new Rectangle(0, 128, 256, 256);
                 //rect = new Rectangle(0, 0, Width, Height);
                 if (endTexture != null) batch.Draw(endTexture, rect, Color.White);
                 
@@ -633,7 +633,7 @@ namespace XNA_PoolGame
                         if (thread.Running) thread.StopThread();
                         else thread.ResumeThread();
                     }
-                    else
+                    else if (!(component is Scenario))
                         component.Enabled = enable;
                 }
             }

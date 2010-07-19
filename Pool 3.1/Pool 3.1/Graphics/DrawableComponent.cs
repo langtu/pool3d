@@ -61,7 +61,7 @@ namespace XNA_PoolGame.Graphics
 
         public virtual void LoadContent()
         {
-            if (useThread) BuildThread(true);
+            
         }
 
         public virtual void Draw(GameTime gameTime)

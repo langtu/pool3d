@@ -264,7 +264,7 @@ namespace XNA_PoolGame.Cameras
 
         public override void SetMouseCentered()
         {
-            
+            throw new NotImplementedException();
         }
     }
 }

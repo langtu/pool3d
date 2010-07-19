@@ -12,7 +12,8 @@ namespace XNA_PoolGame
 {
     public static class World
     {
-        public static int TotalLights = 2;
+        // LIGHTS
+        public static int TotalLights = 1;
 
         public static Camera camera = null;
         public static EmptyCamera emptycamera = null;
@@ -45,7 +46,7 @@ namespace XNA_PoolGame
         // SHADOWS SETTINGS
         public static bool displayShadows = true;
         public static bool displayShadowsTextures = false;
-        public static int shadowMapSize = 1024 * 2;
+        public static int shadowMapSize = 1024 / 2;
         public static ShadowTechnnique shadowTechnique = ShadowTechnnique.ScreenSpaceShadowMapping;
         // NORMAL MAPPING
         public static DisplacementType displacementType = DisplacementType.None;

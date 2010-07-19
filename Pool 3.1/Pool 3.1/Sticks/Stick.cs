@@ -23,6 +23,9 @@ namespace XNA_PoolGame.Sticks
         private float angleY = 0.0f;
         protected float width = 483.291f + 7.0f;
 
+        /// <summary>
+        /// Cue ball
+        /// </summary>
         public Ball ballTarget;
         public float angle = 0.0f;
 

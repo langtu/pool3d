@@ -86,6 +86,7 @@ namespace XNA_PoolGame.Scenarios
         
         public override void Update(GameTime gameTime)
         {
+            UpdateParticles(gameTime);
             base.Update(gameTime);
         }
 
