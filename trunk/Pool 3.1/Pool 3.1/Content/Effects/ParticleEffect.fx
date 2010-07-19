@@ -26,7 +26,6 @@ float EndVelocity;
 float4 MinColor;
 float4 MaxColor;
 
-
 // These float2 parameters describe the min and max of a range.
 // The actual value is chosen differently for each particle,
 // interpolating between x and y by some random amount.

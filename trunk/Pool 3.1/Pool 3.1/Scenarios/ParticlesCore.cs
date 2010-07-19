@@ -9,6 +9,9 @@ using XNA_PoolGame.Helpers;
 
 namespace XNA_PoolGame.Scenarios
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class ParticlesCore : ThreadComponent
     {
         private Scenario scenario = null;
@@ -16,7 +19,7 @@ namespace XNA_PoolGame.Scenarios
 
         public Scenario Scenario
         {
-            set { scenario = value; }
+            set { scenario = value; scenario.Enabled = false; }
         }
         public ParticlesCore(Game _game)
             : base(_game)
@@ -41,6 +44,14 @@ namespace XNA_PoolGame.Scenarios
                 particles[i].Update(gameTime);
             
             base.Update(gameTime);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (particles != null) particles.Clear();
+            particles = null;
+            scenario = null;
+            base.Dispose(disposing);
         }
     }
 }

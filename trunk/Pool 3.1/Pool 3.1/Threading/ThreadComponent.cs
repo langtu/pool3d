@@ -43,6 +43,11 @@ namespace XNA_PoolGame.Threading
             set { useThread = value; }
         }
 
+        public override void Initialize()
+        {
+            base.Initialize();
+            if (useThread) BuildThread(true);
+        }
         /// <summary>
         /// Run Method. Can be overwritten.
         /// </summary>

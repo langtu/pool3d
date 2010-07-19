@@ -90,7 +90,7 @@ namespace XNA_PoolGame.Scenarios
             core.Scenario = this;
             core.AddParticlesFromMultiMap(particles);
             core.AddParticlesFromMultiMap(distortionparticles);
-            core.BuildThread(true);
+            PoolGame.game.Components.Add(core);
 
             smokestack = new Entity(PoolGame.game, "Models\\Cribs\\smokestack");
             smokestack.Position = new Vector3(1150.0f - 120.0f, 0, 0);
@@ -361,7 +361,7 @@ namespace XNA_PoolGame.Scenarios
             World.scenario.Objects.Add(smokestack);
             World.scenario.Objects.Add(smokeStackFireWood);
             World.scenario.Objects.Add(smokeFireWoodKeeper);
-            World.scenario.Objects.Add(smokeFireWoodOut);
+            //World.scenario.Objects.Add(smokeFireWoodOut);
             
 
             for (int i = 0; i < tabourets.Length; ++i)
@@ -469,7 +469,8 @@ namespace XNA_PoolGame.Scenarios
                 {
                     for (int i = 0; i < 2; ++i)
                     {
-                        heatParticles.AddParticle(center + new Vector3(-45.0f + (float)Maths.random.NextDouble() * 95.0f, 45.0f + (float)Maths.random.NextDouble() * 20.0f, -35.0f + (float)Maths.random.NextDouble() * 70), Vector3.Zero);
+                        //heatParticles.AddParticle(center + new Vector3(-45.0f + (float)Maths.random.NextDouble() * 95.0f, 45.0f + (float)Maths.random.NextDouble() * 20.0f, -20.0f + (float)Maths.random.NextDouble() * 40), Vector3.Zero);
+                        heatParticles.AddParticle(center + new Vector3(-45.0f, 45.0f , -20.0f), Vector3.Zero);
                     }
                 }
             }
