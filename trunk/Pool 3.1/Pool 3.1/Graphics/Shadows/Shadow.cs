@@ -72,7 +72,7 @@ namespace XNA_PoolGame.Graphics.Shadows
         /// <summary>
         /// Draw the scene without shadows
         /// </summary>
-        public void DrawTextured(GameTime gameTime)
+        public virtual void DrawTextured(GameTime gameTime)
         {
             World.camera.ItemsDrawn = 0;
             PostProcessManager.ChangeRenderMode(RenderMode.BasicRender);

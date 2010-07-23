@@ -79,8 +79,8 @@ namespace XNA_PoolGame.Graphics.Models
                 case RenderMode.ShadowMapRender:
                     //if (!occluder) return;
 
-                    frustum = LightManager.lights[PostProcessManager.shadows.lightpass].Frustum;
-                    DrawModel(false, PostProcessManager.Depth, "DepthMap", delegate { SetParametersShadowMap(LightManager.lights[PostProcessManager.shadows.lightpass]); });
+                    frustum = LightManager.lights[PostProcessManager.shading.shadows.lightpass].Frustum;
+                    DrawModel(false, PostProcessManager.Depth, "DepthMap", delegate { SetParametersShadowMap(LightManager.lights[PostProcessManager.shading.shadows.lightpass]); });
 
                     break;
 
@@ -264,10 +264,10 @@ namespace XNA_PoolGame.Graphics.Models
             PostProcessManager.PCFShadowMap.Parameters["totalLights"].SetValue(LightManager.totalLights);
             for (int i = 0; i < LightManager.totalLights; ++i)
             {
-                PostProcessManager.PCFShadowMap.Parameters["ShadowMap" + i].SetValue(PostProcessManager.shadows.ShadowMapRT[i].GetTexture());
+                PostProcessManager.PCFShadowMap.Parameters["ShadowMap" + i].SetValue(PostProcessManager.shading.shadows.ShadowMapRT[i].GetTexture());
             }
 
-            PostProcessManager.PCFShadowMap.Parameters["PCFSamples"].SetValue(PostProcessManager.shadows.pcfSamples);
+            PostProcessManager.PCFShadowMap.Parameters["PCFSamples"].SetValue(PostProcessManager.shading.shadows.pcfSamples);
             PostProcessManager.PCFShadowMap.Parameters["depthBias"].SetValue(LightManager.depthbias);
             
         }

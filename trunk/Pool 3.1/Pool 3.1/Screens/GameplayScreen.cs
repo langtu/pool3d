@@ -16,6 +16,7 @@ using Microsoft.Xna.Framework.Graphics;
 using XNA_PoolGame.Graphics.Models;
 using XNA_PoolGame.Graphics.Shadows;
 using TextureInUse = XNA_PoolGame.Graphics.PostProcessManager.TextureInUse;
+using XNA_PoolGame.Graphics.Shading;
 
 namespace XNA_PoolGame.Screens
 {
@@ -42,16 +43,29 @@ namespace XNA_PoolGame.Screens
             World.camera.FarPlane = 5500.0f;
             if (World.emptycamera == null) World.emptycamera = new EmptyCamera(PoolGame.game);
 
-            // SET SHADOW TECHNIQUE
-            if (PostProcessManager.shadows != null) PostProcessManager.shadows.Dispose();
+            // SET SHADING TECHNIQUE
+            if (PostProcessManager.shading != null) PostProcessManager.shading.Dispose();
+            switch (World.shadingTech)
+            {
+                case ShadingTechnnique.Foward:
+
+                    break;
+                case ShadingTechnnique.Deferred:
+                    PostProcessManager.shading = new DeferredShading();
+                    break;
+            }
+
             switch (World.shadowTechnique)
             {
                 case ShadowTechnnique.PSMShadowMapping:
-                    PostProcessManager.shadows = new PSMShadowMapping();
+                    PostProcessManager.shading.shadows = new PSMShadowMapping();
                     break;
                 case ShadowTechnnique.ScreenSpaceShadowMapping:
-                    PostProcessManager.shadows = new ScreenSpaceShadowMapping();
+                    PostProcessManager.shading.shadows = new ScreenSpaceShadowMapping();
                     break;
+                case ShadowTechnnique.VarianceShadowMapping:
+                    break;
+
             }
 
             // SCENARIO
@@ -207,8 +221,8 @@ namespace XNA_PoolGame.Screens
             
             #region SHADOW MAPPING
 
-            if (World.displayShadows) PostProcessManager.shadows.Draw(gameTime);
-            else PostProcessManager.shadows.DrawTextured(gameTime);
+            if (World.displayShadows) PostProcessManager.shading.Draw(gameTime);
+            else PostProcessManager.shading.DrawTextured(gameTime);
             
             #endregion
 
@@ -226,7 +240,7 @@ namespace XNA_PoolGame.Screens
                 }
             }*/
             #endregion
-
+            /*
             #region PARTICLES
             PostProcessManager.ChangeRenderMode(RenderMode.ParticleSystem);
             World.scenario.SetParticlesSettings();
@@ -242,8 +256,8 @@ namespace XNA_PoolGame.Screens
                 World.scenario.Draw(gameTime);
             }
             #endregion
-
-            resultTIU = PostProcessManager.mainTIU;
+            */
+            resultTIU = PostProcessManager.shading.resultTIU;
             PoolGame.device.SetRenderTarget(0, null);
             if (!(World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None))
             {
@@ -251,7 +265,7 @@ namespace XNA_PoolGame.Screens
                 PoolGame.device.SetRenderTarget(2, null);
             }
 
-            #region DISTORTION COMBINE
+            /*#region DISTORTION COMBINE
             if (World.doDistortion)
             {
                 distortionTIU = PostProcessManager.GetIntermediateTexture();
@@ -262,7 +276,7 @@ namespace XNA_PoolGame.Screens
 
                 PostProcessManager.distortionsample.DontUse();
             }
-            #endregion
+            #endregion*/
 
             #region MOTION BLUR AND DEPTH OF FIELD
 

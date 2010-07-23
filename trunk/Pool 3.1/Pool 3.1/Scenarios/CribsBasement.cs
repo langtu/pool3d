@@ -96,6 +96,7 @@ namespace XNA_PoolGame.Scenarios
             smokestack.Position = new Vector3(1150.0f - 120.0f, 0, 0);
             smokestack.SpecularColor = Vector4.Zero;
             smokestack.DrawOrder = 3;
+            smokestack.UseModelPartBB = false;
             Light light1 = new Light(smokestack.Position + Vector3.Up * 20.0f);
             light1.LightType = LightType.PointLight;
             light1.DiffuseColor = new Vector4(0.5f, .15f, .075f, 1.0f);
@@ -119,7 +120,7 @@ namespace XNA_PoolGame.Scenarios
 
             PoolGame.game.Components.Add(smokeFireWoodKeeper);
 
-            smokeFireWoodOut = new Entity(PoolGame.game, "Models\\Cribs\\smokefirewoodout");
+            smokeFireWoodOut = new Entity(PoolGame.game, "Models\\Cribs\\smokefirewoodout2");
             smokeFireWoodOut.Position = new Vector3(1150.0f - 120.0f, 0.0f, -440.0f);
             smokeFireWoodOut.PreRotation = Matrix.CreateRotationY(-MathHelper.PiOver2);
             smokeFireWoodOut.SpecularColor = Vector4.Zero;

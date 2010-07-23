@@ -13,7 +13,7 @@ namespace XNA_PoolGame
     public static class World
     {
         // LIGHTS
-        public static int TotalLights = 1;
+        public static int TotalLights = 2;
 
         public static Camera camera = null;
         public static EmptyCamera emptycamera = null;
@@ -45,7 +45,7 @@ namespace XNA_PoolGame
 
         // SHADOWS SETTINGS
         public static bool displayShadows = true;
-        public static bool displayShadowsTextures = false;
+        public static bool displayShadowsTextures = true;
         public static int shadowMapSize = 1024 * 2;
         public static ShadowTechnnique shadowTechnique = ShadowTechnnique.ScreenSpaceShadowMapping;
         // NORMAL MAPPING
@@ -61,12 +61,15 @@ namespace XNA_PoolGame
         public static BallCollider ballcollider = null;
 
         // DISTORTION
-        public static bool doDistortion = true;
+        public static bool doDistortion = false;
 
         // INSTANCING MODELS
         public static InstancingTechnique instancingTech = InstancingTechnique.HardwareInstancing;
 
         //
         public static EnvironmentType dem = EnvironmentType.None;
+
+        //
+        public static ShadingTechnnique shadingTech = ShadingTechnnique.Deferred;
     }
 }

@@ -40,7 +40,7 @@ float2 parallaxscaleBias;
 //int      g_nMinSamples;            
 //int      g_nMaxSamples;
 
-Texture TexColor;
+texture TexColor;
 sampler ColorSampler = sampler_state
 {
     Texture = <TexColor>;
@@ -50,7 +50,7 @@ sampler ColorSampler = sampler_state
     MipFilter = ANISOTROPIC;
 };
 
-Texture TexBlurV;
+texture TexBlurV;
 sampler BlurVSampler = sampler_state
 {
     Texture = <TexBlurV>;
@@ -463,6 +463,7 @@ technique SSSTechnique
 {
     pass P0
     {
+		sampler[0] = <ColorSampler>;
         VertexShader = compile vs_3_0 VS_ScreenSpaceShadow();
         PixelShader = compile ps_3_0 PS_ScreenSpaceShadow(false, false);
     }
@@ -471,6 +472,7 @@ technique NoMRTSSSTechnique
 {
     pass P0
     {
+		sampler[0] = <ColorSampler>;
 		sampler[4] = <ssaoSampler>;
         VertexShader = compile vs_3_0 VS_ScreenSpaceShadow();
         PixelShader = compile ps_3_0 PS_ScreenSpaceShadowNoMRT(false, false, false);
@@ -481,6 +483,7 @@ technique NoMRTEMSSSTechnique
 {
     pass P0
     {
+		sampler[0] = <ColorSampler>;
 		sampler[4] = <ssaoSampler>;
         VertexShader = compile vs_3_0 VS_ScreenSpaceShadow();
         PixelShader = compile ps_3_0 PS_ScreenSpaceShadowNoMRT(false, false, true);
@@ -490,6 +493,7 @@ technique NormalMappingSSSTechnique
 {
     pass P0
     {
+		sampler[0] = <ColorSampler>;
 		sampler[2] = <normalSampler>;
 
         VertexShader = compile vs_3_0 VS_ScreenSpaceShadow();
@@ -501,6 +505,7 @@ technique NoMRTNormalMappingSSSTechnique
 {
     pass P0
     {
+		sampler[0] = <ColorSampler>;
 		sampler[2] = <normalSampler>;
 
         VertexShader = compile vs_3_0 VS_ScreenSpaceShadow();
@@ -512,6 +517,7 @@ technique NoMRTParallaxMappingSSSTechnique
 {
     pass P0
     {
+		sampler[0] = <ColorSampler>;
 		sampler[2] = <normalSampler>;
 		sampler[3] = <heightSampler>;
 		sampler[4] = <ssaoSampler>;
@@ -524,6 +530,7 @@ technique ParallaxMappingSSSTechnique
 {
     pass P0
     {
+		sampler[0] = <ColorSampler>;
 		sampler[2] = <normalSampler>;
 		sampler[3] = <heightSampler>;
         VertexShader = compile vs_3_0 VS_ScreenSpaceShadow();

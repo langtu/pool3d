@@ -444,8 +444,8 @@ namespace XNA_PoolGame.Graphics.Models
                     {
                         if (!occluder) return;
 
-                        frustum = LightManager.lights[PostProcessManager.shadows.lightpass].Frustum;
-                        DrawModel(false, PostProcessManager.Depth, "DepthMap", delegate { SetParametersShadowMap(LightManager.lights[PostProcessManager.shadows.lightpass]); });
+                        frustum = LightManager.lights[PostProcessManager.shading.shadows.lightpass].Frustum;
+                        DrawModel(false, PostProcessManager.Depth, "DepthMap", delegate { SetParametersShadowMap(LightManager.lights[PostProcessManager.shading.shadows.lightpass]); });
                     }
                     break;
                 case RenderMode.PCFShadowMapRender:
@@ -502,14 +502,21 @@ namespace XNA_PoolGame.Graphics.Models
                 case RenderMode.BasicRender:
                     {
                         frustum = World.camera.FrustumCulling;
-                        string basicTechnique = "ModelTechnique";
-                        if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) basicTechnique = "NoMRT" + basicTechnique;
-                       
+                        string basicTechnique = PostProcessManager.shading.GetBasicRenderTechnique();
+                        //if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) basicTechnique = "NoMRT" + basicTechnique;
+
                         DrawModel(true, PostProcessManager.modelEffect, basicTechnique, delegate { SetParametersModelEffectMRT(LightManager.lights); });
                         
                     }
                     break;
+                case RenderMode.RenderGBuffer:
+                    {
+                        frustum = World.camera.FrustumCulling;
+                        string basicTechnique = PostProcessManager.shading.GetBasicRenderTechnique();
 
+                        DrawModel(true, PostProcessManager.renderGBuffer_DefEffect, basicTechnique, delegate { SetParameterRenderGBuffer(); });
+                    }
+                    break;
                 case RenderMode.DEM:
                     {
                         if (DEM)
@@ -584,6 +591,8 @@ namespace XNA_PoolGame.Graphics.Models
 
             base.Draw(gameTime);
         }
+
+        
 
 
         /// <summary>
@@ -803,6 +812,21 @@ namespace XNA_PoolGame.Graphics.Models
 
 
         #endregion
+        #region Set Parameters for RenderGBuffer
+
+        private void SetParameterRenderGBuffer()
+        {
+            //PostProcessManager.renderGBuffer_Def.Parameters["View"].SetValue(World.camera.View);
+            PostProcessManager.renderGBuffer_DefEffect.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
+            //if (normalMapAsset != null)
+            //    PostProcessManager.renderGBuffer_DefEffect.Parameters["NormalMap"].SetValue(normalMapTexture);
+            //else
+                PostProcessManager.renderGBuffer_DefEffect.Parameters["NormalMap"].SetValue(PostProcessManager.normalMapNull);
+
+            PostProcessManager.renderGBuffer_DefEffect.Parameters["SpecularMap"].SetValue(PostProcessManager.whiteTexture);
+        }
+
+        #endregion
 
         #region Set Parameters for Basic Render
 
@@ -880,7 +904,7 @@ namespace XNA_PoolGame.Graphics.Models
             if (PostProcessManager.shadowBlurTech == ShadowBlurTechnnique.SoftShadow)
                 PostProcessManager.SSSoftShadow_MRT.Parameters["TexBlurV"].SetValue(PostProcessManager.GBlurVRT.GetTexture());
             else
-                PostProcessManager.SSSoftShadow_MRT.Parameters["TexBlurV"].SetValue(PostProcessManager.shadows.ShadowRT.GetTexture());
+                PostProcessManager.SSSoftShadow_MRT.Parameters["TexBlurV"].SetValue(PostProcessManager.shading.shadows.ShadowRT.GetTexture());
 
             PostProcessManager.SSSoftShadow_MRT.Parameters["Shineness"].SetValue(shineness);
 
@@ -910,7 +934,7 @@ namespace XNA_PoolGame.Graphics.Models
             if (PostProcessManager.shadowBlurTech == ShadowBlurTechnnique.SoftShadow)
                 PostProcessManager.SSSoftShadow.Parameters["TexBlurV"].SetValue(PostProcessManager.GBlurVRT.GetTexture());
             else
-                PostProcessManager.SSSoftShadow.Parameters["TexBlurV"].SetValue(PostProcessManager.shadows.ShadowRT.GetTexture());
+                PostProcessManager.SSSoftShadow.Parameters["TexBlurV"].SetValue(PostProcessManager.shading.shadows.ShadowRT.GetTexture());
 
 
             PostProcessManager.SSSoftShadow.Parameters["LightPosition"].SetValue(new Vector4(light.Position.X, light.Position.Y, light.Position.Z, 1.0f));
@@ -932,10 +956,10 @@ namespace XNA_PoolGame.Graphics.Models
             PostProcessManager.PCFShadowMap.Parameters["totalLights"].SetValue(LightManager.totalLights);
             for (int i = 0; i < LightManager.totalLights; ++i)
             {
-                PostProcessManager.PCFShadowMap.Parameters["ShadowMap" + i].SetValue(PostProcessManager.shadows.ShadowMapRT[i].GetTexture());   
+                PostProcessManager.PCFShadowMap.Parameters["ShadowMap" + i].SetValue(PostProcessManager.shading.shadows.ShadowMapRT[i].GetTexture());   
             }
-            
-            PostProcessManager.PCFShadowMap.Parameters["PCFSamples"].SetValue(PostProcessManager.shadows.pcfSamples);
+
+            PostProcessManager.PCFShadowMap.Parameters["PCFSamples"].SetValue(PostProcessManager.shading.shadows.pcfSamples);
             PostProcessManager.PCFShadowMap.Parameters["depthBias"].SetValue(LightManager.depthbias);
         }
 
