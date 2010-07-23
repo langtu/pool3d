@@ -12,13 +12,15 @@ using XNA_PoolGame.Graphics;
 
 namespace XNA_PoolGame.Cameras
 {
+	/// <summary>
+    /// Main camera.
+    /// </summary>
     public abstract class Camera : GameComponent
     {
         #region Properties
 
         #region Frustum Culling
         protected BoundingFrustum frustum;
-        //public FrustumCulling fc;
         protected bool enableFrustum;
         public int ItemsDrawn = 0;
 

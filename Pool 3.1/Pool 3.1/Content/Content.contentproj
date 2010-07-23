@@ -620,6 +620,21 @@
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
+    <Compile Include="Effects\ClearGBuffer_Def.fx">
+      <Name>ClearGBuffer_Def</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Effects\CombineFinal_Def.fx">
+      <Name>CombineFinal_Def</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Effects\DirectionalLight.fx">
+      <Name>DirectionalLight</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
     <None Include="Effects\DOF_Common.fxh">
       <Name>DOF_Common</Name>
       <Importer>EffectImporter</Importer>
@@ -628,6 +643,16 @@
     <None Include="Effects\pp_Common.fxh">
       <Name>pp_Common</Name>
     </None>
+    <Compile Include="Effects\RenderGBuffer_Def.fx">
+      <Name>RenderGBuffer_Def</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Cribs\smokefirewoodout2.X">
+      <Name>smokefirewoodout2</Name>
+      <Importer>XImporter</Importer>
+      <Processor>CustomModelProcessor</Processor>
+    </Compile>
     <Compile Include="Models\Cribs\carpet.X">
       <Name>carpet</Name>
       <Importer>XImporter</Importer>
@@ -1159,6 +1184,20 @@
   <ItemGroup>
     <Compile Include="Particles\heat.png">
       <Name>heat</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\nullnormalmap.jpg">
+      <Name>nullnormalmap</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\nullspecularmap.jpg">
+      <Name>nullspecularmap</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

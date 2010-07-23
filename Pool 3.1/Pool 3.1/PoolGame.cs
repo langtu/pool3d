@@ -27,6 +27,7 @@ using XNA_PoolGame.Scenarios;
 using XNA_PoolGame.Graphics.Particles;
 using XNA_PoolGame.Graphics.Models;
 using XNA_PoolGame.Threading;
+using XNA_PoolGame.Graphics.Shading;
 #endregion
 
 namespace XNA_PoolGame
@@ -517,9 +518,9 @@ namespace XNA_PoolGame
                 Texture2D endTexture = null;
                 //endTexture = PostProcessManager.shadows.ShadowMapRT[0].GetTexture();
                 //endTexture = PostProcessManager.shadows.ShadowRT.GetTexture();
-                //endTexture = World.poolTable.cueBall.refCubeMap.GetTexture();
+                endTexture = ((DeferredShading)PostProcessManager.shading).normalTIU.renderTarget.GetTexture();
                 //if (World.dofType != DOFType.None || World.motionblurType != MotionBlurType.None) endTexture = PostProcessManager.depthRT.GetTexture();
-                Rectangle rect = new Rectangle(0, 0, 256, 256);
+                Rectangle rect = new Rectangle(0, 0, 128, 128);
 
                 
                 batch.Begin(SpriteBlendMode.None);
@@ -528,15 +529,17 @@ namespace XNA_PoolGame
 
 
                 //endTexture = PostProcessManager.shadows.ShadowMapRT[1].GetTexture();
-                if (PostProcessManager.distortionsample != null) endTexture = PostProcessManager.distortionsample.renderTarget.GetTexture();
-                rect = new Rectangle(0, 128, 256, 256);
+                //if (PostProcessManager.distortionsample != null) endTexture = PostProcessManager.distortionsample.renderTarget.GetTexture();
+                endTexture = ((DeferredShading)PostProcessManager.shading).diffuseColorTIU.renderTarget.GetTexture();
+                rect = new Rectangle(0, 128, 128, 128);
                 //rect = new Rectangle(0, 0, Width, Height);
                 if (endTexture != null) batch.Draw(endTexture, rect, Color.White);
-                
-                
-                //endTexture = PostProcessManager.GBlurVRT.GetTexture();
-                //rect = new Rectangle(0, 128*2, 128, 128);
-                //batch.Draw(endTexture, rect, Color.White);
+
+
+                endTexture = ((DeferredShading)PostProcessManager.shading).lightTIU.renderTarget.GetTexture();
+                rect = new Rectangle(0, 128 * 2, 128, 128);
+                //rect = new Rectangle(0, 0, Width, Height);
+                if (endTexture != null) batch.Draw(endTexture, rect, Color.White);
 
                 batch.End();
             }

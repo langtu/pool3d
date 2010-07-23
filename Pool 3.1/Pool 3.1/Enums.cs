@@ -112,7 +112,8 @@ namespace XNA_PoolGame
         FPS,
         Light,
         ParticleSystem,
-        DistortionParticleSystem
+        DistortionParticleSystem,
+        RenderGBuffer
     }
     /// <summary>
     /// Controls the DOF effect being applied
@@ -145,7 +146,13 @@ namespace XNA_PoolGame
     public enum ShadowTechnnique
     {
         ScreenSpaceShadowMapping,
-        PSMShadowMapping
+        PSMShadowMapping,
+        VarianceShadowMapping
+    }
+    public enum ShadingTechnnique
+    {
+        Foward,
+        Deferred
     }
     public enum ScenarioType
     {

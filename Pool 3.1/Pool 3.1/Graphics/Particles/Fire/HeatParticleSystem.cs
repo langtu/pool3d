@@ -22,7 +22,7 @@ namespace XNA_PoolGame.Graphics.Particles.Fire
         {
             settings.TextureName = "fire";
 
-            settings.MaxParticles = 45;
+            settings.MaxParticles = 12;
 
             settings.Duration = TimeSpan.FromSeconds(1.25f);
 
@@ -40,8 +40,8 @@ namespace XNA_PoolGame.Graphics.Particles.Fire
             //settings.MinColor = new Color(255, 240, 240, 25);
             //settings.MaxColor = new Color(255, 240, 240, 40);
 
-            settings.MinColor = new Color(100, 0, 0, 255);
-            settings.MaxColor = new Color(255, 0, 0, 255);
+            settings.MinColor = new Color(100, 0, 0, 25);
+            settings.MaxColor = new Color(255, 0, 0, 45);
 
             settings.MinStartSize = 5 * 2;
             settings.MaxStartSize = 10 * 2;

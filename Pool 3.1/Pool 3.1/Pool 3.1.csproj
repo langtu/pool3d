@@ -94,6 +94,8 @@
     <Compile Include="Graphics\Models\InstancedModelPart.cs" />
     <Compile Include="Graphics\MotionBlur.cs" />
     <Compile Include="Graphics\Particles\Fire\HeatParticleSystem.cs" />
+    <Compile Include="Graphics\Shading\BaseShading.cs" />
+    <Compile Include="Graphics\Shading\DeferredShading.cs" />
     <Compile Include="Graphics\Shadows\ScreenSpaceShadowMapping.cs" />
     <Compile Include="Graphics\Shadows\Shadow.cs" />
     <Compile Include="Graphics\Shadows\PSMShadowMapping.cs" />

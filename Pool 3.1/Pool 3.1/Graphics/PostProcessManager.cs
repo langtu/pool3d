@@ -9,6 +9,7 @@ using XNA_PoolGame.Graphics;
 using Microsoft.Xna.Framework;
 using XNA_PoolGame.Graphics.Shadows;
 using XNA_PoolGame.Graphics.Bloom;
+using XNA_PoolGame.Graphics.Shading;
 
 namespace XNA_PoolGame.Graphics
 {
@@ -37,6 +38,9 @@ namespace XNA_PoolGame.Graphics
         public static Effect GBlurV;
         public static Effect Depth;
         public static Effect distortionCombineEffect;
+        public static Effect clearGBuffer_DefEffect;
+        public static Effect renderGBuffer_DefEffect, combineFinal_DefEffect;
+        public static Effect directionalLightEffect;
 
         public static BasicEffect basicEffect;
 
@@ -49,7 +53,7 @@ namespace XNA_PoolGame.Graphics
         public static RenderMode currentRenderMode = RenderMode.BasicRender;
 
         // SHADOW MAPPING
-        public static Shadow shadows;
+        public static BaseShading shading;
         public static Texture2D depthBlurred;
         
         public static float[] weights;
@@ -73,6 +77,9 @@ namespace XNA_PoolGame.Graphics
         public static TextureInUse distortionsample, GBlurVTIU, GBlurHTIU;
         //
         public static Texture2D whiteTexture;
+        public static Texture2D normalMapNull;
+        public static Texture2D specularMapNull;
+        
 
         //
         public static ResolveTexture2D resolveTarget;
@@ -121,11 +128,18 @@ namespace XNA_PoolGame.Graphics
             SSSoftShadow_MRT = PoolGame.content.Load<Effect>("Effects\\ScreenSpaceSoftShadow_MRT");
             motionblurEffect = PoolGame.content.Load<Effect>("Effects\\MotionBlur");
             clearGBufferEffect = PoolGame.content.Load<Effect>("Effects\\ClearGBuffer");
+            clearGBuffer_DefEffect = PoolGame.content.Load<Effect>("Effects\\ClearGBuffer_Def");
+            combineFinal_DefEffect = PoolGame.content.Load<Effect>("Effects\\CombineFinal_Def");
+            directionalLightEffect = PoolGame.content.Load<Effect>("Effects\\DirectionalLight");
+            renderGBuffer_DefEffect = PoolGame.content.Load<Effect>("Effects\\RenderGBuffer_Def");
 
             blurEffect = PoolGame.content.Load<Effect>("Effects\\Blur");
             DOFEffect = PoolGame.content.Load<Effect>("Effects\\DOF");
             scalingEffect = PoolGame.content.Load<Effect>("Effects\\Scale");
+
             whiteTexture = PoolGame.content.Load<Texture2D>("Textures\\white");
+            normalMapNull = PoolGame.content.Load<Texture2D>("Textures\\nullnormalmap");
+            specularMapNull = PoolGame.content.Load<Texture2D>("Textures\\nullspecularmap");
 
             distortionCombineEffect.Parameters["texelx"].SetValue(1.0f / (float)PoolGame.device.PresentationParameters.BackBufferWidth);
             distortionCombineEffect.Parameters["texely"].SetValue(1.0f / (float)PoolGame.device.PresentationParameters.BackBufferHeight);
@@ -466,6 +480,10 @@ namespace XNA_PoolGame.Graphics
             blurEffect.Dispose();
             scalingEffect.Dispose();
             DOFEffect.Dispose();
+            clearGBuffer_DefEffect.Dispose();
+            renderGBuffer_DefEffect.Dispose();
+            directionalLightEffect.Dispose();
+            combineFinal_DefEffect.Dispose();
 
             // DISPOSE RENDER TARGETS
             foreach (TextureInUse t in renderTargets)

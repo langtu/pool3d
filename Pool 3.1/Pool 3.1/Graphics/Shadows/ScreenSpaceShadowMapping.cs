@@ -73,12 +73,11 @@ namespace XNA_PoolGame.Graphics.Shadows
             World.scenario.DrawScene(gameTime);
 
             ///////////////// PASS 3 - DEM //////////////
-            if (World.dem != EnvironmentType.None)
+            if (World.dem == EnvironmentType.Dynamic)
             {
                 PostProcessManager.ChangeRenderMode(RenderMode.DEM);
                 RenderDEM();
 
-                //World.poolTable.cueBall.Draw(gameTime);
                 World.scenario.DrawDEMObjects(gameTime);
             }
             ///////////////// PASS 4 - SSSM /////////////

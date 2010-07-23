@@ -50,8 +50,8 @@ namespace XNA_PoolGame.Cameras
             get { return viewProjectionMatrix; }
             set
             {
-                viewProjectionMatrix = View * Projection;
-                frustum.Matrix = viewMatrix * projectionMatrix;
+                viewProjectionMatrix = value;
+                frustum.Matrix = viewProjectionMatrix;
             }
         }
         public override BoundingFrustum FrustumCulling
