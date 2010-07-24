@@ -795,7 +795,7 @@ Frame Box01 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename Diffuse {
-     "..\\..\\Textures\\Cribs\\ConcreteNew0003_S2.jpg";
+     "..\\..\\Textures\\Cribs\\BrickLargePainted0051_5_S.jpg";
     }
    }
   }
@@ -7175,7 +7175,7 @@ Frame ChamferBox01 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename Diffuse {
-     "..\\..\\Textures\\Cribs\\ConcreteNew0003_S2.jpg";
+     "..\\..\\Textures\\Cribs\\BrickLargePainted0051_5_S.jpg";
     }
    }
   }

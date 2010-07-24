@@ -60,13 +60,16 @@ namespace XNA_PoolGame.Graphics.Models
         public string customnormalMapAsset = null;
         public string customheightMapAsset = null;
         public string customssaoMapAsset = null;
+        public string customspecularMapAsset = null;
         
         protected Texture2D customnormalMapTexture = null;
         protected Texture2D customheightMapTexture = null;
         protected Texture2D customssaoMapTexture = null;
+        protected Texture2D customspecularMapTexture = null;
         public List<Texture2D> normalMapTextures;
         public List<Texture2D> heightMapTextures;
         public List<Texture2D> ssaoMapTextures;
+        public List<Texture2D> specularMapTextures;
 
         private List<Light> aditionalLights;
         private float[] lightsradius;
@@ -77,6 +80,7 @@ namespace XNA_PoolGame.Graphics.Models
         private bool useNormalMapTextures = false;
         private bool useHeightMapTextures = false;
         private bool useSSAOMapTextures = false;
+        private bool useSpecularMapTextures = false;
         private bool useDEM = false;
         public RenderTargetCube refCubeMap = null;
         public TextureCube environmentMap;
@@ -171,6 +175,12 @@ namespace XNA_PoolGame.Graphics.Models
         {
             get { return useNormalMapTextures; }
             set { useNormalMapTextures = value; customnormalMapAsset = null; }
+        }
+
+        public bool UseSpecularMapTextures
+        {
+            get { return useSpecularMapTextures; }
+            set { useSpecularMapTextures = value; customspecularMapAsset = null; }
         }
 
         public bool UseHeightMapTextures
@@ -269,6 +279,7 @@ namespace XNA_PoolGame.Graphics.Models
             normalMapTextures = new List<Texture2D>();
             heightMapTextures = new List<Texture2D>();
             ssaoMapTextures = new List<Texture2D>();
+            specularMapTextures = new List<Texture2D>();
             worldDirty = true;
         }
 
@@ -343,23 +354,14 @@ namespace XNA_PoolGame.Graphics.Models
             if (textureAsset != null) useTexture = PoolGame.content.Load<Texture2D>(textureAsset);
 
             //
+            List<string> baseTexturesFileNames = modelL1.GetDiffuseTexturesFilename();
+
             if (customnormalMapAsset != null) customnormalMapTexture = PoolGame.content.Load<Texture2D>(customnormalMapAsset);
             else if (UseNormalMapTextures)
             {
-                List<string> normalfilename = modelL1.GetDiffuseTexturesFilename();
-
-                foreach (string str in normalfilename)
+                foreach (string baseasset in baseTexturesFileNames)
                 {
-                    string folder = "";//Path.GetFileName(Path.GetDirectoryName(str));
-                    string st = Path.GetDirectoryName(str);
-                    while (!Path.GetFileName(st).Equals("Textures"))
-                    {
-                        folder = Path.GetFileName(st) + "\\" + folder;
-                        st = Path.GetDirectoryName(st);
-                    }
-                    string fileasset = Path.GetFileNameWithoutExtension(str);
-                    string baseasset = "Textures\\" + folder + fileasset.Substring(0, fileasset.Length - 1);
-
+                    
                     string normalasset = baseasset + "N";
 
                     Texture2D texLoaded = null;
@@ -375,29 +377,72 @@ namespace XNA_PoolGame.Graphics.Models
                     {
                         normalMapTextures.Add(texLoaded);
                     }
-
-                    if (UseHeightMapTextures)
-                    {
-                        string heightasset = baseasset + "H";
-                        texLoaded = null;
-                        try
-                        {
-                            texLoaded = PoolGame.content.Load<Texture2D>(heightasset);
-                        }
-                        catch (ContentLoadException conexception)
-                        {
-                            texLoaded = PostProcessManager.whiteTexture;
-                        }
-                        finally
-                        {
-                            heightMapTextures.Add(texLoaded);
-                        }
-                    }
                 }
             }
             if (customheightMapAsset != null) customheightMapTexture = PoolGame.content.Load<Texture2D>(customheightMapAsset);
+            else if (UseHeightMapTextures)
+            {
+                foreach (string baseasset in baseTexturesFileNames)
+                {
+                    string heightasset = baseasset + "H";
+                    Texture2D texLoaded = null;
+                    try
+                    {
+                        texLoaded = PoolGame.content.Load<Texture2D>(heightasset);
+                    }
+                    catch (ContentLoadException conexception)
+                    {
+                        texLoaded = PostProcessManager.whiteTexture;
+                    }
+                    finally
+                    {
+                        heightMapTextures.Add(texLoaded);
+                    }
+                }
+            }
             if (customssaoMapAsset != null) customssaoMapTexture = PoolGame.content.Load<Texture2D>(customssaoMapAsset);
+            else if (useSSAOMapTextures)
+            {
+                foreach (string baseasset in baseTexturesFileNames)
+                {
+                    string ssaoasset = baseasset + "AO";
+                    Texture2D texLoaded = null;
+                    try
+                    {
+                        texLoaded = PoolGame.content.Load<Texture2D>(ssaoasset);
+                    }
+                    catch (ContentLoadException conexception)
+                    {
+                        texLoaded = PostProcessManager.whiteTexture;
+                    }
+                    finally
+                    {
+                        ssaoMapTextures.Add(texLoaded);
+                    }
+                }
+            }
 
+            if (customspecularMapAsset != null) customspecularMapTexture = PoolGame.content.Load<Texture2D>(customspecularMapAsset);
+            else if (UseSpecularMapTextures)
+            {
+                foreach (string baseasset in baseTexturesFileNames)
+                {
+                    string specularasset = baseasset + "S";
+                    Texture2D texLoaded = null;
+                    try
+                    {
+                        texLoaded = PoolGame.content.Load<Texture2D>(specularasset);
+                    }
+                    catch (ContentLoadException conexception)
+                    {
+                        texLoaded = PostProcessManager.whiteTexture;
+                    }
+                    finally
+                    {
+                        specularMapTextures.Add(texLoaded);
+                    }
+                }
+            }
             // Setup model.
             textures = modelL1.GetDiffuseTextures();
 
@@ -528,7 +573,7 @@ namespace XNA_PoolGame.Graphics.Models
                     break;
                 case RenderMode.PCFShadowMapRender:
                     {
-                        if (!occluder) return;
+                        //if (!occluder) return;
 
                         frustum = World.camera.FrustumCulling;
                         DrawModel(false, PostProcessManager.PCFShadowMap, "PCFSMTechnique", delegate { SetParametersPCFShadowMap(LightManager.lights); });
@@ -555,14 +600,18 @@ namespace XNA_PoolGame.Graphics.Models
 
                         PoolGame.device.SamplerStates[4].AddressU = TEXTURE_ADDRESS_MODE;
                         PoolGame.device.SamplerStates[4].AddressV = TEXTURE_ADDRESS_MODE;
-                        if (customssaoMapAsset != null && World.useSSAO)
-                            PostProcessManager.SSSoftShadow_MRT.Parameters["SSAOMap"].SetValue(customssaoMapTexture);
-                        else
-                            PostProcessManager.SSSoftShadow_MRT.Parameters["SSAOMap"].SetValue(PostProcessManager.whiteTexture);
-                        
+                        PoolGame.device.SamplerStates[5].AddressU = TEXTURE_ADDRESS_MODE;
+                        PoolGame.device.SamplerStates[5].AddressV = TEXTURE_ADDRESS_MODE;
+                        if (!useSSAOMapTextures)
+                        {
+                            if (customssaoMapAsset != null && World.useSSAOTextures)
+                                PostProcessManager.SSSoftShadow_MRT.Parameters["SSAOMap"].SetValue(customssaoMapTexture);
+                            else
+                                PostProcessManager.SSSoftShadow_MRT.Parameters["SSAOMap"].SetValue(PostProcessManager.whiteTexture);
+                        }
                         if (DEM && World.dem != EnvironmentType.None) basicTechnique = "EM" + basicTechnique;
-                        if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) 
-                            basicTechnique = "NoMRT" + basicTechnique;
+                        if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) basicTechnique = "NoMRT" + basicTechnique;
+                        if (World.doSSAO) basicTechnique = basicTechnique + "SSAO";
                         DrawModel(true, PostProcessManager.SSSoftShadow_MRT, basicTechnique, delegate { SetParametersSoftShadowMRT(LightManager.lights); });
                     }
                     break;
@@ -727,6 +776,18 @@ namespace XNA_PoolGame.Graphics.Models
                         if (World.displacementType == DisplacementType.ParallaxMapping && UseHeightMapTextures)
                             effect.Parameters["HeightMap"].SetValue(heightMapTextures[i]);
                     }
+
+                    if (useSSAOMapTextures)
+                    {
+                        if (World.useSSAOTextures) effect.Parameters["SSAOMap"].SetValue(ssaoMapTextures[i]);
+                        else effect.Parameters["SSAOMap"].SetValue(PostProcessManager.whiteTexture);
+                    }
+
+                    if (useSpecularMapTextures)
+                    {
+                        effect.Parameters["SpecularMap"].SetValue(specularMapTextures[i]);
+                    }
+                    else effect.Parameters["SpecularMap"].SetValue(PostProcessManager.whiteTexture);
                 }
                 effect.Parameters["World"].SetValue(localWorld);
 

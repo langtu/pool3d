@@ -635,9 +635,29 @@
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </None>
+    <Compile Include="Effects\Multiply.fx">
+      <Name>Multiply</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
     <None Include="Effects\pp_Common.fxh">
       <Name>pp_Common</Name>
     </None>
+    <Compile Include="Effects\SSAO.fx">
+      <Name>SSAO</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Cribs\tallestwall.X">
+      <Name>tallestwall</Name>
+      <Importer>XImporter</Importer>
+      <Processor>CustomModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\Cribs\longwall.X">
+      <Name>longwall</Name>
+      <Importer>XImporter</Importer>
+      <Processor>CustomModelProcessor</Processor>
+    </Compile>
     <Compile Include="Models\Painting\patriciapainting.X">
       <Name>patriciapainting</Name>
       <Importer>XImporter</Importer>
@@ -1287,6 +1307,185 @@
       <Processor>TextureProcessor</Processor>
       <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
       <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\MarbleBeige0044_S_S.jpg">
+      <Name>MarbleBeige0044_S_S</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\WoodPlanksClean0046_1_S.jpg">
+      <Name>WoodPlanksClean0046_1_S</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\WoodPlanksClean0046_1_S_H.jpg">
+      <Name>WoodPlanksClean0046_1_S_H</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+    </Compile>
+    <Compile Include="Textures\Cribs\WoodPlanksClean0046_1_S_N.jpg">
+      <Name>WoodPlanksClean0046_1_S_N</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\WoodPlanksClean0046_1_S_AO.jpg">
+      <Name>WoodPlanksClean0046_1_S_AO</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\BrickLargePainted0017_2_S.jpg">
+      <Name>BrickLargePainted0017_2_S</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Cribs\BrickLargePainted0017_2_S_AO.jpg">
+      <Name>BrickLargePainted0017_2_S_AO</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Cribs\BrickLargePainted0017_2_S_H.jpg">
+      <Name>BrickLargePainted0017_2_S_H</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Cribs\BrickLargePainted0017_2_S_N.jpg">
+      <Name>BrickLargePainted0017_2_S_N</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\ConcreteNew0005_2_S.jpg">
+      <Name>ConcreteNew0005_2_S</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Cribs\ConcreteNew0005_2_S_AO.jpg">
+      <Name>ConcreteNew0005_2_S_AO</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Cribs\ConcreteNew0005_2_S_H.jpg">
+      <Name>ConcreteNew0005_2_S_H</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Cribs\ConcreteNew0005_2_S_N.jpg">
+      <Name>ConcreteNew0005_2_S_N</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\WoodPlanksDirty0044_1_S.jpg">
+      <Name>WoodPlanksDirty0044_1_S</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+    </Compile>
+    <Compile Include="Textures\Cribs\WoodPlanksDirty0044_1_S_H.jpg">
+      <Name>WoodPlanksDirty0044_1_S_H</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Cribs\WoodPlanksDirty0044_1_S_N.jpg">
+      <Name>WoodPlanksDirty0044_1_S_N</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\BrickLargePainted0017_4_S.jpg">
+      <Name>BrickLargePainted0017_4_S</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+    </Compile>
+    <Compile Include="Textures\Cribs\BrickLargePainted0017_4_S_H.jpg">
+      <Name>BrickLargePainted0017_4_S_H</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+    </Compile>
+    <Compile Include="Textures\Cribs\BrickLargePainted0017_4_S_N.jpg">
+      <Name>BrickLargePainted0017_4_S_N</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <ProcessorParameters_ResizeToPowerOfTwo>True</ProcessorParameters_ResizeToPowerOfTwo>
+      <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\BrickLargePainted0017_3_S.jpg">
+      <Name>BrickLargePainted0017_3_S</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Cribs\BrickLargePainted0017_3_S_H.jpg">
+      <Name>BrickLargePainted0017_3_S_H</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Cribs\BrickLargePainted0017_3_S_N.jpg">
+      <Name>BrickLargePainted0017_3_S_N</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\BrickLargePainted0003_2_S.jpg">
+      <Name>BrickLargePainted0003_2_S</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Cribs\BrickLargePainted0003_2_S_H.jpg">
+      <Name>BrickLargePainted0003_2_S_H</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\Cribs\BrickLargePainted0003_2_S_N.jpg">
+      <Name>BrickLargePainted0003_2_S_N</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\Cribs\BrickLargePainted0051_5_S.jpg">
+      <Name>BrickLargePainted0051_5_S</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\noise.png">
+      <Name>noise</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />

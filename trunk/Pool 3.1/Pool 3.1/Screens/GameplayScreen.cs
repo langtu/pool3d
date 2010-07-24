@@ -218,12 +218,12 @@ namespace XNA_PoolGame.Screens
 
             List<TextureInUse> useless = new List<TextureInUse>();
             TextureInUse distortionTIU = null;
-            
+
             #region SHADOW MAPPING
 
             if (World.displayShadows) PostProcessManager.shading.Draw(gameTime);
             else PostProcessManager.shading.DrawTextured(gameTime);
-            
+
             #endregion
 
             #region LIGHT'S POINT
@@ -246,17 +246,17 @@ namespace XNA_PoolGame.Screens
             World.scenario.SetParticlesSettings();
             World.scenario.Draw(gameTime);
             #endregion
-
+            
             #region DISTORTION PARTICLES
             if (World.doDistortion)
-            {   
+            {
                 PostProcessManager.ChangeRenderMode(RenderMode.DistortionParticleSystem);
                 PostProcessManager.DistorionParticles();
                 World.scenario.SetDistortionParticleSettings();
                 World.scenario.Draw(gameTime);
             }
             #endregion
-            
+
             resultTIU = PostProcessManager.shading.resultTIU;
             PoolGame.device.SetRenderTarget(0, null);
             if (!(World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None))
@@ -277,6 +277,15 @@ namespace XNA_PoolGame.Screens
                 PostProcessManager.distortionsample.DontUse();
             }
             #endregion
+
+            if (World.doSSAO)
+            {
+
+                PostProcessManager.ssao.Draw(resultTIU);
+                resultTIU = PostProcessManager.ssao.resultTIU;
+            }
+
+            
 
             #region MOTION BLUR AND DEPTH OF FIELD
 
@@ -343,6 +352,8 @@ namespace XNA_PoolGame.Screens
             for (int k = 0; k < useless.Count; ++k) useless[k].DontUse();
             useless.Clear(); useless = null;
             resultTIU.DontUse();
+            PostProcessManager.ssao.FreeStuff();
+
             PostProcessManager.halfVertTIU.DontUse(); PostProcessManager.halfHorTIU.DontUse();
             PostProcessManager.depthTIU.DontUse();
             if (World.motionblurType == MotionBlurType.None) { PostProcessManager.velocityTIU.DontUse(); PostProcessManager.velocityLastFrameTIU.DontUse(); }

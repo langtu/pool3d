@@ -92,10 +92,10 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 600;
-            graphics.PreferredBackBufferHeight = 480;
-            graphics.SynchronizeWithVerticalRetrace = false;
-            //graphics.PreferMultiSampling = true;
+            graphics.PreferredBackBufferWidth = 1280;
+            graphics.PreferredBackBufferHeight = 720;
+            graphics.SynchronizeWithVerticalRetrace = true;
+            graphics.PreferMultiSampling = true;
             
             graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
             //graphics.IsFullScreen = true;
@@ -128,9 +128,9 @@ namespace XNA_PoolGame
             SurfaceFormat format = adapter.CurrentDisplayMode.Format;
             DisplayMode currentmode = adapter.CurrentDisplayMode;
             
-            /*e.GraphicsDeviceInformation.PresentationParameters.MultiSampleQuality = 0;
+            e.GraphicsDeviceInformation.PresentationParameters.MultiSampleQuality = 0;
             e.GraphicsDeviceInformation.PresentationParameters.MultiSampleType =
-                MultiSampleType.FourSamples;*/
+                MultiSampleType.FourSamples;
 #if XBOX
             e.GraphicsDeviceInformation.PresentationParameters.MultiSampleQuality = 0;
             e.GraphicsDeviceInformation.PresentationParameters.MultiSampleType =
@@ -317,7 +317,7 @@ namespace XNA_PoolGame
 
             if (kb.IsKeyDown(Keys.F7) && lastkb.IsKeyUp(Keys.F7))
             {
-                World.useSSAO = !World.useSSAO;
+                World.useSSAOTextures = !World.useSSAOTextures;
             }
 
             if (kb.IsKeyDown(Keys.F8) && lastkb.IsKeyUp(Keys.F8))
@@ -518,9 +518,12 @@ namespace XNA_PoolGame
                 Texture2D endTexture = null;
                 //endTexture = PostProcessManager.shadows.ShadowMapRT[0].GetTexture();
                 //endTexture = PostProcessManager.shadows.ShadowRT.GetTexture();
-                endTexture = ((DeferredShading)PostProcessManager.shading).normalTIU.renderTarget.GetTexture();
+                endTexture = PostProcessManager.ssao.ssaoTIU.renderTarget.GetTexture();
+                //endTexture = ((DeferredShading)PostProcessManager.shading).normalTIU.renderTarget.GetTexture();
                 //if (World.dofType != DOFType.None || World.motionblurType != MotionBlurType.None) endTexture = PostProcessManager.depthRT.GetTexture();
-                Rectangle rect = new Rectangle(0, 0, 128, 128);
+                Rectangle rect;
+                //rect = new Rectangle(0, 0, 128, 128);
+                rect = new Rectangle(0, 0, PoolGame.Width, PoolGame.Height);
 
                 
                 batch.Begin(SpriteBlendMode.None);
@@ -529,17 +532,19 @@ namespace XNA_PoolGame
 
 
                 //endTexture = PostProcessManager.shadows.ShadowMapRT[1].GetTexture();
+                //endTexture = PostProcessManager.ssao.normalTIU.renderTarget.GetTexture();
                 //if (PostProcessManager.distortionsample != null) endTexture = PostProcessManager.distortionsample.renderTarget.GetTexture();
-                endTexture = ((DeferredShading)PostProcessManager.shading).diffuseColorTIU.renderTarget.GetTexture();
+                //endTexture = ((DeferredShading)PostProcessManager.shading).diffuseColorTIU.renderTarget.GetTexture();
                 rect = new Rectangle(0, 128, 128, 128);
                 //rect = new Rectangle(0, 0, Width, Height);
-                if (endTexture != null) batch.Draw(endTexture, rect, Color.White);
+                //if (endTexture != null) batch.Draw(endTexture, rect, Color.White);
 
 
-                endTexture = ((DeferredShading)PostProcessManager.shading).lightTIU.renderTarget.GetTexture();
+                //endTexture = ((DeferredShading)PostProcessManager.shading).lightTIU.renderTarget.GetTexture();
+                //endTexture = PostProcessManager.ssao.viewTIU.renderTarget.GetTexture();
                 rect = new Rectangle(0, 128 * 2, 128, 128);
                 //rect = new Rectangle(0, 0, Width, Height);
-                if (endTexture != null) batch.Draw(endTexture, rect, Color.White);
+                //if (endTexture != null) batch.Draw(endTexture, rect, Color.White);
 
                 batch.End();
             }
