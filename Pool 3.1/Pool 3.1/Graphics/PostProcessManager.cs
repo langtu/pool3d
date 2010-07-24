@@ -100,6 +100,9 @@ namespace XNA_PoolGame.Graphics
         public static DepthOfField depthOfField;
         public static Texture2D dofMapTex;
 
+        // SSAO
+        public static SSAO ssao;
+
         //
         public static FullScreenQuad quad;
 
@@ -158,6 +161,8 @@ namespace XNA_PoolGame.Graphics
             depthOfField = new DepthOfField();
             depthOfField.focalWidth = 1750.0f;
             depthOfField.focalDistance = 550.0f;
+
+            ssao = new SSAO();
 
             quad = new FullScreenQuad(PoolGame.device);
         }
@@ -491,6 +496,7 @@ namespace XNA_PoolGame.Graphics
 
             renderTargets.Clear();
 
+            ssao.Dispose();
             resolveTarget.Dispose();
         }
         #endregion

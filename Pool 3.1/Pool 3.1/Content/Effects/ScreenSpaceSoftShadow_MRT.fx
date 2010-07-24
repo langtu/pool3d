@@ -93,6 +93,17 @@ sampler2D ssaoSampler = sampler_state
 	MINFILTER = Linear;
 	MIPFILTER = Linear;
 };
+
+texture SpecularMap;
+sampler2D specularSampler = sampler_state
+{
+	Texture = <SpecularMap>;
+	
+	MAGFILTER = Linear;
+	MINFILTER = Linear;
+	MIPFILTER = Linear;
+};
+
 texture EnvironmentMap;
 samplerCUBE EnvironmentMapSampler = sampler_state 
 { 
@@ -128,6 +139,13 @@ struct PS_ScreenSpaceShadow_Output
 	float4 Velocity : COLOR2;
 };
 
+struct PS_ScreenSpaceShadowNoMRTSSAO_Output
+{
+	float4 Color : COLOR0;
+	half4 Normal : COLOR1;
+	half4 ViewS : COLOR2;
+};
+
 VS_ScreenSpaceShadow_Output VS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Input input)
 {
     VS_ScreenSpaceShadow_Output output;
@@ -159,7 +177,101 @@ VS_ScreenSpaceShadow_Output VS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Input inpu
     output.TBN[2] = mul(input.Normal, World);
     return output;
 }
-
+PS_ScreenSpaceShadowNoMRTSSAO_Output PS_ScreenSpaceShadowNoMRTSSAO(VS_ScreenSpaceShadow_Output input, uniform bool bnormalmapping,
+	uniform bool bparallax)
+{
+	PS_ScreenSpaceShadowNoMRTSSAO_Output output;
+	///////////////////////////////////////////////////////////////////////
+	float2 texCoord;
+	float3 ViewDir = normalize(CameraPosition.xyz - input.WorldPosition.xyz);
+	if (bparallax == true)
+    {
+		float3 ViewDirTBN = mul(ViewDir, input.TBN);
+		
+        float height = tex2D(heightSampler, input.TexCoord).r;
+        
+        height = height * parallaxscaleBias.x + parallaxscaleBias.y;
+        texCoord = input.TexCoord + (height * ViewDirTBN.xy);
+    }
+    else
+        texCoord = input.TexCoord;
+    
+	float4 Color = tex2D(ColorSampler, texCoord);
+	
+	float fShadowTerm = tex2Dproj(BlurVSampler, input.ScreenCoord).x;
+	float4 totalDiffuse = float4(0,0,0,0);
+	float4 totalSpecular = float4(0,0,0,0);
+	float3 Normal;
+	
+	if (bnormalmapping)
+	{
+		Normal = 2.0f * tex2D(normalSampler, texCoord) - 1.0f;
+		Normal = normalize(mul(Normal, input.TBN));
+	} else
+		Normal = input.TBN[2];
+		
+	
+	for (int k = 0; k < totalLights; k++)
+	{
+		//
+		float3 LightDir = normalize(LightPosition[k] - input.WorldPosition);
+		
+		// self shadowing
+	    //float selfshadow = saturate(4.0 * LightDir.z);
+	    //totalselfshadowing *= selfshadow;
+	    
+	    
+		// Calculate normal diffuse light.
+		float DiffuseLightingFactor = dot(LightDir, Normal);
+	    
+		// R = 2 * (N.L) * N – L
+		float3 Reflect = normalize(2 * DiffuseLightingFactor * Normal - LightDir);  
+		float Specular = pow(saturate(dot(Reflect, ViewDir)), Shineness); // R.V^n
+	    
+		// I = A + Dcolor * Dintensity * N.L + Scolor * Sintensity * (R.V)n
+	    totalDiffuse += (vDiffuseColor[k] * DiffuseLightingFactor);
+	    totalSpecular += vSpecularColor[k] * Specular;
+	    
+    }
+    float4 totalDiffuse2 = float4(0,0,0,0);
+    for (int k = 0; k < aditionalLights; ++k)
+    {
+		//
+		float3 LightDir = (vaditionalLightPositions[k] - input.WorldPosition);
+		
+		if (vaditionalLightType[k] == 0) // Point Light
+		{
+			float attenuation = saturate(1.0f - dot(LightDir / vaditionalLightRadius[k], LightDir / vaditionalLightRadius[k]));
+			
+			LightDir = normalize(LightDir);
+			float DiffuseLightingFactor = dot(LightDir, Normal);
+			totalDiffuse2 += (vaditionalLightColor[k] * DiffuseLightingFactor) * attenuation;
+			
+		} else if (vaditionalLightType[k] == 1)
+		{
+			LightDir = normalize(LightDir);
+			//float3 ViewDir = normalize(CameraPosition - input.WorldPosition);
+			
+			// Calculate normal diffuse light.
+			float DiffuseLightingFactor = dot(LightDir, Normal);
+			totalDiffuse2 += (vaditionalLightColor[k] * DiffuseLightingFactor);
+		}
+    }
+    //totalDiffuse /= totalLights;
+    //totalAmbient /= totalLights;
+    
+    totalDiffuse = saturate(totalDiffuse);
+    //
+    //output.Color  = (Color * (vAmbient + vDiffuseColor * DiffuseLightingFactor * materialDiffuseColor) + vSpecularColor * Specular) * fShadowTerm;
+    /////output.Color = saturate((Color * (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular)) * fShadowTerm;
+    output.Color = saturate((Color * (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular) * fShadowTerm + totalDiffuse2 * totalDiffuse2.a);
+    
+    output.Normal = float4((Normal + 1.0f) * 0.5f , 1.0f);
+    output.ViewS = input.PositionViewS;
+	
+	return output;
+	
+}
 
 PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output input, uniform bool bnormalmapping,
 	uniform bool bparallax)
@@ -261,10 +373,6 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output inp
 	vVelocity.y *= -1;
 	output.Velocity = float4(vVelocity, 1.0f, 1.0f);
 	
-    /////////////////////////////////////////////////////////////////////////
-    //output.Color = float4(0.0, 0.0, 0.0, 1.0);
-    //output.DepthColor = float4(input.Depth, input.Depth, input.Depth, 1.0f);
-    //output.Color = output.DepthColor ;
 	return output;
 	
 }
@@ -294,7 +402,7 @@ float4 PS_ScreenSpaceShadowNoMRT(VS_ScreenSpaceShadow_Output input, uniform bool
 	float4 totalDiffuse = float4(0,0,0,0);
 	float4 totalSpecular = float4(0,0,0,0);
 	float3 Normal;
-	float ssaoterm = tex2D(ssaoSampler, texCoord);
+	float ssaoterm = tex2D(ssaoSampler, texCoord).r;
 	
 	if (bnormalmapping)
 	{
@@ -363,6 +471,7 @@ float4 PS_ScreenSpaceShadowNoMRT(VS_ScreenSpaceShadow_Output input, uniform bool
     totalDiffuse = saturate(totalDiffuse);
     //
     
+    totalSpecular *= tex2D(specularSampler, texCoord);
     return (saturate((Color * (vAmbient + totalDiffuse * materialDiffuseColor) + totalSpecular) * fShadowTerm + totalDiffuse2 * totalDiffuse2.a)) * ssaoterm;
     //return saturate(Color);
     
@@ -457,7 +566,15 @@ VS_ScreenSpaceShadow_Output HardwareInstancingVertexShader(VS_ScreenSpaceShadow_
 }
 
 //#endif
-
+technique NoMRTSSSTechniqueSSAO
+{
+    pass P0
+    {
+		sampler[0] = <ColorSampler>;
+        VertexShader = compile vs_3_0 VS_ScreenSpaceShadow();
+        PixelShader = compile ps_3_0 PS_ScreenSpaceShadowNoMRTSSAO(false, false);
+    }
+}
 
 technique SSSTechnique
 {

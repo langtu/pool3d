@@ -15,7 +15,6 @@ namespace XNA_PoolGame.Graphics.Shading
             shadows.Pass3(gameTime);
             shadows.Pass4(gameTime);
 
-
             shadows.PostDraw();
             if (World.motionblurType != MotionBlurType.None || World.dofType != DOFType.None)
             {

@@ -4248,7 +4248,7 @@ Frame LTypeStair01 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename Diffuse {
-     "..\\..\\Textures\\Cribs\\MarbleBeige0044_S.jpg";
+     "..\\..\\Textures\\Cribs\\ConcreteNew0003_S2.jpg";
     }
    }
   }

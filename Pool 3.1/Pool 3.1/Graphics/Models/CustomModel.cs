@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using XNA_PoolGame.Helpers;
+using System.IO;
 
 namespace XNA_PoolGame.Graphics.Models
 {
@@ -83,8 +84,17 @@ namespace XNA_PoolGame.Graphics.Models
             List<string> list = new List<string>();
             foreach (CustomModelPart modelPart in modelParts)
             {
+                string folder = "";//Path.GetFileName(Path.GetDirectoryName(str));
+                string st = Path.GetDirectoryName(modelPart.TextureFileName);
+                while (!Path.GetFileName(st).Equals("Content"))
+                {
+                    folder = Path.GetFileName(st) + "\\" + folder;
+                    st = Path.GetDirectoryName(st);
+                }
+                string fileasset = Path.GetFileNameWithoutExtension(modelPart.TextureFileName);
+                string baseasset =  folder + fileasset.Substring(0, fileasset.Length - 1);
 
-                list.Add(modelPart.TextureFileName);
+                list.Add(baseasset);
             }
             return list;
         }

@@ -171,7 +171,7 @@ Frame Box01 {
     0.000000;0.000000;0.000000;;
 
     TextureFilename {
-     "..\\..\\Textures\\Cribs\\RooftilesTiles_5_S.jpg";
+     "..\\..\\Textures\\Cribs\\WoodPlanksDirty0044_1_S.jpg";
     }
    }
   }
