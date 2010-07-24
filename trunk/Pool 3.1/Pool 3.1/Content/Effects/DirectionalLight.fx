@@ -22,27 +22,27 @@ sampler colorSampler = sampler_state
     Texture = (colorMap);
     AddressU = CLAMP;
     AddressV = CLAMP;
-    MagFilter = LINEAR;
-    MinFilter = LINEAR;
-    Mipfilter = LINEAR;
+    MagFilter = ANISOTROPIC;
+    MinFilter = ANISOTROPIC;
+    Mipfilter = ANISOTROPIC;
 };
 sampler depthSampler = sampler_state
 {
     Texture = (depthMap);
     AddressU = CLAMP;
     AddressV = CLAMP;
-    MagFilter = POINT;
-    MinFilter = POINT;
-    Mipfilter = POINT;
+    MagFilter = ANISOTROPIC;
+    MinFilter = ANISOTROPIC;
+    Mipfilter = ANISOTROPIC;
 };
 sampler normalSampler = sampler_state
 {
     Texture = (normalMap);
     AddressU = CLAMP;
     AddressV = CLAMP;
-    MagFilter = POINT;
-    MinFilter = POINT;
-    Mipfilter = POINT;
+    MagFilter = ANISOTROPIC;
+    MinFilter = ANISOTROPIC;
+    Mipfilter = ANISOTROPIC;
 };
 
 
@@ -94,8 +94,8 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     position /= position.w;
     
     //surface-to-light vector
-    //float3 lightVector = -normalize(lightDirection);
-    float3 lightVector = normalize(lightDirection - position.xyz);
+    float3 lightVector = -normalize(lightDirection);
+    //float3 lightVector = normalize(lightDirection - position.xyz);
 
     //compute diffuse light
     float NdL = max(0,dot(normal,lightVector));
@@ -109,7 +109,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     float specularLight = specularIntensity * pow( saturate(dot(reflectionVector, directionToCamera)), specularPower);
 
     //output the two lights
-    return float4(diffuseLight.rgb, 1) ;
+    return float4(diffuseLight.rgb, specularLight) ;
 }
 
 technique Technique0

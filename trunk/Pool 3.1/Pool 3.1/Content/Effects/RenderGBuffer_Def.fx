@@ -6,9 +6,9 @@ texture TexColor;
 sampler diffuseSampler = sampler_state
 {
     Texture = (TexColor);
-    MAGFILTER = LINEAR;
-    MINFILTER = LINEAR;
-    MIPFILTER = LINEAR;
+    MAGFILTER = ANISOTROPIC;
+    MINFILTER = ANISOTROPIC;
+    MIPFILTER = ANISOTROPIC;
     //AddressU = Wrap;
     //AddressV = Wrap;
 };
@@ -17,9 +17,9 @@ texture SpecularMap;
 sampler specularSampler = sampler_state
 {
     Texture = (SpecularMap);
-    MagFilter = LINEAR;
-    MinFilter = LINEAR;
-    Mipfilter = LINEAR;
+    MagFilter = ANISOTROPIC;
+    MinFilter = ANISOTROPIC;
+    Mipfilter = ANISOTROPIC;
     //AddressU = Wrap;
     //AddressV = Wrap;
 };
@@ -28,9 +28,9 @@ texture NormalMap;
 sampler normalSampler = sampler_state
 {
     Texture = (NormalMap);
-    MagFilter = LINEAR;
-    MinFilter = LINEAR;
-    Mipfilter = LINEAR;
+    MagFilter = ANISOTROPIC;
+    MinFilter = ANISOTROPIC;
+    Mipfilter = ANISOTROPIC;
     //AddressU = Wrap;
     //AddressV = Wrap;
 };
@@ -114,7 +114,7 @@ technique Technique1
     {
         // TODO: set renderstates here.
 		
-        VertexShader = compile vs_3_0 VertexShaderFunction();
-        PixelShader = compile ps_3_0 PixelShaderFunction();
+        VertexShader = compile vs_2_0 VertexShaderFunction();
+        PixelShader = compile ps_2_0 PixelShaderFunction();
     }
 }

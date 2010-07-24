@@ -43,6 +43,9 @@ namespace XNA_PoolGame.Graphics.Models
         public int VertexStride;
 
         [ContentSerializer]
+        public string TextureFileName;
+
+        [ContentSerializer]
         public VertexDeclaration VertexDeclaration;
 
         [ContentSerializer]

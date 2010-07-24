@@ -62,7 +62,7 @@ namespace XNA_PoolGame.Graphics.Shadows
                 RenderShadowMap(i);
                 shadowMapTIU[i].Use();
                 World.scenario.DrawScene(gameTime);
-                lightpass++;
+                ++lightpass;
             }
 
             ///////////////// PASS 2 - PCF //////////////
@@ -71,35 +71,9 @@ namespace XNA_PoolGame.Graphics.Shadows
             shadowTIU.Use();
 
             World.scenario.DrawScene(gameTime);
-
-            ///////////////// PASS 3 - DEM //////////////
-            if (World.dem == EnvironmentType.Dynamic)
-            {
-                PostProcessManager.ChangeRenderMode(RenderMode.DEM);
-                RenderDEM();
-
-                World.scenario.DrawDEMObjects(gameTime);
-            }
-            ///////////////// PASS 4 - SSSM /////////////
-            World.camera.ItemsDrawn = 0;
-            PostProcessManager.ChangeRenderMode(RenderMode.ScreenSpaceSoftShadowRender);
-            RenderSoftShadow();
-
-            World.scenario.DrawScene(gameTime);
-
-            /////////////////////////////////////////////
-            PoolGame.device.RenderState.StencilEnable = false;
-            for (int i = 0; i < LightManager.totalLights; ++i)
-                shadowMapTIU[i].DontUse();
-            shadowTIU.DontUse();
-
-            if (World.motionblurType != MotionBlurType.None || World.dofType != DOFType.None)
-            {
-                PoolGame.device.SetRenderTarget(1, null);
-                PoolGame.device.SetRenderTarget(2, null);
-            }
         }
-        private void RenderDEM()
+
+        public void RenderDEM()
         {
             PoolGame.device.RenderState.DepthBufferEnable = true;
             PoolGame.device.RenderState.DepthBufferWriteEnable = true;
@@ -108,7 +82,8 @@ namespace XNA_PoolGame.Graphics.Shadows
 
             PoolGame.device.SetRenderTarget(0, null);
         }
-        private void RenderShadowMap(int lightindex)
+
+        public void RenderShadowMap(int lightindex)
         {
             PoolGame.device.RenderState.DepthBufferEnable = true;
             PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
@@ -123,7 +98,7 @@ namespace XNA_PoolGame.Graphics.Shadows
 
         }
 
-        private void RenderPCFShadowMap()
+        public void RenderPCFShadowMap()
         {
             //Render PCF Shadow Map
             PoolGame.device.DepthStencilBuffer = oldBuffer;
@@ -132,7 +107,8 @@ namespace XNA_PoolGame.Graphics.Shadows
 
             PoolGame.device.RenderState.CullMode = CullMode.None;
         }
-        private void RenderSoftShadow()
+
+        public void RenderSoftShadow()
         {
             // Soft
             if (PostProcessManager.shadowBlurTech == ShadowBlurTechnnique.SoftShadow)
@@ -180,6 +156,38 @@ namespace XNA_PoolGame.Graphics.Shadows
         {
 
             base.Dispose();
+        }
+
+        public override void PostDraw()
+        {
+            /////////////////////////////////////////////
+            PoolGame.device.RenderState.StencilEnable = false;
+            for (int i = 0; i < LightManager.totalLights; ++i)
+                shadowMapTIU[i].DontUse();
+            shadowTIU.DontUse();
+        }
+
+        public override void Pass3(GameTime gameTime)
+        {
+            ///////////////// PASS 3 - DEM //////////////
+            if (World.dem == EnvironmentType.Dynamic)
+            {
+                PostProcessManager.ChangeRenderMode(RenderMode.DEM);
+                RenderDEM();
+
+                World.scenario.DrawDEMObjects(gameTime);
+            }
+            
+        }
+
+        public override void Pass4(GameTime gameTime)
+        {
+            ///////////////// PASS 4 - SSSM /////////////
+            World.camera.ItemsDrawn = 0;
+            PostProcessManager.ChangeRenderMode(RenderMode.ScreenSpaceSoftShadowRender);
+            RenderSoftShadow();
+
+            World.scenario.DrawScene(gameTime);
         }
     }
 }

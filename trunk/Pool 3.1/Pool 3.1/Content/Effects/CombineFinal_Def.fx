@@ -7,18 +7,18 @@ sampler colorSampler = sampler_state
     Texture = (colorMap);
     AddressU = CLAMP;
     AddressV = CLAMP;
-    MagFilter = LINEAR;
-    MinFilter = LINEAR;
-    Mipfilter = LINEAR;
+    MagFilter = ANISOTROPIC;
+    MinFilter = ANISOTROPIC;
+    Mipfilter = ANISOTROPIC;
 };
 sampler lightSampler = sampler_state
 {
     Texture = (lightMap);
     AddressU = CLAMP;
     AddressV = CLAMP;
-    MagFilter = LINEAR;
-    MinFilter = LINEAR;
-    Mipfilter = LINEAR;
+    MagFilter = ANISOTROPIC;
+    MinFilter = ANISOTROPIC;
+    Mipfilter = ANISOTROPIC;
 };
 
 sampler shadowSampler = sampler_state
@@ -57,15 +57,15 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     float4 light = tex2D(lightSampler,input.TexCoord);
     float3 diffuseLight = light.rgb;
     float specularLight = light.a;
-    //return float4(shadowTerm * (diffuseColor * diffuseLight + specularLight),1);
-    return saturate(float4(shadowTerm * (diffuseColor * diffuseLight),1));
+    return float4(shadowTerm * (diffuseColor * diffuseLight + specularLight),1);
+    //return saturate(float4(shadowTerm * (diffuseColor * diffuseLight),1));
 }
 
 technique Technique1
 {
     pass Pass1
     {
-        VertexShader = compile vs_3_0 VertexShaderFunction();
-        PixelShader = compile ps_3_0 PixelShaderFunction();
+        VertexShader = compile vs_2_0 VertexShaderFunction();
+        PixelShader = compile ps_2_0 PixelShaderFunction();
     }
 }
