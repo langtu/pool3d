@@ -48,13 +48,13 @@ namespace XNA_PoolGame.Screens
             switch (World.shadingTech)
             {
                 case ShadingTechnnique.Foward:
-
+                    PostProcessManager.shading = new FowardShading();
                     break;
                 case ShadingTechnnique.Deferred:
                     PostProcessManager.shading = new DeferredShading();
                     break;
             }
-
+            // SET SHADOW TECHNIQUE
             switch (World.shadowTechnique)
             {
                 case ShadowTechnnique.PSMShadowMapping:
@@ -240,7 +240,7 @@ namespace XNA_PoolGame.Screens
                 }
             }*/
             #endregion
-            /*
+            
             #region PARTICLES
             PostProcessManager.ChangeRenderMode(RenderMode.ParticleSystem);
             World.scenario.SetParticlesSettings();
@@ -256,7 +256,7 @@ namespace XNA_PoolGame.Screens
                 World.scenario.Draw(gameTime);
             }
             #endregion
-            */
+            
             resultTIU = PostProcessManager.shading.resultTIU;
             PoolGame.device.SetRenderTarget(0, null);
             if (!(World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None))
@@ -265,7 +265,7 @@ namespace XNA_PoolGame.Screens
                 PoolGame.device.SetRenderTarget(2, null);
             }
 
-            /*#region DISTORTION COMBINE
+            #region DISTORTION COMBINE
             if (World.doDistortion)
             {
                 distortionTIU = PostProcessManager.GetIntermediateTexture();
@@ -276,7 +276,7 @@ namespace XNA_PoolGame.Screens
 
                 PostProcessManager.distortionsample.DontUse();
             }
-            #endregion*/
+            #endregion
 
             #region MOTION BLUR AND DEPTH OF FIELD
 

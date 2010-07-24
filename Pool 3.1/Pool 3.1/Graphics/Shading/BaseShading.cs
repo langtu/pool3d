@@ -12,14 +12,19 @@ namespace XNA_PoolGame.Graphics.Shading
         public Vector2 halfPixel;
         public Shadow shadows;
         public TextureInUse resultTIU;
+        
         public virtual void Dispose()
         {
-
+            if (shadows != null) shadows.Dispose();
+            shadows = null;
         }
+
         public abstract void Draw(GameTime gameTime);
 
         public abstract void DrawTextured(GameTime gameTime);
 
         public abstract string GetBasicRenderTechnique();
+
+
     }
 }

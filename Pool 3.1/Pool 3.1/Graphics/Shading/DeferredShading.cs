@@ -51,22 +51,22 @@ namespace XNA_PoolGame.Graphics.Shading
             PoolGame.device.RenderState.SeparateAlphaBlendEnabled = false;
             PoolGame.device.RenderState.DepthBufferEnable = false;
 
-            Color gris = new Color(128, 128, 128);
-            //Color gris = new Color(255, 255, 255);
+            //Color gris = new Color(128, 128, 128);
+            Color gris = new Color(255, 255, 255);
             for (int i = 0; i < LightManager.totalLights; ++i)
             {
-                //Vector3 dir = (LightManager.lights[i].LookAt - LightManager.lights[i].Position);
-                Vector3 dir = LightManager.lights[i].Position;
+                Vector3 dir = (LightManager.lights[i].LookAt - LightManager.lights[i].Position);
+                //Vector3 dir = LightManager.lights[i].Position;
                 //dir.Normalize();
-                DrawDirectionalLight(dir, gris);
+                //DrawDirectionalLight(dir, gris);
             }
 
-            //DrawDirectionalLight(Vector3.Down, gris);
-            //DrawDirectionalLight(Vector3.Up, gris);
-            //DrawDirectionalLight(Vector3.Left, gris);
-            //DrawDirectionalLight(Vector3.Right, gris);
-            //DrawDirectionalLight(Vector3.Forward, gris);
-            //DrawDirectionalLight(Vector3.Backward, gris);
+            DrawDirectionalLight(Vector3.Down, Color.White);
+            DrawDirectionalLight(Vector3.Up, gris);
+            DrawDirectionalLight(Vector3.Left, gris);
+            DrawDirectionalLight(Vector3.Right, gris);
+            DrawDirectionalLight(Vector3.Forward, gris);
+            DrawDirectionalLight(Vector3.Backward, gris);
         }
         private void DrawDirectionalLight(Vector3 lightDirection, Color color)
         {

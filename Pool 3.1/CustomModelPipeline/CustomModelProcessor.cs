@@ -16,6 +16,7 @@ using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using System.ComponentModel;
 using System;
+using System.IO;
 #endregion
 
 namespace CustomModelPipeline
@@ -31,6 +32,7 @@ namespace CustomModelPipeline
     {
         #region Fields
 
+        string directory;
         private string effectFileName = "basicEffect.fx";
         [DisplayName("Effect File")]
         [DefaultValue("Effects\\basicEffect.fx")]
@@ -40,7 +42,7 @@ namespace CustomModelPipeline
             get { return effectFileName; }
             set { effectFileName = value; }
         }
-        
+
         ContentProcessorContext context;
         CustomModelContent outputModel;
 
@@ -59,7 +61,8 @@ namespace CustomModelPipeline
                                                    ContentProcessorContext context)
         {
             this.context = context;
-
+            //System.Diagnostics.Debugger.Launch();
+            directory = Path.GetDirectoryName(input.Identity.SourceFilename);
             outputModel = new CustomModelContent();
 
             ProcessNode(input);
@@ -78,7 +81,7 @@ namespace CustomModelPipeline
             // Instead we will just bake any node transforms into the geometry, after
             // which we can reset them to identity and forget all about them.
             MeshHelper.TransformScene(node, node.Transform);
-            
+
             node.Transform = Matrix.Identity;
 
             // Is this node in fact a mesh?
@@ -99,7 +102,6 @@ namespace CustomModelPipeline
                         bAlreadyContainsTangent = true;
                         break;
                     }
-                   
                 }
                 if (!bAlreadyContainsTangent)
                 {
@@ -115,7 +117,7 @@ namespace CustomModelPipeline
                     ProcessGeometry(geometry);
                 }
 
-                
+
             }
 
             // Recurse over any child nodes.
@@ -153,17 +155,22 @@ namespace CustomModelPipeline
             geometry.Vertices.CreateVertexBuffer(out vertexBufferContent,
                                                  out vertexElements,
                                                  context.TargetPlatform);
-            
+
             int vertexStride = VertexDeclaration.GetVertexStrideSize(vertexElements, 0);
 
+            //geometry.Material.Textures.Add()
             // Convert the input material.
             MaterialContent material = ProcessMaterial(geometry.Material);
+
+            BasicMaterialContent basicMaterial = (BasicMaterialContent)geometry.Material;
+            string filename = null;
+            if (basicMaterial.Texture != null) filename = basicMaterial.Texture.Filename;
 
             // Add the new piece of geometry to our output model.
             outputModel.AddModelPart(triangleCount, vertexCount, vertexStride,
                                      vertexElements, vertexBufferContent,
-                                     geometry.Indices, material, new BoundingBox(min, max));
-            
+                                     geometry.Indices, material, new BoundingBox(min, max), filename);
+
         }
 
 
@@ -179,7 +186,30 @@ namespace CustomModelPipeline
             // Have we already processed this material?
             if (!processedMaterials.ContainsKey(material))
             {
-                
+                //EffectMaterialContent customModelMaterial = new EffectMaterialContent();
+                //customModelMaterial.Effect = new ExternalReference<EffectContent>(effectFileName);
+
+                //// Copy texture data across from the original material.
+                //BasicMaterialContent basicMaterial = (BasicMaterialContent)material;
+
+                //if (basicMaterial.Texture != null)
+                //{
+                //    customModelMaterial.Textures.Add("Texture", basicMaterial.Texture);
+
+                //    //
+                    
+                //    //string folder = Path.GetFileName(Path.GetDirectoryName(basicMaterial.Texture.Filename));
+                //    //string newDir = Path.GetFullPath(Path.GetDirectoryName(basicMaterial.Texture.Filename) + "..\\..\\" + folder + "Textures");
+
+                //    //string normalmapFileName = newDir + Path.GetFileNameWithoutExtension(basicMaterial.Texture.Filename) + "_N" + Path.GetExtension(basicMaterial.Texture.Filename);
+                //    string normalmapFileName = Path.GetDirectoryName(basicMaterial.Texture.Filename) + "\\" + Path.GetFileNameWithoutExtension(basicMaterial.Texture.Filename) + "_N" + Path.GetExtension(basicMaterial.Texture.Filename);
+                //    if (File.Exists(normalmapFileName))
+                //    {
+                //        customModelMaterial.Textures.Add("NormalMap",
+                //            new ExternalReference<TextureContent>(normalmapFileName));
+                //    }
+                //}
+
                 // If not, process it now.
                 processedMaterials[material] =
                     context.Convert<MaterialContent,

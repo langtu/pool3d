@@ -59,17 +59,32 @@ namespace XNA_PoolGame.Graphics.Models
         }
 
         #region List of texture
+        
         /// <summary>
-        /// 
+        /// Get the list of diffuse textures
         /// </summary>
         /// <returns></returns>
-        public List<Texture2D> GetTextures()
+        public List<Texture2D> GetDiffuseTextures()
         {
             List<Texture2D> list = new List<Texture2D>();
             foreach (CustomModelPart modelPart in modelParts)
             {
                 BasicEffect be = (BasicEffect)modelPart.Effect;
                 list.Add(be.Texture);
+            }
+            return list;
+        }
+        /// <summary>
+        /// Get the list of diffuse textures filename
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetDiffuseTexturesFilename()
+        {
+            List<string> list = new List<string>();
+            foreach (CustomModelPart modelPart in modelParts)
+            {
+
+                list.Add(modelPart.TextureFileName);
             }
             return list;
         }

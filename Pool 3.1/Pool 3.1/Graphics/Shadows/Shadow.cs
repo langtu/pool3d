@@ -67,7 +67,9 @@ namespace XNA_PoolGame.Graphics.Shadows
 
             depthBias = null;
         }
-
+        public abstract void PostDraw();
+        public abstract void Pass3(GameTime gameTime);
+        public abstract void Pass4(GameTime gameTime);
 
         /// <summary>
         /// Draw the scene without shadows

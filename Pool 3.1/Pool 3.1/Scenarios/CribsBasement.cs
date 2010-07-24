@@ -26,6 +26,7 @@ namespace XNA_PoolGame.Scenarios
         public Entity[] sticksOnCueRack = null;
 
         public Entity snowPainting = null;
+        public Entity patriciaPainting = null;
         public Entity aloneCouch = null;
         public Entity tv = null;
         public Entity rollupDoor = null;
@@ -86,7 +87,7 @@ namespace XNA_PoolGame.Scenarios
             distortionparticles.Add(heatParticles);            
             
             ////////////////////////////////
-            core = new ParticlesCore(Game);
+            core = new ParticlesCore(PoolGame.game);
             core.Scenario = this;
             core.AddParticlesFromMultiMap(particles);
             core.AddParticlesFromMultiMap(distortionparticles);
@@ -95,8 +96,11 @@ namespace XNA_PoolGame.Scenarios
             smokestack = new Entity(PoolGame.game, "Models\\Cribs\\smokestack");
             smokestack.Position = new Vector3(1150.0f - 120.0f, 0, 0);
             smokestack.SpecularColor = Vector4.Zero;
+            smokestack.UseNormalMapTextures = true;
+            smokestack.UseHeightMapTextures = true;
             smokestack.DrawOrder = 3;
             smokestack.UseModelPartBB = false;
+            smokestack.TEXTURE_ADDRESS_MODE = TextureAddressMode.Clamp;
             Light light1 = new Light(smokestack.Position + Vector3.Up * 20.0f);
             light1.LightType = LightType.PointLight;
             light1.DiffuseColor = new Vector4(0.5f, .15f, .075f, 1.0f);
@@ -126,6 +130,7 @@ namespace XNA_PoolGame.Scenarios
             smokeFireWoodOut.SpecularColor = Vector4.Zero;
             smokeFireWoodOut.DrawOrder = 3;
             smokeFireWoodOut.UseModelPartBB = false;
+            smokeFireWoodOut.occluder = false;
 
             PoolGame.game.Components.Add(smokeFireWoodOut);
 
@@ -245,8 +250,8 @@ namespace XNA_PoolGame.Scenarios
                 col.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
                 col.DrawOrder = 1;
                 //col.normalMapAsset = "Textures\\Cribs\\BrickBrown_S_N";
-                col.normalMapAsset = "Textures\\Cribs\\BrickLargeBare0039_2_S_N";
-                col.heightMapAsset = "Textures\\Cribs\\BrickLargeBare0039_2_S_H";
+                col.customnormalMapAsset = "Textures\\Cribs\\BrickLargeBare0039_2_S_N";
+                col.customheightMapAsset = "Textures\\Cribs\\BrickLargeBare0039_2_S_H";
                 
                 PoolGame.game.Components.Add(col);    
             }
@@ -257,8 +262,13 @@ namespace XNA_PoolGame.Scenarios
             snowPainting.SpecularColor = Vector4.Zero;
 
             PoolGame.game.Components.Add(snowPainting);
-            
-            
+
+            /////////////// PATRICIA WALL'S PAINTING
+            patriciaPainting = new Entity(PoolGame.game, "Models\\Painting\\patriciapainting");
+            patriciaPainting.Position = new Vector3(-500, 350, -1092);
+            patriciaPainting.SpecularColor = Vector4.Zero;
+
+            PoolGame.game.Components.Add(patriciaPainting);
 
             /////////////// ROOF
             roof = new Entity(PoolGame.game, "Models\\Cribs\\roof", true, "Textures\\Cribs\\ConcreteNew0003_S2");
@@ -268,18 +278,18 @@ namespace XNA_PoolGame.Scenarios
             roof.TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;
             roof.SpecularColor = Vector4.Zero;
             roof.occluder = false;
-            roof.normalMapAsset = "Textures\\Cribs\\ConcreteNew0003_S2_N";
-            roof.heightMapAsset = "Textures\\Cribs\\ConcreteNew0003_S2_H";
+            roof.customnormalMapAsset = "Textures\\Cribs\\ConcreteNew0003_S2_N";
+            roof.customheightMapAsset = "Textures\\Cribs\\ConcreteNew0003_S2_H";
             PoolGame.game.Components.Add(roof);
 
             /////////////// FLOOR
-            floor = new Entity(PoolGame.game, "Models\\Cribs\\floor_new", "Textures\\Cribs\\PlanksNew0026_9_L2");
+            floor = new Entity(PoolGame.game, "Models\\Cribs\\floor");
 
             floor.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
             floor.SpecularColor = Vector4.Zero;
-            floor.normalMapAsset = "Textures\\Cribs\\PlanksNew0026_9_L2_N";
-            floor.heightMapAsset = "Textures\\Cribs\\PlanksNew0026_9_L2_H";
-            floor.ssaoMapAsset = "Textures\\Cribs\\PlanksNew0026_9_L2_AO";
+            floor.customnormalMapAsset = "Textures\\Cribs\\Picture14 010_N";
+            floor.customheightMapAsset = "Textures\\Cribs\\Picture14 010_H";
+            floor.customssaoMapAsset = "Textures\\Cribs\\Picture14 010_AO";
             floor.DrawOrder = 1;
             floor.AditionalLights = smokestack.AditionalLights;
 
@@ -291,8 +301,8 @@ namespace XNA_PoolGame.Scenarios
             carpet.Position = new Vector3(0.0f, 10.0f, 0.0f);
             carpet.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
             carpet.SpecularColor = Vector4.Zero;
-            carpet.normalMapAsset = "Textures\\Cribs\\pic81_N";
-            carpet.heightMapAsset = "Textures\\Cribs\\pic81_H";
+            carpet.customnormalMapAsset = "Textures\\Cribs\\pic81_N";
+            carpet.customheightMapAsset = "Textures\\Cribs\\pic81_H";
             //carpet.ssaoMapAsset = "Textures\\Cribs\\PlanksNew0026_9_L2_AO";
             carpet.DrawOrder = 1;
 
@@ -318,7 +328,7 @@ namespace XNA_PoolGame.Scenarios
             walls[2].TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;
 
             walls[3] = new Entity(PoolGame.game, "Models\\Cribs\\wall", true);
-            walls[3].Position = new Vector3(-1200, 0, 0);
+            walls[3].Position = new Vector3(-1500, 0, 0);
             walls[3].TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;
 
             foreach (Entity wall in walls)
@@ -326,8 +336,8 @@ namespace XNA_PoolGame.Scenarios
                 wall.SpecularColor = Vector4.Zero;
                 wall.DrawOrder = 1;
 
-                wall.normalMapAsset = "Textures\\Cribs\\ConcreteNew0003_S2_N";
-                wall.heightMapAsset = "Textures\\Cribs\\ConcreteNew0003_S2_H";
+                wall.customnormalMapAsset = "Textures\\Cribs\\ConcreteNew0003_S2_N";
+                wall.customheightMapAsset = "Textures\\Cribs\\ConcreteNew0003_S2_H";
 
                 //wall.MaterialDiffuse = new Vector4(0.7f, 1.0f, 1.0f, 1.0f);
                 //wall.TextureAsset = "Textures\\Cribs\\floor_tile_stoneIrregular";
@@ -343,6 +353,7 @@ namespace XNA_PoolGame.Scenarios
             stairs.Position = new Vector3(-600.0f, 0.0f, 650.0f);
             stairs.SpecularColor = Vector4.Zero;
             stairs.PreRotation = Matrix.CreateRotationY(MathHelper.ToRadians(90.0f));
+            //stairs
             stairs.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
             
             PoolGame.game.Components.Add(stairs);
@@ -368,7 +379,7 @@ namespace XNA_PoolGame.Scenarios
             World.scenario.Objects.Add(smokestack);
             World.scenario.Objects.Add(smokeStackFireWood);
             World.scenario.Objects.Add(smokeFireWoodKeeper);
-            World.scenario.Objects.Add(smokeFireWoodOut);
+            //World.scenario.Objects.Add(smokeFireWoodOut);
             
 
             for (int i = 0; i < tabourets.Length; ++i)
@@ -391,6 +402,7 @@ namespace XNA_PoolGame.Scenarios
                 World.scenario.Objects.Add(col);
 
             World.scenario.Objects.Add(snowPainting);
+            World.scenario.Objects.Add(patriciaPainting);
             World.scenario.Objects.Add(roof);
             World.scenario.Objects.Add(floor);
             World.scenario.Objects.Add(carpet);
@@ -541,6 +553,7 @@ namespace XNA_PoolGame.Scenarios
             }
 
             if (snowPainting != null) snowPainting.Dispose();
+            if (patriciaPainting != null) patriciaPainting.Dispose();
             if (aloneCouch != null) aloneCouch.Dispose();
             if (tv != null) tv.Dispose();
 

@@ -50,6 +50,7 @@ namespace CustomModelPipeline
             public int TriangleCount;
             public int VertexCount;
             public int VertexStride;
+            public string TextureFileName;
             
             // These properties are not the same type as their equivalents in the
             // runtime CustomModel! Here, we are using design time managed classes,
@@ -82,7 +83,7 @@ namespace CustomModelPipeline
                                  VertexElement[] vertexElements,
                                  VertexBufferContent vertexBufferContent,
                                  IndexCollection indexCollection,
-                                 MaterialContent materialContent, BoundingBox bbox)
+                                 MaterialContent materialContent, BoundingBox bbox, string filename)
         {
             CustomModelPart modelPart = new CustomModelPart();
             Vector3 center = (bbox.Max + bbox.Min) / 2.0f;
@@ -99,6 +100,7 @@ namespace CustomModelPipeline
             modelPart.VertexBufferContent = vertexBufferContent;
             modelPart.IndexCollection = indexCollection;
             modelPart.MaterialContent = materialContent;
+            modelPart.TextureFileName = filename;
 
             modelParts.Add(modelPart);
         }
