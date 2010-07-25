@@ -324,10 +324,6 @@ namespace XNA_PoolGame.Graphics.Models
 
         #endregion
 
-        #region Initialize
-
-        #endregion
-
         #region LoadContent
 
         public override void LoadContent()
@@ -1034,6 +1030,7 @@ namespace XNA_PoolGame.Graphics.Models
 
         #endregion
 
+        #region Set Parameters for SSAO
         public void SetParametersSSAO()
         {
             PostProcessManager.SSAOPrePassEffect.Parameters["View"].SetValue(World.camera.View);
@@ -1050,6 +1047,7 @@ namespace XNA_PoolGame.Graphics.Models
                 }
             }*/
         }
+        #endregion
 
         #region Set Parameters for Shadow
 

@@ -100,6 +100,7 @@
     <Compile Include="Graphics\Shadows\ScreenSpaceShadowMapping.cs" />
     <Compile Include="Graphics\Shadows\Shadow.cs" />
     <Compile Include="Graphics\Shadows\PSMShadowMapping.cs" />
+    <Compile Include="Graphics\Shadows\VarianceShadowMapping.cs" />
     <Compile Include="Graphics\Skybox.cs" />
     <Compile Include="Graphics\SSAO.cs" />
     <Compile Include="Helpers\Tuple.cs" />

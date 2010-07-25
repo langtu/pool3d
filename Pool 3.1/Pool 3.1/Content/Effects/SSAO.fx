@@ -6,6 +6,10 @@ texture RandomMap;
 float g_screen_size;
 float g_self_occlusion = 0.1f;
 
+//this is used to compute the world-position
+float4x4 InvertViewProjection;
+
+bool calculatePosition = false;
 
 float random_size = 64.0f * 64.0f;
 float g_sample_rad = 8.85f;
@@ -57,7 +61,24 @@ struct VertexShaderOutput
 
 float3 getPosition(in float2 uv)
 {
-	return tex2D(g_buffer_pos,uv).xyz;
+	float3 position;
+	if (calculatePosition)
+	{
+		float depthVal = tex2D(g_buffer_pos, uv).r;
+	
+		float4 pos4;
+		pos4.x = uv.x * 2.0f - 1.0f;
+		pos4.y = -(uv.y * 2.0f - 1.0f);
+		pos4.z = depthVal;
+		pos4.w = 1.0f;
+		//transform to world space
+		pos4 = mul(pos4, InvertViewProjection);
+		pos4 /= pos4.w;
+		position = pos4.xyz;
+    }
+	else position = tex2D(g_buffer_pos,uv).xyz;
+	
+	return position;
 }
 
 float3 getNormal(in float2 uv)

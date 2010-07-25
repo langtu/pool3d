@@ -9,7 +9,7 @@ using XNA_PoolGame.Graphics.Shadows;
 namespace XNA_PoolGame.Graphics.Models
 {
     /// <summary>
-    /// Define a Instanced model.
+    /// Define a Instanced entity.
     /// </summary>
     public class InstancedEntity : DrawableComponent
     {

@@ -12,13 +12,14 @@ namespace XNA_PoolGame.Graphics.Shading
     {
         private PresentationParameters pp;
         public TextureInUse diffuseColorTIU, normalTIU, lightTIU, depthTIU, combineTIU;
-        private Vector2 pixelsize;
+        
         public DeferredShading()
         {
             halfPixel.X = 0.5f / (float)PoolGame.device.PresentationParameters.BackBufferWidth;
             halfPixel.Y = 0.5f / (float)PoolGame.device.PresentationParameters.BackBufferHeight;
 
             pp = PoolGame.device.PresentationParameters;
+            stencilBuffer = new DepthStencilBuffer(PoolGame.device, PoolGame.Width, PoolGame.Height, PoolGame.device.DepthStencilBuffer.Format, pp.MultiSampleType, pp.MultiSampleQuality);
         }
         public override void Draw(GameTime gameTime)
         {
@@ -28,10 +29,21 @@ namespace XNA_PoolGame.Graphics.Shading
             PostProcessManager.ChangeRenderMode(RenderMode.RenderGBuffer);
             World.scenario.DrawScene(gameTime);
             
-
             ResolveGBuffer();
+
+            shadows.Draw(gameTime);
+            
+            DepthStencilBuffer oldBuffer = PoolGame.device.DepthStencilBuffer;
+            PoolGame.device.DepthStencilBuffer = stencilBuffer;
+            
             DrawLights(gameTime);
             CombineFinal();
+            PoolGame.device.DepthStencilBuffer = oldBuffer;
+
+            if (World.doSSAO)
+            {
+                PostProcessManager.ssao.normalTIU = normalTIU;
+            }
         }
 
         private void DrawLights(GameTime gameTime)
@@ -40,6 +52,7 @@ namespace XNA_PoolGame.Graphics.Shading
 
 
             PoolGame.device.SetRenderTarget(0, lightTIU.renderTarget);
+
             //clear all components to 0
             PoolGame.device.Clear(Color.TransparentBlack);
             PoolGame.device.RenderState.AlphaBlendEnable = true;
@@ -55,14 +68,14 @@ namespace XNA_PoolGame.Graphics.Shading
             Color gris = new Color(255, 255, 255);
             for (int i = 0; i < LightManager.totalLights; ++i)
             {
-                Vector3 dir = (LightManager.lights[i].LookAt - LightManager.lights[i].Position);
-                //Vector3 dir = LightManager.lights[i].Position;
+                //Vector3 dir = (LightManager.lights[i].LookAt - LightManager.lights[i].Position);
+                Vector3 dir = LightManager.lights[i].Position;
                 //dir.Normalize();
-                //DrawDirectionalLight(dir, gris);
+                DrawDirectionalLight(dir, gris);
             }
 
-            DrawDirectionalLight(new Vector3(1, -1, 1), Color.White);
-            DrawDirectionalLight(new Vector3(-1, 1, -1), Color.White);
+            //DrawDirectionalLight(new Vector3(1, -1, 1), Color.White);
+            //DrawDirectionalLight(new Vector3(-1, 1, -1), Color.White);
             //DrawDirectionalLight(Vector3.Up, gris);
             //DrawDirectionalLight(Vector3.Left, gris);
             //DrawDirectionalLight(Vector3.Right, gris);
@@ -100,7 +113,7 @@ namespace XNA_PoolGame.Graphics.Shading
 
         private void ClearGBuffer()
         {
-            //PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
+            
             //PostProcessManager.DrawQuad(PostProcessManager.whiteTexture, PostProcessManager.clearGBuffer_DefEffect);
 
             PostProcessManager.clearGBuffer_DefEffect.Begin();
@@ -108,6 +121,8 @@ namespace XNA_PoolGame.Graphics.Shading
             PostProcessManager.quad.Draw(PoolGame.device);
             PostProcessManager.clearGBuffer_DefEffect.Techniques[0].Passes[0].End();
             PostProcessManager.clearGBuffer_DefEffect.End();
+
+            PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
 
             PoolGame.device.RenderState.DepthBufferEnable = true;
             PoolGame.device.RenderState.DepthBufferWriteEnable = true;
@@ -119,14 +134,18 @@ namespace XNA_PoolGame.Graphics.Shading
         {
             combineTIU = PostProcessManager.GetIntermediateTexture();
             PoolGame.device.RenderState.AlphaBlendEnable = false;
+            PoolGame.device.RenderState.DepthBufferEnable = false;
+            PoolGame.device.RenderState.DepthBufferWriteEnable = false;
+            PoolGame.device.RenderState.StencilEnable = false;
+
             PoolGame.device.SetRenderTarget(0, combineTIU.renderTarget);
 
             //set the effect parameters
             PostProcessManager.combineFinal_DefEffect.Parameters["colorMap"].SetValue(diffuseColorTIU.renderTarget.GetTexture());
             PostProcessManager.combineFinal_DefEffect.Parameters["lightMap"].SetValue(lightTIU.renderTarget.GetTexture());
             PostProcessManager.combineFinal_DefEffect.Parameters["halfPixel"].SetValue(halfPixel);
-            //PostProcessManager.combineFinal_DefEffect.Parameters["shadowOcclusion"].SetValue(shadowOcclusion.GetTexture());
-            PostProcessManager.combineFinal_DefEffect.Parameters["shadowOcclusion"].SetValue(PostProcessManager.whiteTexture);
+            PostProcessManager.combineFinal_DefEffect.Parameters["shadowOcclusion"].SetValue(shadows.ShadowRT.GetTexture());
+            //PostProcessManager.combineFinal_DefEffect.Parameters["shadowOcclusion"].SetValue(PostProcessManager.whiteTexture);
 
             PostProcessManager.combineFinal_DefEffect.Begin();
             PostProcessManager.combineFinal_DefEffect.Techniques[0].Passes[0].Begin();
@@ -142,6 +161,7 @@ namespace XNA_PoolGame.Graphics.Shading
             lightTIU.DontUse();
             diffuseColorTIU.DontUse();
 
+
             resultTIU = combineTIU;
         }
 
@@ -151,6 +171,7 @@ namespace XNA_PoolGame.Graphics.Shading
             PoolGame.device.SetRenderTarget(1, null);
             PoolGame.device.SetRenderTarget(2, null);
         }
+
         public override void DrawTextured(GameTime gameTime)
         {
             
