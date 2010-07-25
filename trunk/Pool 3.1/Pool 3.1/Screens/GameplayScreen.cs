@@ -226,6 +226,9 @@ namespace XNA_PoolGame.Screens
 
             #endregion
 
+            resultTIU = PostProcessManager.shading.resultTIU;
+            PoolGame.device.SetRenderTarget(0, resultTIU.renderTarget);
+            
             #region LIGHT'S POINT
             //PoolGame.game.PrepareRenderStates();
             /*PostProcessManager.ChangeRenderMode(RenderMode.BasicRender);
@@ -240,11 +243,14 @@ namespace XNA_PoolGame.Screens
                 }
             }*/
             #endregion
-            
+
             #region PARTICLES
-            PostProcessManager.ChangeRenderMode(RenderMode.ParticleSystem);
-            World.scenario.SetParticlesSettings();
-            World.scenario.Draw(gameTime);
+            if (World.drawParticles)
+            {
+                PostProcessManager.ChangeRenderMode(RenderMode.ParticleSystem);
+                World.scenario.SetParticlesSettings();
+                World.scenario.Draw(gameTime);
+            }
             #endregion
             
             #region DISTORTION PARTICLES
@@ -256,16 +262,16 @@ namespace XNA_PoolGame.Screens
                 World.scenario.Draw(gameTime);
             }
             #endregion
-
-            resultTIU = PostProcessManager.shading.resultTIU;
+            
             PoolGame.device.SetRenderTarget(0, null);
-            if (!(World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None))
+            if (World.motionblurType != MotionBlurType.None || World.dofType != DOFType.None)
             {
                 PoolGame.device.SetRenderTarget(1, null);
                 PoolGame.device.SetRenderTarget(2, null);
             }
-
+            
             #region DISTORTION COMBINE
+
             if (World.doDistortion)
             {
                 distortionTIU = PostProcessManager.GetIntermediateTexture();
@@ -276,16 +282,15 @@ namespace XNA_PoolGame.Screens
 
                 PostProcessManager.distortionsample.DontUse();
             }
-            #endregion
 
+            #endregion
+            
             if (World.doSSAO)
             {
-
                 PostProcessManager.ssao.Draw(resultTIU);
+                resultTIU.DontUse();
                 resultTIU = PostProcessManager.ssao.resultTIU;
             }
-
-            
 
             #region MOTION BLUR AND DEPTH OF FIELD
 

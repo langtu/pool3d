@@ -38,6 +38,8 @@ namespace XNA_PoolGame.Graphics.Shadows
         /// </summary>
         public RenderTarget2D ShadowRT;
 
+        public TextureInUse resultTIU;
+
         public int lightpass = 0;
         public abstract void Draw(GameTime gameTime);
         public virtual void Dispose()

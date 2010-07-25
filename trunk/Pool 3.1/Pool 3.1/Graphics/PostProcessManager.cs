@@ -41,6 +41,7 @@ namespace XNA_PoolGame.Graphics
         public static Effect clearGBuffer_DefEffect;
         public static Effect renderGBuffer_DefEffect, combineFinal_DefEffect;
         public static Effect directionalLightEffect;
+        public static Effect SSAOPrePassEffect;
 
         public static BasicEffect basicEffect;
 
@@ -135,6 +136,7 @@ namespace XNA_PoolGame.Graphics
             combineFinal_DefEffect = PoolGame.content.Load<Effect>("Effects\\CombineFinal_Def");
             directionalLightEffect = PoolGame.content.Load<Effect>("Effects\\DirectionalLight");
             renderGBuffer_DefEffect = PoolGame.content.Load<Effect>("Effects\\RenderGBuffer_Def");
+            SSAOPrePassEffect = PoolGame.content.Load<Effect>("Effects\\SSAOPrePass");
 
             blurEffect = PoolGame.content.Load<Effect>("Effects\\Blur");
             DOFEffect = PoolGame.content.Load<Effect>("Effects\\DOF");
@@ -429,6 +431,7 @@ namespace XNA_PoolGame.Graphics
             Viewport viewport = PoolGame.device.Viewport;
 
             //effect.CommitChanges();
+            //effect.Begin(SaveStateMode.SaveState);
             effect.Begin();
             spriteBatch.Begin(SpriteBlendMode.None, SpriteSortMode.Immediate, SaveStateMode.SaveState);
 
@@ -489,6 +492,7 @@ namespace XNA_PoolGame.Graphics
             renderGBuffer_DefEffect.Dispose();
             directionalLightEffect.Dispose();
             combineFinal_DefEffect.Dispose();
+            SSAOPrePassEffect.Dispose();
 
             // DISPOSE RENDER TARGETS
             foreach (TextureInUse t in renderTargets)
@@ -659,6 +663,11 @@ namespace XNA_PoolGame.Graphics
 
 
 
-        
+
+
+        internal static void SSAOPrePass()
+        {
+            
+        }
     }
 }

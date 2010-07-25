@@ -144,7 +144,7 @@ namespace XNA_PoolGame.Scenarios
             {
                 if (World.motionblurType != MotionBlurType.None)
                     particle.SetCamera(World.camera.View, World.camera.Projection, World.camera.PrevViewProjection);
-                else 
+                else
                     particle.SetCamera(World.camera.View, World.camera.Projection);
             }
         }

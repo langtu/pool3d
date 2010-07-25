@@ -54,7 +54,7 @@ namespace XNA_PoolGame
 
         //
         public static bool useSSAOTextures = true;
-        public static bool doSSAO = false;
+        public static bool doSSAO = true;
         
         // BLOOM
         public static bool BloomPostProcessing = true;
@@ -65,6 +65,7 @@ namespace XNA_PoolGame
 
         // DISTORTION
         public static bool doDistortion = true;
+        public static bool drawParticles = true;
 
         // INSTANCING MODELS
         public static InstancingTechnique instancingTech = InstancingTechnique.HardwareInstancing;

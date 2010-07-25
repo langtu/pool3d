@@ -131,7 +131,7 @@ namespace XNA_PoolGame.Scenarios
             smokeFireWoodOut.SpecularColor = Vector4.Zero;
             smokeFireWoodOut.DrawOrder = 3;
             smokeFireWoodOut.UseModelPartBB = false;
-            smokeFireWoodOut.occluder = false;
+            //smokeFireWoodOut.occluder = false;
 
             PoolGame.game.Components.Add(smokeFireWoodOut);
 

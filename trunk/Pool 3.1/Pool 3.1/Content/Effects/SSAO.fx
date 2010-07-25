@@ -4,6 +4,7 @@ texture NormalMap;
 texture PositionMap;
 texture RandomMap;
 float g_screen_size;
+float g_self_occlusion = 0.1f;
 
 
 float random_size = 64.0f * 64.0f;
@@ -75,6 +76,7 @@ float doAmbientOcclusion(in float2 tcoord,in float2 uv, in float3 p, in float3 c
 	const float3 v = normalize(diff);
 	const float d = length(diff) * g_scale;
 	return max(0.0, dot(cnorm, v) - g_bias) * (1.0f / (1.0f + d)) * g_intensity;
+	//return max(0.0 - g_self_occlusion,dot(cnorm, v) - g_bias)*(1.0/(1.0+d)) * g_intensity;
 }
 
 VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
@@ -90,8 +92,8 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	float4 color;
 	color.rgb = 1.0f;
 	color.a = 1.0f;
-	const float2 vec[4] = {float2(1,0),float2(-1,0),
-			float2(0,1),float2(0,-1)};
+	const float2 vec[4] = {float2(1,0),float2(-1,0),float2(0,1),float2(0,-1)};
+	//const float2 vec[6] = {float2(1,0),float2(-1,0),float2(0,1),float2(0,-1),float2(-1,-1),float2(1,-1)};
 
 	float3 p = getPosition(input.TexCoord);
 	float3 n = getNormal(input.TexCoord);
@@ -105,16 +107,31 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	for (int j = 0; j < iterations; ++j)
 	{
 		float2 coord1 = reflect(vec[j], rand) * rad;
-		float2 coord2 = float2(coord1.x * 0.707 - coord1.y * 0.707, coord1.x * 0.707 + coord1.y * 0.707);
+		float2 coord2 = float2(coord1.x - coord1.y, coord1.x + coord1.y) * 0.707f;
 
 		ao += doAmbientOcclusion(input.TexCoord, coord1 * 0.25f, p, n);
 		ao += doAmbientOcclusion(input.TexCoord, coord2 * 0.5f, p, n);
 		ao += doAmbientOcclusion(input.TexCoord, coord1 * 0.75f, p, n);
 		ao += doAmbientOcclusion(input.TexCoord, coord2, p, n);
+		
+		/*ao += doAmbientOcclusion(input.TexCoord, coord1 * 0.166f, p, n);
+		ao += doAmbientOcclusion(input.TexCoord, coord2 * 0.332f, p, n);
+		ao += doAmbientOcclusion(input.TexCoord, coord1 * 0.498f, p, n);
+		ao += doAmbientOcclusion(input.TexCoord, coord2 * 0.664f, p, n);
+		ao += doAmbientOcclusion(input.TexCoord, coord2 * 0.83f, p, n);
+		ao += doAmbientOcclusion(input.TexCoord, coord2, p, n);*/
+		
+		//ao += g_self_occlusion;
 	} 
 	ao /= (float)iterations * 4.0f;
-	color.rgb = 1.0f - ao;
-	//color.rgb = ao;
+	
+	//color.rgb = 1.0f - ao;
+	color.rgb = ao;
+	
+	//color.rgb = (color.rgb - 0.5f) * 1.5f + 0.5f; //contrast
+	color.rgb = pow(color.rgb, 1.0f / 2.5f); //gamma
+	
+	//color.rgb = 1.0f - ao;
     return color;
 }
 
