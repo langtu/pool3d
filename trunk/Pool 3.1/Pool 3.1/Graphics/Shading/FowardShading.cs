@@ -24,7 +24,7 @@ namespace XNA_PoolGame.Graphics.Shading
         {
             #region SSAO PREPASS
 
-            if (World.doSSAO)
+            if (World.doSSAO || World.doNormalPositionPass)
             {
                 PostProcessManager.ssao.normalTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, SurfaceFormat.HalfVector4, PoolGame.device.PresentationParameters.MultiSampleType, PoolGame.device.PresentationParameters.MultiSampleQuality);
                 PostProcessManager.ssao.viewTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, SurfaceFormat.HalfVector4, PoolGame.device.PresentationParameters.MultiSampleType, PoolGame.device.PresentationParameters.MultiSampleQuality);
@@ -38,11 +38,7 @@ namespace XNA_PoolGame.Graphics.Shading
                 PoolGame.device.SetRenderTarget(0, PostProcessManager.ssao.normalTIU.renderTarget);
                 PoolGame.device.SetRenderTarget(1, PostProcessManager.ssao.viewTIU.renderTarget);
 
-
-                PoolGame.device.RenderState.DepthBufferEnable = false;
-                PoolGame.device.RenderState.DepthBufferWriteEnable = false;
                 PostProcessManager.clearGBufferEffect.CurrentTechnique = PostProcessManager.clearGBufferEffect.Techniques["SSAOClearGBufferTechnnique"];
-
                 PostProcessManager.DrawQuad(PostProcessManager.whiteTexture, PostProcessManager.clearGBufferEffect);
 
 
@@ -75,8 +71,6 @@ namespace XNA_PoolGame.Graphics.Shading
             }
 
             resultTIU = shadows.resultTIU;
-
-            
         }
 
         public override void DrawTextured(GameTime gameTime)
@@ -113,7 +107,8 @@ namespace XNA_PoolGame.Graphics.Shading
         }
         public override void Dispose()
         {
-            stencilBuffer.Dispose();
+            if (stencilBuffer != null) stencilBuffer.Dispose();
+            stencilBuffer = null;
             base.Dispose();
         }
         public override string GetBasicRenderTechnique()

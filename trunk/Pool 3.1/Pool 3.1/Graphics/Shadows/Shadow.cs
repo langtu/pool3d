@@ -8,6 +8,9 @@ using TextureInUse = XNA_PoolGame.Graphics.PostProcessManager.TextureInUse;
 
 namespace XNA_PoolGame.Graphics.Shadows
 {
+    /// <summary>
+    /// Abstract class.
+    /// </summary>
     public abstract class Shadow
     {
         public Vector2[] pcfSamples = new Vector2[9];

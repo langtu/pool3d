@@ -45,6 +45,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             ShadowFinalPCM = PoolGame.content.Load<Effect>("Effects\\ShadowFinal");
             stencilBuffer = new DepthStencilBuffer(PoolGame.device, shadowMapSize, shadowMapSize, PoolGame.device.DepthStencilBuffer.Format);
         }
+
         public override void Draw(GameTime gameTime)
         {
             PostProcessManager.ChangeRenderMode(RenderMode.ShadowMapRender);

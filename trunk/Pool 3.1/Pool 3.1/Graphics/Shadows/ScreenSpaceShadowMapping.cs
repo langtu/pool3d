@@ -8,6 +8,9 @@ using TextureInUse = XNA_PoolGame.Graphics.PostProcessManager.TextureInUse;
 
 namespace XNA_PoolGame.Graphics.Shadows
 {
+    /// <summary>
+    /// Screen Space Shadow Mapping with PCF Samples.
+    /// </summary>
     public class ScreenSpaceShadowMapping : Shadow
     {
 
@@ -177,6 +180,8 @@ namespace XNA_PoolGame.Graphics.Shadows
             for (int i = 0; i < LightManager.totalLights; ++i)
                 shadowMapTIU[i].DontUse();
             shadowTIU.DontUse();
+
+
         }
 
         public override void Pass3(GameTime gameTime)

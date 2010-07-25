@@ -86,7 +86,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     //compute screen-space position
     float4 position;
     position.x = input.TexCoord.x * 2.0f - 1.0f;
-    position.y = -(input.TexCoord.x * 2.0f - 1.0f);
+    position.y = -(input.TexCoord.y * 2.0f - 1.0f);
     position.z = depthVal;
     position.w = 1.0f;
     //transform to world space
@@ -94,8 +94,8 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     position /= position.w;
     
     //surface-to-light vector
-    float3 lightVector = -normalize(lightDirection);
-    //float3 lightVector = normalize(lightDirection - position.xyz);
+    //float3 lightVector = -normalize(lightDirection);
+    float3 lightVector = normalize(lightDirection - position.xyz);
 
     //compute diffuse light
     float NdL = max(0,dot(normal,lightVector));

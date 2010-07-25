@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region Using statement
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,7 @@ using XNA_PoolGame.Graphics.Models;
 using XNA_PoolGame.Graphics.Shadows;
 using TextureInUse = XNA_PoolGame.Graphics.PostProcessManager.TextureInUse;
 using XNA_PoolGame.Graphics.Shading;
+#endregion
 
 namespace XNA_PoolGame.Screens
 {

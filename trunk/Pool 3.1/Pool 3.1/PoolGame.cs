@@ -92,10 +92,10 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 1280;
-            graphics.PreferredBackBufferHeight = 720;
+            graphics.PreferredBackBufferWidth = 640;
+            graphics.PreferredBackBufferHeight = 480;
             graphics.SynchronizeWithVerticalRetrace = true;
-            graphics.PreferMultiSampling = true;
+            graphics.PreferMultiSampling = false;
             
             graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
             //graphics.IsFullScreen = true;
@@ -128,9 +128,9 @@ namespace XNA_PoolGame
             SurfaceFormat format = adapter.CurrentDisplayMode.Format;
             DisplayMode currentmode = adapter.CurrentDisplayMode;
             
-            e.GraphicsDeviceInformation.PresentationParameters.MultiSampleQuality = 0;
+            /*e.GraphicsDeviceInformation.PresentationParameters.MultiSampleQuality = 0;
             e.GraphicsDeviceInformation.PresentationParameters.MultiSampleType =
-                MultiSampleType.FourSamples;
+                MultiSampleType.FourSamples;*/
 #if XBOX
             e.GraphicsDeviceInformation.PresentationParameters.MultiSampleQuality = 0;
             e.GraphicsDeviceInformation.PresentationParameters.MultiSampleType =

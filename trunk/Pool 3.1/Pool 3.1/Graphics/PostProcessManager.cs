@@ -21,7 +21,7 @@ namespace XNA_PoolGame.Graphics
         public static Effect bloomExtractEffect;
         public static Effect bloomCombineEffect;
         public static Effect gaussianBlurEffect;
-        public static Effect saturation;
+        public static Effect saturationEffect;
         public static Effect modelEffect;
         public static Effect blurEffect;
         public static Effect DOFEffect;
@@ -121,7 +121,7 @@ namespace XNA_PoolGame.Graphics
             bloomExtractEffect = PoolGame.content.Load<Effect>("Effects\\BloomExtract");
             bloomCombineEffect = PoolGame.content.Load<Effect>("Effects\\BloomCombine");
             gaussianBlurEffect = PoolGame.content.Load<Effect>("Effects\\GaussianBlur");
-            saturation = PoolGame.content.Load<Effect>("Effects\\Saturate");
+            saturationEffect = PoolGame.content.Load<Effect>("Effects\\Saturate");
             modelEffect = PoolGame.content.Load<Effect>("Effects\\ModelEffect_MRT");
             distortionCombineEffect = PoolGame.content.Load<Effect>("Effects\\DistortionCombine");
             Depth = PoolGame.content.Load<Effect>("Effects\\Depth");
@@ -516,10 +516,10 @@ namespace XNA_PoolGame.Graphics
             PoolGame.device.ResolveBackBuffer(resolveTarget);
             PoolGame.device.Clear(Color.White);
 
-            saturation.Parameters["Saturation"].SetValue(sat);
-            saturation.Parameters["Base"].SetValue(new Vector4(0.9f, 0.7f, 0.3f, 1.0f));
+            saturationEffect.Parameters["Saturation"].SetValue(sat);
+            saturationEffect.Parameters["Base"].SetValue(new Vector4(0.9f, 0.7f, 0.3f, 1.0f));
 
-            DrawQuad(resolveTarget, saturation);
+            DrawQuad(resolveTarget, saturationEffect);
         }
 
         #region Bloom
@@ -634,8 +634,8 @@ namespace XNA_PoolGame.Graphics
             newTexture.Use();
             return newTexture;
         }
-        
 
+        #region Texture in use class
         public class TextureInUse
         {
             public RenderTarget2D renderTarget;
@@ -660,14 +660,6 @@ namespace XNA_PoolGame.Graphics
                 inUse = false;
             }
         }
-
-
-
-
-
-        internal static void SSAOPrePass()
-        {
-            
-        }
+        #endregion
     }
 }

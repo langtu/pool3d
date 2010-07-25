@@ -17,7 +17,7 @@ namespace XNA_PoolGame.Scenarios
     public abstract class Scenario : GameComponent
     {
         /// <summary>
-        /// Object's scene
+        /// Object's scene.
         /// </summary>
         public MultiMap<int, DrawableComponent> objects;
 
@@ -29,12 +29,12 @@ namespace XNA_PoolGame.Scenarios
         public List<Light> lights;
 
         /// <summary>
-        /// Particles to be rendered. Use Multimap for the drawing order of particles
+        /// Particles to be rendered. Use Multimap for the drawing order of particles.
         /// </summary>
         public MultiMap<int, ParticleSystem> particles;
 
         /// <summary>
-        /// Distortion particles to be rendered. Use Multimap for the drawing order of particles
+        /// Distortion particles to be rendered. Use Multimap for the drawing order of particles.
         /// </summary>
         public MultiMap<int, ParticleSystem> distortionparticles;
 
@@ -103,7 +103,7 @@ namespace XNA_PoolGame.Scenarios
         }
 
         /// <summary>
-        /// 
+        /// Draw the entire scene.
         /// </summary>
         /// <param name="gameTime"></param>
         public void DrawScene(GameTime gameTime)

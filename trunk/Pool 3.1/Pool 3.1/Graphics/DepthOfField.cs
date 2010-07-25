@@ -171,7 +171,7 @@ namespace XNA_PoolGame.Graphics
                 PostProcessManager.DOFEffect.Parameters["g_fFocalDistance"].SetValue(focalDistance);
                 PostProcessManager.DOFEffect.Parameters["g_fFocalWidth"].SetValue(focalWidth / 2.0f);
                 PostProcessManager.DOFEffect.Parameters["g_fFarClip"].SetValue(World.camera.FarPlane);
-                PostProcessManager.DOFEffect.Parameters["g_fAttenuation"].SetValue(1.0f);
+                PostProcessManager.DOFEffect.Parameters["g_fAttenuation"].SetValue(attenuation);
 
                 RenderTarget2D[] sources = doubleSourceArray;
                 sources[0] = source;
