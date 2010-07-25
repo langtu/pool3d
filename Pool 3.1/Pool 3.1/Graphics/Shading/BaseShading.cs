@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using XNA_PoolGame.Graphics.Shadows;
 using TextureInUse = XNA_PoolGame.Graphics.PostProcessManager.TextureInUse;
+using Microsoft.Xna.Framework.Graphics;
 namespace XNA_PoolGame.Graphics.Shading
 {
     public abstract class BaseShading
@@ -12,6 +13,7 @@ namespace XNA_PoolGame.Graphics.Shading
         public Vector2 halfPixel;
         public Shadow shadows;
         public TextureInUse resultTIU;
+        public DepthStencilBuffer stencilBuffer;
         
         public virtual void Dispose()
         {

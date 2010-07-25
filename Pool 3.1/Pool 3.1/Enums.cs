@@ -113,7 +113,8 @@ namespace XNA_PoolGame
         Light,
         ParticleSystem,
         DistortionParticleSystem,
-        RenderGBuffer
+        RenderGBuffer,
+        SSAOPrePass
     }
     /// <summary>
     /// Controls the DOF effect being applied

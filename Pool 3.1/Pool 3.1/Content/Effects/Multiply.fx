@@ -1,5 +1,7 @@
 // Shader Variable
 float2 halfPixel = 0;
+float gamma = 1.6f;
+
 // Texture Sampler
 texture sceneMap;
 sampler inputSampler = sampler_state
@@ -50,9 +52,21 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
 	// Get the pixel's color
-	float4 color = tex2D(inputSampler, input.TexCoord) * tex2D(SSAOSampler, input.TexCoord);
+	float ssaoColor = tex2D(SSAOSampler, input.TexCoord).r;
 	
-	return color;
+	//ssaoColor = (ssaoColor - 0.5f) * 1.5f + 0.5f;
+	//ssaoColor = pow(ssaoColor, 1.0f / gamma); 
+	
+	//ssaoColor -= 0.5f;
+	
+	ssaoColor = 1.0f - ssaoColor;
+	
+	//float4 color = (tex2D(inputSampler, input.TexCoord) * 0.8f) + (0.2f * ssaoColor);
+	float4 color = tex2D(inputSampler, input.TexCoord) * (ssaoColor);
+	
+	color.a = 1.0f;
+	
+	return saturate(color);
 }
 
 // Technique

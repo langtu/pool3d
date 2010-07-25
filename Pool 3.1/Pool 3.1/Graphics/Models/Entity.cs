@@ -587,21 +587,21 @@ namespace XNA_PoolGame.Graphics.Models
                         if (World.displacementType != DisplacementType.None && (this.customnormalMapAsset != null || useNormalMapTextures))
                         {
                             basicTechnique = World.displacementType.ToString() + basicTechnique;
-                            
-                            PoolGame.device.SamplerStates[2].AddressU = TEXTURE_ADDRESS_MODE;
+
+                            PoolGame.device.SamplerStates[2].AddressU = TEXTURE_ADDRESS_MODE; // Normal Map
                             PoolGame.device.SamplerStates[2].AddressV = TEXTURE_ADDRESS_MODE;
                             
                             if (World.displacementType == DisplacementType.ParallaxMapping)
                             {
-                                PoolGame.device.SamplerStates[3].AddressU = TEXTURE_ADDRESS_MODE;
+                                PoolGame.device.SamplerStates[3].AddressU = TEXTURE_ADDRESS_MODE; // Height Map
                                 PoolGame.device.SamplerStates[3].AddressV = TEXTURE_ADDRESS_MODE;
                             }
                         }
 
-                        PoolGame.device.SamplerStates[4].AddressU = TEXTURE_ADDRESS_MODE;
+                        PoolGame.device.SamplerStates[4].AddressU = TEXTURE_ADDRESS_MODE; // SSAO map
                         PoolGame.device.SamplerStates[4].AddressV = TEXTURE_ADDRESS_MODE;
-                        PoolGame.device.SamplerStates[5].AddressU = TEXTURE_ADDRESS_MODE;
-                        PoolGame.device.SamplerStates[5].AddressV = TEXTURE_ADDRESS_MODE;
+                        PoolGame.device.SamplerStates[5].AddressU = TEXTURE_ADDRESS_MODE; // Specular
+                        PoolGame.device.SamplerStates[5].AddressV = TEXTURE_ADDRESS_MODE; 
                         if (!useSSAOMapTextures)
                         {
                             if (customssaoMapAsset != null && World.useSSAOTextures)
@@ -611,8 +611,14 @@ namespace XNA_PoolGame.Graphics.Models
                         }
                         if (DEM && World.dem != EnvironmentType.None) basicTechnique = "EM" + basicTechnique;
                         if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) basicTechnique = "NoMRT" + basicTechnique;
-                        if (World.doSSAO) basicTechnique = basicTechnique + "SSAO";
+                        
                         DrawModel(true, PostProcessManager.SSSoftShadow_MRT, basicTechnique, delegate { SetParametersSoftShadowMRT(LightManager.lights); });
+                    }
+                    break;
+                case RenderMode.SSAOPrePass:
+                    {
+                        frustum = World.camera.FrustumCulling;
+                        DrawModel(false, PostProcessManager.SSAOPrePassEffect, "SSAO", delegate { SetParametersSSAO(); });
                     }
                     break;
                 case RenderMode.DEMBasicRender:
@@ -783,11 +789,11 @@ namespace XNA_PoolGame.Graphics.Models
                         else effect.Parameters["SSAOMap"].SetValue(PostProcessManager.whiteTexture);
                     }
 
-                    if (useSpecularMapTextures)
+                    /*if (useSpecularMapTextures)
                     {
                         effect.Parameters["SpecularMap"].SetValue(specularMapTextures[i]);
                     }
-                    else effect.Parameters["SpecularMap"].SetValue(PostProcessManager.whiteTexture);
+                    else effect.Parameters["SpecularMap"].SetValue(PostProcessManager.whiteTexture);*/
                 }
                 effect.Parameters["World"].SetValue(localWorld);
 
@@ -1027,6 +1033,23 @@ namespace XNA_PoolGame.Graphics.Models
         }
 
         #endregion
+
+        public void SetParametersSSAO()
+        {
+            PostProcessManager.SSAOPrePassEffect.Parameters["View"].SetValue(World.camera.View);
+            PostProcessManager.SSAOPrePassEffect.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
+            PostProcessManager.SSAOPrePassEffect.Parameters["CameraPosition"].SetValue(new Vector4(World.camera.CameraPosition.X, World.camera.CameraPosition.Y, World.camera.CameraPosition.Z, 0.0f));
+
+            /*if (World.displacementType != DisplacementType.None)
+            {
+                if (customnormalMapAsset != null) PostProcessManager.SSSoftShadow_MRT.Parameters["NormalMap"].SetValue(customnormalMapTexture);
+                if (World.displacementType == DisplacementType.ParallaxMapping)
+                {
+                    PostProcessManager.SSSoftShadow_MRT.Parameters["parallaxscaleBias"].SetValue(World.scaleBias);
+                    if (customheightMapAsset != null) PostProcessManager.SSSoftShadow_MRT.Parameters["HeightMap"].SetValue(customheightMapTexture);
+                }
+            }*/
+        }
 
         #region Set Parameters for Shadow
 

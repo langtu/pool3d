@@ -125,63 +125,43 @@ namespace XNA_PoolGame.Graphics.Shadows
                 PoolGame.device.SetRenderTarget(0, PostProcessManager.GBlurVRT);
                 PostProcessManager.DrawQuad(PostProcessManager.GBlurHRT.GetTexture(), PostProcessManager.GBlurV);
 
-                PostProcessManager.SetBlurEffectParameters(1.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurH);
-                PostProcessManager.SetBlurEffectParameters(0.0f, 1.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurV);
+                PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurH);
+                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurV);
             }
 
             //Screen Space Shadow
             PostProcessManager.mainTIU.Use();
             PoolGame.device.SetRenderTarget(0, PostProcessManager.mainRT);
-            string basicTechnnique = "ClearGBufferTechnnique";
+            
             if (World.motionblurType != MotionBlurType.None || World.dofType != DOFType.None)
             {
                 PostProcessManager.depthTIU.Use(); PostProcessManager.velocityTIU.Use(); PostProcessManager.velocityLastFrameTIU.Use();
                 PoolGame.device.SetRenderTarget(1, PostProcessManager.depthRT);
                 PoolGame.device.SetRenderTarget(2, PostProcessManager.velocityRT);
 
-                //if (World.doSSAO) basicTechnnique = "DepthSSAO" + basicTechnnique;
-                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
-                PostProcessManager.clearGBufferEffect.CurrentTechnique = PostProcessManager.clearGBufferEffect.Techniques[basicTechnnique];
+
+                PostProcessManager.clearGBufferEffect.CurrentTechnique = PostProcessManager.clearGBufferEffect.Techniques["ClearGBufferTechnnique"];
                 PostProcessManager.DrawQuad(PostProcessManager.whiteTexture, PostProcessManager.clearGBufferEffect);
 
-                if (World.doSSAO)
-                {
-                    PostProcessManager.ssao.viewTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, SurfaceFormat.HalfVector4, pp.MultiSampleType, pp.MultiSampleQuality);
-                    PostProcessManager.ssao.normalTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, SurfaceFormat.HalfVector4, pp.MultiSampleType, pp.MultiSampleQuality);
-                }
-
+                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
             }
             else
             {
                 PostProcessManager.depthTIU.DontUse(); PostProcessManager.velocityTIU.DontUse(); PostProcessManager.velocityLastFrameTIU.DontUse();
 
-                if (World.doSSAO)
                 {
-                    basicTechnnique = "SSAO" + basicTechnnique;
-                    PostProcessManager.ssao.viewTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, SurfaceFormat.HalfVector4, pp.MultiSampleType, pp.MultiSampleQuality);
-                    PostProcessManager.ssao.normalTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, SurfaceFormat.HalfVector4, pp.MultiSampleType, pp.MultiSampleQuality);
-
-                    PoolGame.device.SetRenderTarget(1, PostProcessManager.ssao.normalTIU.renderTarget);
-                    PoolGame.device.SetRenderTarget(2, PostProcessManager.ssao.viewTIU.renderTarget);
-
-                    PostProcessManager.clearGBufferEffect.CurrentTechnique = PostProcessManager.clearGBufferEffect.Techniques[basicTechnnique];
-
-                    PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
-                    PostProcessManager.DrawQuad(PostProcessManager.whiteTexture, PostProcessManager.clearGBufferEffect);
-                }
-                else
-                {
-                    
                     PoolGame.device.SetRenderTarget(1, null);
                     PoolGame.device.SetRenderTarget(2, null);
 
-                    PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target, Color.CornflowerBlue, 1.0f, 0);
+                    PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target | ClearOptions.Stencil, Color.CornflowerBlue, 1.0f, 0);
                 }
             }
 
             PoolGame.device.RenderState.DepthBufferEnable = true;
             PoolGame.device.RenderState.DepthBufferWriteEnable = true;
             PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
+
+            resultTIU = PostProcessManager.mainTIU;
         }
 
         public override void Dispose()
@@ -220,6 +200,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             RenderSoftShadow();
 
             World.scenario.DrawScene(gameTime);
+
         }
     }
 }

@@ -14,8 +14,8 @@ namespace XNA_PoolGame.Graphics
         public float focalDistance, focalWidth;
 
 
-        protected float blurSigma = 2.5f;
-
+        protected float blurSigma;
+        protected float attenuation;
         protected Vector3[] frustumCornersWS = new Vector3[8];
         protected Vector3[] frustumCornersVS = new Vector3[8];
         protected Vector3[] farFrustumCornersVS = new Vector3[4];
@@ -25,8 +25,10 @@ namespace XNA_PoolGame.Graphics
 
         public DepthOfField()
         {
-
+            blurSigma = 2.5f;
+            attenuation = 1.0f;
         }
+
         protected void GenerateDownscaleTargetSW(RenderTarget2D source, RenderTarget2D result)
         {
             string techniqueName = "Downscale4";
@@ -41,6 +43,7 @@ namespace XNA_PoolGame.Graphics
             PostProcess(downscale1.renderTarget, result, PostProcessManager.scalingEffect);
             downscale1.DontUse();
         }
+
         protected void GenerateDownscaleTargetHW(RenderTarget2D source, RenderTarget2D result)
         {
             TextureInUse downscale1 = PostProcessManager.GetIntermediateTexture(source.Width / 2, source.Height / 2, source.Format);
@@ -61,12 +64,14 @@ namespace XNA_PoolGame.Graphics
             PostProcess(downscale3.renderTarget, result, PostProcessManager.scalingEffect);
             downscale3.DontUse();
         }
+
         protected void PostProcess(RenderTarget2D source, RenderTarget2D result, Effect effect)
         {
             RenderTarget2D[] sources = singleSourceArray;
             sources[0] = source;
             PostProcess(sources, result, effect);
         }
+
         public void Blur(RenderTarget2D source,
                             RenderTarget2D result)
         {
@@ -130,6 +135,8 @@ namespace XNA_PoolGame.Graphics
 
             blurH.DontUse();
         }
+
+
         public void DOF(RenderTarget2D source, 
                         RenderTarget2D result, 
                         RenderTarget2D depthTexture,
@@ -192,7 +199,7 @@ namespace XNA_PoolGame.Graphics
                 PostProcessManager.DOFEffect.Parameters["g_fFocalDistance"].SetValue(focalDistance);
                 PostProcessManager.DOFEffect.Parameters["g_fFocalWidth"].SetValue(focalWidth / 2.0f);
                 PostProcessManager.DOFEffect.Parameters["g_fFarClip"].SetValue(World.camera.FarPlane);
-                PostProcessManager.DOFEffect.Parameters["g_fAttenuation"].SetValue(1.0f);
+                PostProcessManager.DOFEffect.Parameters["g_fAttenuation"].SetValue(attenuation);
 
                 RenderTarget2D[] sources = tripleSourceArray;
                 sources[0] = source;

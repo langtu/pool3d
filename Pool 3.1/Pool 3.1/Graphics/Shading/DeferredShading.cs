@@ -61,12 +61,13 @@ namespace XNA_PoolGame.Graphics.Shading
                 //DrawDirectionalLight(dir, gris);
             }
 
-            DrawDirectionalLight(Vector3.Down, Color.White);
-            DrawDirectionalLight(Vector3.Up, gris);
-            DrawDirectionalLight(Vector3.Left, gris);
-            DrawDirectionalLight(Vector3.Right, gris);
-            DrawDirectionalLight(Vector3.Forward, gris);
-            DrawDirectionalLight(Vector3.Backward, gris);
+            DrawDirectionalLight(new Vector3(1, -1, 1), Color.White);
+            DrawDirectionalLight(new Vector3(-1, 1, -1), Color.White);
+            //DrawDirectionalLight(Vector3.Up, gris);
+            //DrawDirectionalLight(Vector3.Left, gris);
+            //DrawDirectionalLight(Vector3.Right, gris);
+            //DrawDirectionalLight(Vector3.Forward, gris);
+            //DrawDirectionalLight(Vector3.Backward, gris);
         }
         private void DrawDirectionalLight(Vector3 lightDirection, Color color)
         {

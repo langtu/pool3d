@@ -253,6 +253,11 @@ namespace XNA_PoolGame
                 World.displacementType = (DisplacementType)(((int)(World.displacementType + 1) % 3));
             }
 
+            if (kb.IsKeyDown(Keys.F11) && lastkb.IsKeyUp(Keys.F11))
+            {
+                World.doSSAO = !World.doSSAO;
+            }
+
             if (kb.IsKeyDown(Keys.Y) && lastkb.IsKeyUp(Keys.Y))
             {
                 World.displayShadows = !World.displayShadows;
@@ -518,12 +523,17 @@ namespace XNA_PoolGame
                 Texture2D endTexture = null;
                 //endTexture = PostProcessManager.shadows.ShadowMapRT[0].GetTexture();
                 //endTexture = PostProcessManager.shadows.ShadowRT.GetTexture();
-                endTexture = PostProcessManager.ssao.ssaoTIU.renderTarget.GetTexture();
+                if (PostProcessManager.ssao.blurIt)
+                    endTexture = PostProcessManager.GBlurVRT.GetTexture();
+                else
+                    endTexture = PostProcessManager.ssao.ssaoTIU.renderTarget.GetTexture();
+                //endTexture = PostProcessManager.ssao.normalTIU.renderTarget.GetTexture();
+                //endTexture = PostProcessManager.ssao.viewTIU.renderTarget.GetTexture();
                 //endTexture = ((DeferredShading)PostProcessManager.shading).normalTIU.renderTarget.GetTexture();
                 //if (World.dofType != DOFType.None || World.motionblurType != MotionBlurType.None) endTexture = PostProcessManager.depthRT.GetTexture();
                 Rectangle rect;
-                //rect = new Rectangle(0, 0, 128, 128);
-                rect = new Rectangle(0, 0, PoolGame.Width, PoolGame.Height);
+                rect = new Rectangle(0, 0, 128, 128);
+                //rect = new Rectangle(0, 0, PoolGame.Width, PoolGame.Height);
 
                 
                 batch.Begin(SpriteBlendMode.None);
