@@ -18,7 +18,8 @@ namespace XNA_PoolGame.Graphics.Shadows
         #region Fields
         private Vector3 position;
         private Vector3 lookAt;
-        
+
+        private Color lightColor;
         private Vector4 diffuseColor;
         private Vector4 specularColor;
         private float lightPower;
@@ -164,7 +165,16 @@ namespace XNA_PoolGame.Graphics.Shadows
         public Vector4 DiffuseColor
         {
             get { return diffuseColor; }
-            set { diffuseColor = value; }
+            set
+            {
+                diffuseColor = value;
+                lightColor = new Color(diffuseColor);
+            }
+        }
+
+        public Color LightColor
+        {
+            get { return lightColor; }
         }
 
         public Vector3 Position

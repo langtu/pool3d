@@ -80,7 +80,7 @@ namespace XNA_PoolGame.Graphics.Models
                     //if (!occluder) return;
 
                     frustum = LightManager.lights[PostProcessManager.shading.shadows.lightpass].Frustum;
-                    DrawModel(false, PostProcessManager.Depth, "DepthMap", delegate { SetParametersShadowMap(LightManager.lights[PostProcessManager.shading.shadows.lightpass]); });
+                    DrawModel(false, PostProcessManager.DepthEffect, "DepthMap", delegate { SetParametersShadowMap(LightManager.lights[PostProcessManager.shading.shadows.lightpass]); });
 
                     break;
 
@@ -275,8 +275,8 @@ namespace XNA_PoolGame.Graphics.Models
         public void SetParametersShadowMap(Light light)
         {
             
-            PostProcessManager.Depth.Parameters["ViewProj"].SetValue(light.LightViewProjection);
-            PostProcessManager.Depth.Parameters["MaxDepth"].SetValue(light.LightFarPlane);
+            PostProcessManager.DepthEffect.Parameters["ViewProj"].SetValue(light.LightViewProjection);
+            PostProcessManager.DepthEffect.Parameters["MaxDepth"].SetValue(light.LightFarPlane);
             
         }
 

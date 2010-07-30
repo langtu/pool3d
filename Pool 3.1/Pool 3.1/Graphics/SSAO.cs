@@ -25,7 +25,7 @@ namespace XNA_PoolGame.Graphics
         public TextureInUse ssaoTIU, viewTIU, normalTIU, binaryTIU, resultTIU;
         public Vector2 halfPixel;
         private PresentationParameters pp;
-        public bool blurIt = false;
+        public bool blurIt;
         /// <summary>
         /// Create a new instance of SSAO.
         /// </summary>
@@ -34,7 +34,7 @@ namespace XNA_PoolGame.Graphics
             noiseTexture = PoolGame.content.Load<Texture2D>("Textures\\noise");
             effect = PoolGame.content.Load<Effect>("Effects\\SSAO");
             combinefinal = PoolGame.content.Load<Effect>("Effects\\Multiply");
-            intensity = 4.0f;//2.0f;
+            intensity = 8.0f;//4.0f;//2.0f;
             scale = 1.5f;//1.0f;
             randomsize = (float)(noiseTexture.Width * noiseTexture.Height);
             screensize = (float)(PoolGame.Width * PoolGame.Height);
@@ -42,6 +42,7 @@ namespace XNA_PoolGame.Graphics
             bias = 0.01f;
             halfPixel.X = 0.5f / (float)PoolGame.Width;
             halfPixel.Y = 0.5f / (float)PoolGame.Height;
+            blurIt = true;
 
             effect.Parameters["halfPixel"].SetValue(halfPixel);
             effect.Parameters["g_screen_size"].SetValue(screensize);
@@ -59,7 +60,7 @@ namespace XNA_PoolGame.Graphics
 
         public void Draw(TextureInUse source)
         {
-            ssaoTIU = PostProcessManager.GetIntermediateTexture();//PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, SurfaceFormat.HalfVector4, pp.MultiSampleType, pp.MultiSampleQuality);
+            ssaoTIU = PostProcessManager.GetIntermediateTexture();
             PoolGame.device.SetRenderTarget(0, ssaoTIU.renderTarget);
             PoolGame.device.SetRenderTarget(1, null);
             PoolGame.device.SetRenderTarget(2, null);
@@ -88,23 +89,24 @@ namespace XNA_PoolGame.Graphics
             resultTIU = ssaoTIU;
             if (blurIt)
             {
-                PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurH);
-                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurV);
+                PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurHEffect);
+                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurVEffect);
 
                 TextureInUse tmp1 = PostProcessManager.GetIntermediateTexture();
                 //Gaussian Blur H
                 PoolGame.device.SetRenderTarget(0, tmp1.renderTarget);
-                PostProcessManager.DrawQuad(ssaoTIU.renderTarget.GetTexture(), PostProcessManager.GBlurH);
+                PostProcessManager.DrawQuad(resultTIU.renderTarget.GetTexture(), PostProcessManager.GBlurHEffect);
 
-                ssaoTIU.DontUse();
-                //TextureInUse tmp2 = PostProcessManager.GetIntermediateTexture();
+                resultTIU.DontUse();
                 //Guassian Blur V
                 PoolGame.device.SetRenderTarget(0, ssaoTIU.renderTarget);
-                PostProcessManager.DrawQuad(tmp1.renderTarget.GetTexture(), PostProcessManager.GBlurV);
+                PostProcessManager.DrawQuad(tmp1.renderTarget.GetTexture(), PostProcessManager.GBlurVEffect);
 
-                PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurH);
-                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurV);
+                PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurHEffect);
+                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurVEffect);
                 tmp1.DontUse();
+                
+                ssaoTIU.Use();
                 resultTIU = ssaoTIU;
             }
             
@@ -114,12 +116,7 @@ namespace XNA_PoolGame.Graphics
             PoolGame.device.Clear(Color.Black);
             
             combinefinal.Parameters["sceneMap"].SetValue(source.renderTarget.GetTexture());
-
-            //if (blurIt)
-            //    combinefinal.Parameters["SSAOMap"].SetValue(PostProcessManager.GBlurVRT.GetTexture());
-            //else
-                //combinefinal.Parameters["SSAOMap"].SetValue(ssaoTIU.renderTarget.GetTexture());
-                combinefinal.Parameters["SSAOMap"].SetValue(resultTIU.renderTarget.GetTexture());
+            combinefinal.Parameters["SSAOMap"].SetValue(resultTIU.renderTarget.GetTexture());
 
             combinefinal.Begin();
             combinefinal.Techniques[0].Passes[0].Begin();

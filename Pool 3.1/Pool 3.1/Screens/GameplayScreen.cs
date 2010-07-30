@@ -360,6 +360,7 @@ namespace XNA_PoolGame.Screens
             useless.Clear(); useless = null;
             resultTIU.DontUse();
             PostProcessManager.ssao.FreeStuff();
+            PostProcessManager.shading.FreeStuff();
 
             PostProcessManager.halfVertTIU.DontUse(); PostProcessManager.halfHorTIU.DontUse();
             PostProcessManager.depthTIU.DontUse();

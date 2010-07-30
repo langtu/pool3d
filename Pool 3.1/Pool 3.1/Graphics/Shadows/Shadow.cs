@@ -15,7 +15,7 @@ namespace XNA_PoolGame.Graphics.Shadows
     {
         public Vector2[] pcfSamples = new Vector2[9];
         public float[] depthBias;
-
+        public TextureInUse shadowOcclussionTIU;
 
         public DepthStencilBuffer stencilBuffer;
 
@@ -44,7 +44,9 @@ namespace XNA_PoolGame.Graphics.Shadows
         public TextureInUse resultTIU;
 
         public int lightpass = 0;
+        
         public abstract void Draw(GameTime gameTime);
+
         public virtual void Dispose()
         {
             if (ShadowMapRT != null)

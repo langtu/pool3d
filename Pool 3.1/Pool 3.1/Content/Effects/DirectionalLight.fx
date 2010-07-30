@@ -69,7 +69,7 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     return output;
 }
 
-float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
+float4 PixelShaderFunction(VertexShaderOutput input, uniform bool blightPosition) : COLOR0
 {
     //get normal data from the normalMap
     float4 normalData = tex2D(normalSampler,input.TexCoord);
@@ -94,8 +94,11 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     position /= position.w;
     
     //surface-to-light vector
-    //float3 lightVector = -normalize(lightDirection);
-    float3 lightVector = normalize(lightDirection - position.xyz);
+    float3 lightVector;
+    if (!blightPosition)
+		lightVector = -normalize(lightDirection);
+    else 
+		lightVector = normalize(lightDirection - position.xyz);
 
     //compute diffuse light
     float NdL = max(0,dot(normal,lightVector));
@@ -112,11 +115,20 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     return float4(diffuseLight.rgb, specularLight) ;
 }
 
-technique Technique0
+technique DirectionalPositionTechnique
 {
     pass Pass0
     {
         VertexShader = compile vs_2_0 VertexShaderFunction();
-        PixelShader = compile ps_2_0 PixelShaderFunction();
+        PixelShader = compile ps_2_0 PixelShaderFunction(true);
+    }
+}
+
+technique DirectionalTechnique
+{
+    pass Pass0
+    {
+        VertexShader = compile vs_2_0 VertexShaderFunction();
+        PixelShader = compile ps_2_0 PixelShaderFunction(false);
     }
 }
