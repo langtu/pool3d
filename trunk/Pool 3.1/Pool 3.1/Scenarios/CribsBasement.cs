@@ -514,7 +514,8 @@ namespace XNA_PoolGame.Scenarios
         public override void Update(GameTime gameTime)
         {
             smokestack.AditionalLights[0].Position = smokestack.Position + new Vector3(Maths.RamdomNumberBetween(-5.0f, 50.0f), Maths.RamdomNumberBetween(20.0f, 45.0f), Maths.RamdomNumberBetween(-40.0f, 40.0f));
-            smokestack.AditionalLights[0].Radius = Maths.RamdomNumberBetween(200, 350);
+            smokestack.AditionalLights[0].Radius = 250;
+            //smokestack.AditionalLights[0].Radius = Maths.RamdomNumberBetween(200, 350);
 
             smokestack.UpdateLightsProperties();
             smokeStackFireWood.UpdateLightsProperties();

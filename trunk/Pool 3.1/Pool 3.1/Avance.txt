@@ -1,0 +1,35 @@
+
+- Realizar HUD
+	- Menus
+	- Gameplay
+	
+- Colisiones de pelotas con BFS (Listo)
+- Sombras y múltiples luces con Phong (Listo)
+- Point Lights (Medio Listo)
+- Agregar objetos a la escena
+- Hardware instancing
+	- Separar instancemodel de entity (crear nueva clase)
+	- Terminar todas las técnicas
+
+- Acomodar Normal mapping con PSM Shadow Mapping
+- Partículas con DOF y MotionBlur (Listo)
+- InstanceMode con Motionblur
+- Sonido3D
+- Mejorar partículas (Listo)
+- Hacer lógica del juego jaja
+- Acomodar normal mapping e incluir parallax mapping (Listo)
+- DynamicEnvironmentmapping con 1 nivel de detalle (Listo)
+- Cambiar el formato de las texturas a jpg
+- DeferredRendering (listo)
+	- Agregar Point lights y luces con objetos sin forma
+	
+- Modificar custom pipeline para reconocer texturas NormalMap, HeightMap, Specular, AOMap (es un desastre, olvidarse de esto)
+- SSAO (listo)
+	- http://www.gamedev.net/reference/programming/features/simpleSSAO/
+	- Owen Worley
+- Fresnel a las pelotas
+- Lensflare
+- Soft particles
+- Optimizar shaders (Vector4 to Vector3, etc..)
+- Multithreading (Listo)
+- BSP

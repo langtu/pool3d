@@ -15,6 +15,9 @@ namespace XNA_PoolGame
         // LIGHTS
         public static int TotalLights = 1;
 
+        /// <summary>
+        /// Current camera.
+        /// </summary>
         public static Camera camera = null;
         public static EmptyCamera emptycamera = null;
 

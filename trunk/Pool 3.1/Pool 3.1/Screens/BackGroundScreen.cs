@@ -14,7 +14,6 @@ namespace XNA_PoolGame.Screens
     {
         #region Fields
 
-        //ContentManager content;
         string textureAsset;
         Texture2D backgroundTexture;
 
@@ -47,9 +46,6 @@ namespace XNA_PoolGame.Screens
         /// </summary>
         public override void LoadContent()
         {
-            //if (content == null)
-            //    content = new ContentManager(ScreenManager.Game.Services, "Content");
-
             backgroundTexture = PoolGame.content.Load<Texture2D>(textureAsset);
         }
 
@@ -89,7 +85,7 @@ namespace XNA_PoolGame.Screens
         {
             SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
             Viewport viewport = ScreenManager.GraphicsDevice.Viewport;
-            Rectangle fullscreen = new Rectangle(0, 0, viewport.Width, viewport.Height);
+            
             byte fade = TransitionAlpha;
 
             //Texture2D result = PostProcessManager.gaussianBlur.PerformGaussianBlur(backgroundTexture, PostProcessManager.renderTargets[3],
@@ -98,7 +94,7 @@ namespace XNA_PoolGame.Screens
             Texture2D result = backgroundTexture;
 
             spriteBatch.Begin(SpriteBlendMode.None);
-            spriteBatch.Draw(result, fullscreen, new Color(fade, fade, fade));
+            spriteBatch.Draw(result, PoolGame.fullscreen, new Color(fade, fade, fade));
             spriteBatch.End();
 
 

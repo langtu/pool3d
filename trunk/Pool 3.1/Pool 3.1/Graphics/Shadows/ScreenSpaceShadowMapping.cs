@@ -75,6 +75,8 @@ namespace XNA_PoolGame.Graphics.Shadows
             shadowTIU.Use();
 
             World.scenario.DrawScene(gameTime);
+
+            shadowOcclussionTIU = shadowTIU;
         }
 
         public void RenderDEM()
@@ -117,19 +119,22 @@ namespace XNA_PoolGame.Graphics.Shadows
             // Soft
             if (PostProcessManager.shadowBlurTech == ShadowBlurTechnnique.SoftShadow)
             {
-                PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurH);
-                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurV);
+                TextureInUse tmp = PostProcessManager.GetIntermediateTexture();
+                PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurHEffect);
+                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurVEffect);
 
                 //Gaussian Blur H
-                PoolGame.device.SetRenderTarget(0, PostProcessManager.GBlurHRT);
-                PostProcessManager.DrawQuad(ShadowRT.GetTexture(), PostProcessManager.GBlurH);
+                PoolGame.device.SetRenderTarget(0, tmp.renderTarget);
+                PostProcessManager.DrawQuad(shadowOcclussionTIU.renderTarget.GetTexture(), PostProcessManager.GBlurHEffect);
 
                 //Guassian Blur V
-                PoolGame.device.SetRenderTarget(0, PostProcessManager.GBlurVRT);
-                PostProcessManager.DrawQuad(PostProcessManager.GBlurHRT.GetTexture(), PostProcessManager.GBlurV);
+                PoolGame.device.SetRenderTarget(0, shadowOcclussionTIU.renderTarget);
+                PostProcessManager.DrawQuad(tmp.renderTarget.GetTexture(), PostProcessManager.GBlurVEffect);
 
-                PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurH);
-                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurV);
+                PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurHEffect);
+                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurVEffect);
+
+                tmp.DontUse();
             }
 
             //Screen Space Shadow

@@ -298,7 +298,7 @@ namespace XNA_PoolGame.Screens.Screen_Manager
             spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Deferred, SaveStateMode.SaveState);
 
             spriteBatch.Draw(blankTexture,
-                             new Rectangle(0, 0, viewport.Width, viewport.Height),
+                             PoolGame.fullscreen,
                              new Color(0, 0, 0, (byte)alpha));
 
             spriteBatch.End();

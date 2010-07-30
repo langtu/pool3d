@@ -33,7 +33,7 @@ using XNA_PoolGame.Graphics.Shading;
 namespace XNA_PoolGame
 {
     /// <summary>
-    /// This is the main type for your game
+    /// Game.
     /// </summary>
     public class PoolGame : Game
     {
@@ -48,6 +48,8 @@ namespace XNA_PoolGame
         private float saturation = 1.0f;
 
         public int currentlight = 0;
+
+        public static Rectangle fullscreen;
 
         #region Constants
 
@@ -166,13 +168,14 @@ namespace XNA_PoolGame
             width = graphics.GraphicsDevice.Viewport.Width;
             height = graphics.GraphicsDevice.Viewport.Height;
 
+            fullscreen = new Rectangle(0, 0, width, height);
             PostProcessManager.Load();
             ModelManager.Load();
 
             // Create the bloom component to create some effects.
             //bloom = new BloomComponent(this);
             //bloom.Settings = BloomSettings.PresetSettings[0];
-            PostProcessManager.bloomSettings = BloomSettings.PresetSettings[0];
+            PostProcessManager.gameplayBloomSettings = BloomSettings.PresetSettings[0];
             World.BloomPostProcessing = false;
 
             // Add FPS component to show frame per second rate.
@@ -407,7 +410,7 @@ namespace XNA_PoolGame
                 bloomSettingsIndex = (bloomSettingsIndex + 1) %
                                      BloomSettings.PresetSettings.Length;
 
-                PostProcessManager.bloomSettings = BloomSettings.PresetSettings[bloomSettingsIndex];
+                PostProcessManager.gameplayBloomSettings = BloomSettings.PresetSettings[bloomSettingsIndex];
                 World.BloomPostProcessing = true;
             }
 
@@ -523,17 +526,17 @@ namespace XNA_PoolGame
                 Texture2D endTexture = null;
                 //endTexture = PostProcessManager.shadows.ShadowMapRT[0].GetTexture();
                 //endTexture = PostProcessManager.shadows.ShadowRT.GetTexture();
-                if (PostProcessManager.ssao.blurIt)
-                    endTexture = PostProcessManager.GBlurVRT.GetTexture();
-                else
-                    endTexture = PostProcessManager.ssao.ssaoTIU.renderTarget.GetTexture();
+                
+                //endTexture = PostProcessManager.ssao.ssaoTIU.renderTarget.GetTexture();
                 //endTexture = PostProcessManager.ssao.normalTIU.renderTarget.GetTexture();
                 //endTexture = PostProcessManager.ssao.viewTIU.renderTarget.GetTexture();
                 //endTexture = ((DeferredShading)PostProcessManager.shading).normalTIU.renderTarget.GetTexture();
+                endTexture = ((DeferredShading)PostProcessManager.shading).normalTexture;
+                //endTexture = ((DeferredShading)PostProcessManager.shading).normalTIU.renderTarget.GetTexture();
                 //if (World.dofType != DOFType.None || World.motionblurType != MotionBlurType.None) endTexture = PostProcessManager.depthRT.GetTexture();
                 Rectangle rect;
-                rect = new Rectangle(0, 0, 128, 128);
-                //rect = new Rectangle(0, 0, PoolGame.Width, PoolGame.Height);
+                //rect = new Rectangle(0, 0, 128, 128);
+                rect = new Rectangle(0, 0, PoolGame.Width, PoolGame.Height);
 
                 
                 batch.Begin(SpriteBlendMode.None);
@@ -613,7 +616,7 @@ namespace XNA_PoolGame
             }
             //text += "\nDirection: \nX: " + forward.X + "\nY: " + forward.Y + "\nZ: " + forward.Z + "\n";
 
-            text += "\n\nBloom Name: (" + PostProcessManager.bloomSettings.Name + ") (KEY: B)" + "\nShow buffer (" + PostProcessManager.showBuffer.ToString() + ")" + " (KEY: V)";
+            text += "\n\nBloom Name: (" + PostProcessManager.gameplayBloomSettings.Name + ") (KEY: B)" + "\nShow buffer (" + PostProcessManager.showBuffer.ToString() + ")" + " (KEY: V)";
 
 
             text += "\n\nShow Shadows: " + World.displayShadows.ToString() + " (KEY: Y)";

@@ -34,14 +34,15 @@ namespace XNA_PoolGame.Graphics
         public static Effect clearGBufferEffect;
         public static Effect PCFShadowMap;
         public static Effect motionblurEffect;
-        public static Effect GBlurH;
-        public static Effect GBlurV;
-        public static Effect Depth;
+        public static Effect GBlurHEffect;
+        public static Effect GBlurVEffect;
+        public static Effect DepthEffect;
         public static Effect distortionCombineEffect;
         public static Effect clearGBuffer_DefEffect;
         public static Effect renderGBuffer_DefEffect, combineFinal_DefEffect;
         public static Effect directionalLightEffect;
         public static Effect SSAOPrePassEffect;
+        public static Effect pointLightEffect;
 
         public static BasicEffect basicEffect;
 
@@ -86,7 +87,7 @@ namespace XNA_PoolGame.Graphics
         public static ResolveTexture2D resolveTarget;
 
         // BLOOM COMPONENT
-        public static BloomSettings bloomSettings;
+        public static BloomSettings gameplayBloomSettings;
         public static IntermediateBuffer showBuffer = IntermediateBuffer.FinalResult;
 
         // BLUR
@@ -124,10 +125,10 @@ namespace XNA_PoolGame.Graphics
             saturationEffect = PoolGame.content.Load<Effect>("Effects\\Saturate");
             modelEffect = PoolGame.content.Load<Effect>("Effects\\ModelEffect_MRT");
             distortionCombineEffect = PoolGame.content.Load<Effect>("Effects\\DistortionCombine");
-            Depth = PoolGame.content.Load<Effect>("Effects\\Depth");
+            DepthEffect = PoolGame.content.Load<Effect>("Effects\\Depth");
             PCFShadowMap = PoolGame.content.Load<Effect>("Effects\\PCFSM");
-            GBlurH = PoolGame.content.Load<Effect>("Effects\\GBlurH");
-            GBlurV = PoolGame.content.Load<Effect>("Effects\\GBlurV");
+            GBlurHEffect = PoolGame.content.Load<Effect>("Effects\\GBlurH");
+            GBlurVEffect = PoolGame.content.Load<Effect>("Effects\\GBlurV");
             SSSoftShadow = PoolGame.content.Load<Effect>("Effects\\ScreenSpaceSoftShadow");
             SSSoftShadow_MRT = PoolGame.content.Load<Effect>("Effects\\ScreenSpaceSoftShadow_MRT");
             motionblurEffect = PoolGame.content.Load<Effect>("Effects\\MotionBlur");
@@ -137,6 +138,7 @@ namespace XNA_PoolGame.Graphics
             directionalLightEffect = PoolGame.content.Load<Effect>("Effects\\DirectionalLight");
             renderGBuffer_DefEffect = PoolGame.content.Load<Effect>("Effects\\RenderGBuffer_Def");
             SSAOPrePassEffect = PoolGame.content.Load<Effect>("Effects\\SSAOPrePass");
+            pointLightEffect = PoolGame.content.Load<Effect>("Effects\\PointLight");
 
             blurEffect = PoolGame.content.Load<Effect>("Effects\\Blur");
             DOFEffect = PoolGame.content.Load<Effect>("Effects\\DOF");
@@ -154,8 +156,8 @@ namespace XNA_PoolGame.Graphics
 
             basicEffect = new BasicEffect(PoolGame.device, null);
 
-            SetBlurEffectParameters(1.5f / PoolGame.device.Viewport.Width, 0, GBlurH);
-            SetBlurEffectParameters(0, 1.5f / PoolGame.device.Viewport.Height, GBlurV);
+            SetBlurEffectParameters(1.5f / PoolGame.device.Viewport.Width, 0, GBlurHEffect);
+            SetBlurEffectParameters(0, 1.5f / PoolGame.device.Viewport.Height, GBlurVEffect);
 
             gaussianBlur = new GaussianBlur(PoolGame.game);
             gaussianBlur.ComputeKernel(BLUR_RADIUS, BLUR_AMOUNT);
@@ -481,9 +483,9 @@ namespace XNA_PoolGame.Graphics
             gaussianBlurEffect.Dispose();
             SSSoftShadow.Dispose();
             PCFShadowMap.Dispose();
-            GBlurH.Dispose();
-            GBlurV.Dispose();
-            Depth.Dispose();
+            GBlurHEffect.Dispose();
+            GBlurVEffect.Dispose();
+            DepthEffect.Dispose();
             SSSoftShadow_MRT.Dispose();
             blurEffect.Dispose();
             scalingEffect.Dispose();
@@ -493,6 +495,7 @@ namespace XNA_PoolGame.Graphics
             directionalLightEffect.Dispose();
             combineFinal_DefEffect.Dispose();
             SSAOPrePassEffect.Dispose();
+            pointLightEffect.Dispose();
 
             // DISPOSE RENDER TARGETS
             foreach (TextureInUse t in renderTargets)
@@ -525,7 +528,7 @@ namespace XNA_PoolGame.Graphics
         #region Bloom
         public static void DrawBloomPostProcessing(RenderTarget2D input, RenderTarget2D result, GameTime gameTime)
         {
-            bloomExtractEffect.Parameters["BloomThreshold"].SetValue(bloomSettings.BloomThreshold);
+            bloomExtractEffect.Parameters["BloomThreshold"].SetValue(gameplayBloomSettings.BloomThreshold);
             //PoolGame.device.ResolveBackBuffer(PostProcessManager.resolveTarget);
 
             PostProcessManager.halfHorTIU.Use(); PostProcessManager.halfVertTIU.Use();
@@ -551,10 +554,10 @@ namespace XNA_PoolGame.Graphics
 
             EffectParameterCollection parameters = bloomCombineEffect.Parameters;
 
-            parameters["BloomIntensity"].SetValue(bloomSettings.BloomIntensity);
-            parameters["BaseIntensity"].SetValue(bloomSettings.BaseIntensity);
-            parameters["BloomSaturation"].SetValue(bloomSettings.BloomSaturation);
-            parameters["BaseSaturation"].SetValue(bloomSettings.BaseSaturation);
+            parameters["BloomIntensity"].SetValue(gameplayBloomSettings.BloomIntensity);
+            parameters["BaseIntensity"].SetValue(gameplayBloomSettings.BaseIntensity);
+            parameters["BloomSaturation"].SetValue(gameplayBloomSettings.BloomSaturation);
+            parameters["BaseSaturation"].SetValue(gameplayBloomSettings.BaseSaturation);
 
             PoolGame.device.Textures[1] = tex;
 
