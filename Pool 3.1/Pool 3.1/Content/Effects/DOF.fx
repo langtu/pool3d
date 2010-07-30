@@ -21,6 +21,10 @@ float g_fFarClip;
 float g_fFocalDistance;
 float g_fFocalWidth;
 float g_fAttenuation;
+bool bDeferred = false;
+
+//this is used to compute the world-position
+float4x4 InvertProjection; 
 
 static const int NUM_DOF_TAPS = 12;
 static const float MAX_COC = 10.0f;
@@ -39,7 +43,24 @@ float4 DOFDiscPS(in float2 in_vTexCoord		: TEXCOORD0) : COLOR
 	float fTotalContribution = 1.0f;
 
 	// Depth and blurriness values for center sample
-	float fCenterDepth = tex2D(PointSampler1, in_vTexCoord).x;
+	float fCenterDepth;
+	
+	if (bDeferred)
+	{
+		//compute screen-space position
+		float4 position;
+		position.x = in_vTexCoord.x * 2.0f - 1.0f;
+		position.y = -(in_vTexCoord.y * 2.0f - 1.0f);
+		position.z = tex2D(PointSampler1, in_vTexCoord).x;
+		position.w = 1.0f;
+		
+		//transform to world space
+		position = mul(position, InvertProjection);
+		position /= position.w;
+		fCenterDepth = -position.z / g_fFarClip;
+	} else
+		fCenterDepth = tex2D(PointSampler1, in_vTexCoord).x;
+				
 	float fCenterBlur = GetBlurFactor(fCenterDepth);
 
 	if (fCenterBlur > 0)
@@ -55,7 +76,23 @@ float4 DOFDiscPS(in float2 in_vTexCoord		: TEXCOORD0) : COLOR
 
 			// Fetch filter tap sample
 			float4 vTapColor = tex2D(LinearSampler0, vTapCoord);
-			float fTapDepth = tex2D(PointSampler1, vTapCoord).x;
+			float fTapDepth;
+			if (bDeferred)
+			{
+				//compute screen-space position
+				float4 position;
+				position.x = in_vTexCoord.x * 2.0f - 1.0f;
+				position.y = -(in_vTexCoord.y * 2.0f - 1.0f);
+				position.z = tex2D(PointSampler1, vTapCoord).r;
+				position.w = 1.0f;
+				
+				//transform to world space
+				position = mul(position, InvertProjection);
+				position /= position.w;
+				fTapDepth = -position.z / g_fFarClip;
+			} else
+				fTapDepth = tex2D(PointSampler1, vTapCoord).x;
+				
 			float fTapBlur = GetBlurFactor(fTapDepth);
 
 			// Compute tap contribution based on depth and blurriness
@@ -76,8 +113,23 @@ float4 DOFBlurBufferPS (	in float2 in_vTexCoord			: TEXCOORD0	)	: COLOR0
 {
 	float4 vOriginalColor = tex2D(PointSampler0, in_vTexCoord);
 	float4 vBlurredColor = tex2D(LinearSampler1, in_vTexCoord);
-	float fDepthVS = tex2D(PointSampler2, in_vTexCoord).x;
+	float fDepthVS;
 
+	if (bDeferred)
+	{
+		//compute screen-space position
+		float4 position;
+		position.x = in_vTexCoord.x * 2.0f - 1.0f;
+		position.y = -(in_vTexCoord.y * 2.0f - 1.0f);
+		position.z = tex2D(PointSampler2, in_vTexCoord).r;
+		position.w = 1.0f;
+		
+		//transform to world space
+		position = mul(position, InvertProjection);
+		position /= position.w;
+		fDepthVS = -position.z / g_fFarClip;
+	} else
+		fDepthVS = tex2D(PointSampler2, in_vTexCoord).x;
 	float fBlurFactor = GetBlurFactor(fDepthVS);
 	
     return lerp(vOriginalColor, vBlurredColor, saturate(fBlurFactor) * g_fAttenuation);

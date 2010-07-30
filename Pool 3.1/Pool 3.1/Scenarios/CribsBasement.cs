@@ -39,6 +39,7 @@ namespace XNA_PoolGame.Scenarios
         public Entity smokeFireWoodKeeper = null;
         public Entity smokeFireWoodOut = null;
         public Entity carpet = null;
+        public Entity lightScatter = null;
 
         public Entity[] rooflamps;
 
@@ -373,8 +374,11 @@ namespace XNA_PoolGame.Scenarios
                 lamp.occluder = false;
                 PoolGame.game.Components.Add(lamp);
             }
-
-
+            lightScatter = new AlphaEntity(PoolGame.game, "Models\\cone");
+            lightScatter.Position = new Vector3(180.0f, 375, 0.0f);
+            lightScatter.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
+            //lightScatter.Scale = new Vector3(5.0f);
+            PoolGame.game.Components.Add(lightScatter);
             ////////////////////////////////////////////////
             //World.scenario.Objects.Add(ballsinstanced);
             
@@ -416,6 +420,9 @@ namespace XNA_PoolGame.Scenarios
 
             foreach (Entity lamp in rooflamps)
                 World.scenario.Objects.Add(lamp);
+
+
+            //World.scenario.Objects.Add(lightScatter);
 
             base.Initialize();
             LoadContent();
@@ -514,8 +521,7 @@ namespace XNA_PoolGame.Scenarios
         public override void Update(GameTime gameTime)
         {
             smokestack.AditionalLights[0].Position = smokestack.Position + new Vector3(Maths.RamdomNumberBetween(-5.0f, 50.0f), Maths.RamdomNumberBetween(20.0f, 45.0f), Maths.RamdomNumberBetween(-40.0f, 40.0f));
-            smokestack.AditionalLights[0].Radius = 250;
-            //smokestack.AditionalLights[0].Radius = Maths.RamdomNumberBetween(200, 350);
+            smokestack.AditionalLights[0].Radius = Maths.RamdomNumberBetween(150, 300);
 
             smokestack.UpdateLightsProperties();
             smokeStackFireWood.UpdateLightsProperties();
@@ -599,6 +605,9 @@ namespace XNA_PoolGame.Scenarios
 
             if (ballsinstanced != null) ballsinstanced.Dispose();
             ballsinstanced = null;
+
+            if (lightScatter != null) lightScatter.Dispose();
+            lightScatter = null;
             base.Dispose(disposing);
         }
         #endregion

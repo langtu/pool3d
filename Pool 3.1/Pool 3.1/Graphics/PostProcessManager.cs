@@ -43,6 +43,7 @@ namespace XNA_PoolGame.Graphics
         public static Effect directionalLightEffect;
         public static Effect SSAOPrePassEffect;
         public static Effect pointLightEffect;
+        public static Effect alphaEffect;
 
         public static BasicEffect basicEffect;
 
@@ -139,6 +140,7 @@ namespace XNA_PoolGame.Graphics
             renderGBuffer_DefEffect = PoolGame.content.Load<Effect>("Effects\\RenderGBuffer_Def");
             SSAOPrePassEffect = PoolGame.content.Load<Effect>("Effects\\SSAOPrePass");
             pointLightEffect = PoolGame.content.Load<Effect>("Effects\\PointLight");
+            alphaEffect = PoolGame.content.Load<Effect>("Effects\\Alpha");
 
             blurEffect = PoolGame.content.Load<Effect>("Effects\\Blur");
             DOFEffect = PoolGame.content.Load<Effect>("Effects\\DOF");
@@ -496,6 +498,7 @@ namespace XNA_PoolGame.Graphics
             combineFinal_DefEffect.Dispose();
             SSAOPrePassEffect.Dispose();
             pointLightEffect.Dispose();
+            alphaEffect.Dispose();
 
             // DISPOSE RENDER TARGETS
             foreach (TextureInUse t in renderTargets)

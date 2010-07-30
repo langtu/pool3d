@@ -92,7 +92,7 @@ namespace XNA_PoolGame.Graphics.Models
         /// <summary>
         /// What frustum volume use? Camera or Light source Frustum.
         /// </summary>
-        private BoundingFrustum frustum;
+        protected BoundingFrustum frustum;
 
         /// <summary>
         /// Type of volume
@@ -613,7 +613,6 @@ namespace XNA_PoolGame.Graphics.Models
                         //if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) basicTechnique = "NoMRT" + basicTechnique;
 
                         DrawModel(true, PostProcessManager.modelEffect, basicTechnique, delegate { SetParametersModelEffectMRT(ref LightManager.lights); });
-                        
                     }
                     break;
                 case RenderMode.RenderGBuffer:
@@ -727,8 +726,8 @@ namespace XNA_PoolGame.Graphics.Models
                 PoolGame.device.SamplerStates[0].AddressV = TEXTURE_ADDRESS_MODE;
             }
             effect.CurrentTechnique = effect.Techniques[technique];
-            
-            bool drawvolume = PostProcessManager.currentRenderMode == RenderMode.ScreenSpaceSoftShadowRender || PostProcessManager.currentRenderMode == RenderMode.BasicRender;
+
+            bool drawvolume = PostProcessManager.currentRenderMode == RenderMode.ScreenSpaceSoftShadowRender || PostProcessManager.currentRenderMode == RenderMode.BasicRender || PostProcessManager.currentRenderMode == RenderMode.RenderGBuffer;
 #if !DRAW_BOUNDINGVOLUME
             drawvolume &= drawboundingvolume;
 #endif

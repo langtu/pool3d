@@ -45,7 +45,7 @@ namespace XNA_PoolGame.Graphics
             PostProcessManager.motionblurEffect.CurrentTechnique = PostProcessManager.motionblurEffect.Techniques[mbType.ToString()];
 
             PostProcessManager.motionblurEffect.Parameters["g_fBlurAmount"].SetValue(this.blurScale);
-            PostProcessManager.motionblurEffect.Parameters["g_matInvView"].SetValue(Matrix.Invert(camera.View));
+            PostProcessManager.motionblurEffect.Parameters["g_matInvView"].SetValue(camera.InvView);
             PostProcessManager.motionblurEffect.Parameters["g_matLastViewProj"].SetValue(prevViewProj);
 
             RenderTarget2D[] sources;

@@ -630,6 +630,11 @@
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
+    <Compile Include="Effects\Alpha.fx">
+      <Name>Alpha</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
     <None Include="Effects\DOF_Common.fxh">
       <Name>DOF_Common</Name>
       <Importer>EffectImporter</Importer>
@@ -648,6 +653,16 @@
     <None Include="Effects\pp_Common.fxh">
       <Name>pp_Common</Name>
     </None>
+    <Compile Include="Models\cone2.X">
+      <Name>cone2</Name>
+      <Importer>XImporter</Importer>
+      <Processor>ModelProcessor</Processor>
+    </Compile>
+    <Compile Include="Models\cone.X">
+      <Name>cone</Name>
+      <Importer>XImporter</Importer>
+      <Processor>CustomModelProcessor</Processor>
+    </Compile>
     <Compile Include="Models\pointlight.X">
       <Name>pointlight</Name>
       <Importer>XImporter</Importer>
@@ -1506,6 +1521,13 @@
   <ItemGroup>
     <Compile Include="Particles\ray2.png">
       <Name>ray2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Particles\ray.png">
+      <Name>ray</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
