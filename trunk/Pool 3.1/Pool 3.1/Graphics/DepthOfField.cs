@@ -142,6 +142,11 @@ namespace XNA_PoolGame.Graphics
                         RenderTarget2D depthTexture,
                         DOFType dofType)
 		{
+            PostProcessManager.DOFEffect.Parameters["bDeferred"].SetValue(World.shadingTech == ShadingTechnnique.Deferred);
+            if (World.shadingTech == ShadingTechnnique.Deferred)
+            {
+                PostProcessManager.DOFEffect.Parameters["InvertProjection"].SetValue(World.camera.InvProjection);
+            }
             if (dofType == DOFType.DiscBlur)
             {
                 // Scale tap offsets based on render target size

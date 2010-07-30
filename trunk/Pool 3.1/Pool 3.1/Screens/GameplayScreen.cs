@@ -230,7 +230,10 @@ namespace XNA_PoolGame.Screens
 
             resultTIU = PostProcessManager.shading.resultTIU;
             PoolGame.device.SetRenderTarget(0, resultTIU.renderTarget);
-            
+
+            //PostProcessManager.ChangeRenderMode(RenderMode.RenderGBuffer);
+            //((CribsBasement)World.scenario).lightScatter.Draw(null);
+
             #region LIGHT'S POINT
             //PoolGame.game.PrepareRenderStates();
             /*PostProcessManager.ChangeRenderMode(RenderMode.BasicRender);

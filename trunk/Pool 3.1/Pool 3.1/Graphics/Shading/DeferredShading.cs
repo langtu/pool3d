@@ -21,7 +21,7 @@ namespace XNA_PoolGame.Graphics.Shading
         public TextureInUse diffuseColorTIU, normalTIU, lightTIU, depthTIU, combineTIU;
         private SurfaceFormat format = SurfaceFormat.HalfVector4;
         public Texture2D normalTexture;
-        private Model sphereModel;
+        private Model sphereModel, model1;
 
         /// <summary>
         /// Creates a new instance of the class.
@@ -36,6 +36,7 @@ namespace XNA_PoolGame.Graphics.Shading
 
             // Point Light
             sphereModel = PoolGame.content.Load<Model>("Models\\pointlight");
+            model1 = PoolGame.content.Load<Model>("Models\\cone2");
 
         }
 
@@ -91,6 +92,8 @@ namespace XNA_PoolGame.Graphics.Shading
             DrawPointLight(((CribsBasement)World.scenario).smokestack.AditionalLights[0].Position, 
                 ((CribsBasement)World.scenario).smokestack.AditionalLights[0].LightColor, 
                 ((CribsBasement)World.scenario).smokestack.AditionalLights[0].Radius, 5.0f);
+
+            DrawFormlessLight(((CribsBasement)World.scenario).lightScatter.Position, 1, Color.White, 1.0f, model1, ((CribsBasement)World.scenario).lightScatter.LocalWorld);
         }
 
         private void DrawDirectionalLight(Vector3 lightDirection, Color color, string technique)
@@ -103,7 +106,7 @@ namespace XNA_PoolGame.Graphics.Shading
             PostProcessManager.directionalLightEffect.Parameters["lightDirection"].SetValue(lightDirection);
             PostProcessManager.directionalLightEffect.Parameters["Color"].SetValue(color.ToVector3());
             PostProcessManager.directionalLightEffect.Parameters["cameraPosition"].SetValue(World.camera.CameraPosition);
-            PostProcessManager.directionalLightEffect.Parameters["InvertViewProjection"].SetValue(Matrix.Invert(World.camera.ViewProjection));
+            PostProcessManager.directionalLightEffect.Parameters["InvertViewProjection"].SetValue(World.camera.InvViewProjection);
             PostProcessManager.directionalLightEffect.Parameters["halfPixel"].SetValue(halfPixel);
             
             PostProcessManager.directionalLightEffect.Begin();
@@ -139,7 +142,7 @@ namespace XNA_PoolGame.Graphics.Shading
 
             //parameters for specular computations
             PostProcessManager.pointLightEffect.Parameters["cameraPosition"].SetValue(World.camera.CameraPosition);
-            PostProcessManager.pointLightEffect.Parameters["InvertViewProjection"].SetValue(Matrix.Invert(World.camera.ViewProjection));
+            PostProcessManager.pointLightEffect.Parameters["InvertViewProjection"].SetValue(World.camera.InvViewProjection);
             //size of a halfpixel, for texture coordinates alignment
             PostProcessManager.pointLightEffect.Parameters["halfPixel"].SetValue(halfPixel);
             //calculate the distance between the camera and light center
@@ -150,7 +153,7 @@ namespace XNA_PoolGame.Graphics.Shading
             else
                 PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
             PoolGame.device.RenderState.DepthBufferEnable = false;
-            //PoolGame.device.RenderState.CullMode = CullMode.None;
+            PoolGame.device.RenderState.CullMode = CullMode.None;
 
             PostProcessManager.pointLightEffect.Begin();
             PostProcessManager.pointLightEffect.Techniques[0].Passes[0].Begin();
@@ -172,7 +175,64 @@ namespace XNA_PoolGame.Graphics.Shading
             PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
             PoolGame.device.RenderState.DepthBufferWriteEnable = true;
         }
+        private void DrawFormlessLight(Vector3 lightPosition, float lightRadius, Color color, float lightIntensity, Model model, Matrix worldMatrix)
+        {
+            PoolGame.device.RenderState.CullMode = CullMode.None;
 
+            //set the G-Buffer parameters
+            PostProcessManager.pointLightEffect.Parameters["colorMap"].SetValue(diffuseColorTIU.renderTarget.GetTexture());
+            PostProcessManager.pointLightEffect.Parameters["normalMap"].SetValue(normalTIU.renderTarget.GetTexture());
+            PostProcessManager.pointLightEffect.Parameters["depthMap"].SetValue(PostProcessManager.depthTIU.renderTarget.GetTexture());
+
+            //compute the light world matrix
+            //scale according to light radius, and translate it to light position
+            
+            PostProcessManager.pointLightEffect.Parameters["World"].SetValue(worldMatrix);
+            PostProcessManager.pointLightEffect.Parameters["View"].SetValue(World.camera.View);
+            PostProcessManager.pointLightEffect.Parameters["Projection"].SetValue(World.camera.Projection);
+            //light position
+            PostProcessManager.pointLightEffect.Parameters["lightPosition"].SetValue(lightPosition);
+
+            //set the color, radius and Intensity
+            PostProcessManager.pointLightEffect.Parameters["Color"].SetValue(color.ToVector3());
+            PostProcessManager.pointLightEffect.Parameters["lightRadius"].SetValue(lightRadius);
+            PostProcessManager.pointLightEffect.Parameters["lightIntensity"].SetValue(lightIntensity);
+
+            //parameters for specular computations
+            PostProcessManager.pointLightEffect.Parameters["cameraPosition"].SetValue(World.camera.CameraPosition);
+            PostProcessManager.pointLightEffect.Parameters["InvertViewProjection"].SetValue(World.camera.InvViewProjection);
+            //size of a halfpixel, for texture coordinates alignment
+            PostProcessManager.pointLightEffect.Parameters["halfPixel"].SetValue(halfPixel);
+            //calculate the distance between the camera and light center
+            float cameraToCenter = Vector3.Distance(World.camera.CameraPosition, lightPosition);
+            //if we are inside the light volume, draw the sphere's inside face
+            if (cameraToCenter < lightRadius)
+                PoolGame.device.RenderState.CullMode = CullMode.CullClockwiseFace;
+            else
+                PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
+            PoolGame.device.RenderState.DepthBufferEnable = false;
+            //PoolGame.device.RenderState.CullMode = CullMode.None;
+
+            PostProcessManager.pointLightEffect.Begin();
+            PostProcessManager.pointLightEffect.Techniques[0].Passes[0].Begin();
+
+            foreach (ModelMesh mesh in model.Meshes)
+            {
+                foreach (ModelMeshPart meshPart in mesh.MeshParts)
+                {
+                    PoolGame.device.VertexDeclaration = meshPart.VertexDeclaration;
+                    PoolGame.device.Vertices[0].SetSource(mesh.VertexBuffer, meshPart.StreamOffset, meshPart.VertexStride);
+                    PoolGame.device.Indices = mesh.IndexBuffer;
+                    PoolGame.device.DrawIndexedPrimitives(PrimitiveType.TriangleList, meshPart.BaseVertex, 0, meshPart.NumVertices, meshPart.StartIndex, meshPart.PrimitiveCount);
+                }
+            }
+
+            PostProcessManager.pointLightEffect.Techniques[0].Passes[0].End();
+            PostProcessManager.pointLightEffect.End();
+
+            PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
+            PoolGame.device.RenderState.DepthBufferWriteEnable = true;
+        }
 
         private void SetGBuffer()
         {
@@ -229,6 +289,8 @@ namespace XNA_PoolGame.Graphics.Shading
             if (!World.doSSAO && !World.doNormalPositionPass) normalTIU.DontUse();
             lightTIU.DontUse();
             diffuseColorTIU.DontUse();
+
+            
 
             resultTIU = combineTIU;
         }
