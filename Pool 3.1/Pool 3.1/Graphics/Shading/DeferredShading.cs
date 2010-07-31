@@ -93,9 +93,10 @@ namespace XNA_PoolGame.Graphics.Shading
                 ((CribsBasement)World.scenario).smokestack.AditionalLights[0].LightColor, 
                 ((CribsBasement)World.scenario).smokestack.AditionalLights[0].Radius, 5.0f);
 
-            DrawFormlessLight(((CribsBasement)World.scenario).lightScatter.Position, 1, Color.White, 1.0f, model1, ((CribsBasement)World.scenario).lightScatter.LocalWorld);
+            //DrawShapelessLight(((CribsBasement)World.scenario).lightScatter.Position, 1, Color.White, 10.0f, model1, ((CribsBasement)World.scenario).lightScatter.LocalWorld);
         }
 
+        #region Directional Light
         private void DrawDirectionalLight(Vector3 lightDirection, Color color, string technique)
         {
             //set all parameters
@@ -116,7 +117,9 @@ namespace XNA_PoolGame.Graphics.Shading
             PostProcessManager.directionalLightEffect.Techniques[0].Passes[0].End();
             PostProcessManager.directionalLightEffect.End();
         }
+        #endregion
 
+        #region Point Light
         private void DrawPointLight(Vector3 lightPosition, Color color, float lightRadius, float lightIntensity)
         {
             PoolGame.device.RenderState.CullMode = CullMode.None;
@@ -153,7 +156,7 @@ namespace XNA_PoolGame.Graphics.Shading
             else
                 PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
             PoolGame.device.RenderState.DepthBufferEnable = false;
-            PoolGame.device.RenderState.CullMode = CullMode.None;
+            //PoolGame.device.RenderState.CullMode = CullMode.None;
 
             PostProcessManager.pointLightEffect.Begin();
             PostProcessManager.pointLightEffect.Techniques[0].Passes[0].Begin();
@@ -175,7 +178,9 @@ namespace XNA_PoolGame.Graphics.Shading
             PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
             PoolGame.device.RenderState.DepthBufferWriteEnable = true;
         }
-        private void DrawFormlessLight(Vector3 lightPosition, float lightRadius, Color color, float lightIntensity, Model model, Matrix worldMatrix)
+        #endregion
+
+        private void DrawShapelessLight(Vector3 lightPosition, float lightRadius, Color color, float lightIntensity, Model model, Matrix worldMatrix)
         {
             PoolGame.device.RenderState.CullMode = CullMode.None;
 
@@ -211,7 +216,7 @@ namespace XNA_PoolGame.Graphics.Shading
             else
                 PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
             PoolGame.device.RenderState.DepthBufferEnable = false;
-            //PoolGame.device.RenderState.CullMode = CullMode.None;
+            PoolGame.device.RenderState.CullMode = CullMode.None;
 
             PostProcessManager.pointLightEffect.Begin();
             PostProcessManager.pointLightEffect.Techniques[0].Passes[0].Begin();
@@ -253,7 +258,8 @@ namespace XNA_PoolGame.Graphics.Shading
             PostProcessManager.clearGBuffer_DefEffect.Techniques[0].Passes[0].End();
             PostProcessManager.clearGBuffer_DefEffect.End();
 
-            PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
+            PoolGame.device.Clear(ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
+            //PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
 
             PoolGame.device.RenderState.DepthBufferEnable = true;
             PoolGame.device.RenderState.DepthBufferWriteEnable = true;
@@ -286,7 +292,7 @@ namespace XNA_PoolGame.Graphics.Shading
             PostProcessManager.combineFinal_DefEffect.Techniques[0].Passes[0].End();
             PostProcessManager.combineFinal_DefEffect.End();
 
-            if (!World.doSSAO && !World.doNormalPositionPass) normalTIU.DontUse();
+            if (!World.doSSAO) normalTIU.DontUse();
             lightTIU.DontUse();
             diffuseColorTIU.DontUse();
 

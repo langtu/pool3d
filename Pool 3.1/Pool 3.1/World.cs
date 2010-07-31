@@ -10,6 +10,9 @@ using XNA_PoolGame.Graphics;
 
 namespace XNA_PoolGame
 {
+    /// <summary>
+    /// World.
+    /// </summary>
     public static class World
     {
         // LIGHTS
@@ -48,9 +51,9 @@ namespace XNA_PoolGame
 
         // SHADOWS SETTINGS
         public static bool displayShadows = true;
-        public static bool displayShadowsTextures = false;
-        public static int shadowMapSize = 1024 * 2;
-        public static ShadowTechnnique shadowTechnique = ShadowTechnnique.ScreenSpaceShadowMapping;
+        public static bool displayShadowsTextures = true;
+        public static int shadowMapSize = 1024 / 2;
+        public static ShadowTechnnique shadowTechnique = ShadowTechnnique.VarianceShadowMapping;
         // NORMAL MAPPING
         public static DisplacementType displacementType = DisplacementType.None;
         public static Vector2 scaleBias = new Vector2(0.04f, -0.03f);

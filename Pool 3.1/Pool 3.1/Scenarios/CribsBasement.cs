@@ -39,7 +39,7 @@ namespace XNA_PoolGame.Scenarios
         public Entity smokeFireWoodKeeper = null;
         public Entity smokeFireWoodOut = null;
         public Entity carpet = null;
-        public Entity lightScatter = null;
+        public AlphaEntity lightScatter = null;
 
         public Entity[] rooflamps;
 
@@ -288,6 +288,7 @@ namespace XNA_PoolGame.Scenarios
             floor.Position = new Vector3(-200.0f, 0.0f, 0.0f);
             floor.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
             floor.SpecularColor = Vector4.Zero;
+            //floor.UseNormalMapTextures = true;
             //floor.UseHeightMapTextures = floor.UseNormalMapTextures = floor.UseSSAOMapTextures = true;
             
             floor.DrawOrder = 1;
@@ -376,7 +377,7 @@ namespace XNA_PoolGame.Scenarios
             }
             lightScatter = new AlphaEntity(PoolGame.game, "Models\\cone");
             lightScatter.Position = new Vector3(180.0f, 375, 0.0f);
-            lightScatter.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
+            lightScatter.TEXTURE_ADDRESS_MODE = TextureAddressMode.Clamp;
             //lightScatter.Scale = new Vector3(5.0f);
             PoolGame.game.Components.Add(lightScatter);
             ////////////////////////////////////////////////
@@ -422,7 +423,7 @@ namespace XNA_PoolGame.Scenarios
                 World.scenario.Objects.Add(lamp);
 
 
-            //World.scenario.Objects.Add(lightScatter);
+            World.scenario.Objects.Add(lightScatter);
 
             base.Initialize();
             LoadContent();

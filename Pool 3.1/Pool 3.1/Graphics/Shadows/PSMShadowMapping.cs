@@ -130,5 +130,20 @@ namespace XNA_PoolGame.Graphics.Shadows
         {
             throw new NotImplementedException();
         }
+
+        public override string GetDepthMapTechnique()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SetPCFParameters(ref List<Light> lights)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SetDepthMapParameters(Light light)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

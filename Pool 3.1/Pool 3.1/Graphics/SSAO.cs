@@ -26,6 +26,7 @@ namespace XNA_PoolGame.Graphics
         public Vector2 halfPixel;
         private PresentationParameters pp;
         public bool blurIt;
+
         /// <summary>
         /// Create a new instance of SSAO.
         /// </summary>

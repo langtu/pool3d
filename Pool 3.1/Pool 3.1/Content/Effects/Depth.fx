@@ -50,6 +50,13 @@ float4 ShadowMapPS(VertexShaderOutput IN) : COLOR0
     return float4(IN.Depth, IN.Depth, IN.Depth, 1.0f);
 }
 
+//-------------------
+//--- PixelShader ---
+float4 ShadowMapPS_VSM(VertexShaderOutput IN) : COLOR0
+{
+    return float4(IN.Depth, IN.Depth * IN.Depth, 0.0f, 1.0f);
+}
+
 ////////////////////////////////////////////////////////////
 
 // Vertex shader helper function shared between the different instancing techniques.
@@ -136,6 +143,15 @@ technique DepthMap
     {
           VertexShader = compile vs_2_0 ShadowMapVS();
           PixelShader = compile ps_2_0 ShadowMapPS();
+    }
+}
+
+technique DepthMap_VSM
+{
+    pass P0
+    {
+          VertexShader = compile vs_2_0 ShadowMapVS();
+          PixelShader = compile ps_2_0 ShadowMapPS_VSM();
     }
 }
 

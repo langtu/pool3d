@@ -78,6 +78,10 @@ namespace XNA_PoolGame.Graphics.Shadows
         public abstract void Pass3(GameTime gameTime);
         public abstract void Pass4(GameTime gameTime);
 
+        public abstract string GetDepthMapTechnique();
+        public abstract void SetPCFParameters(ref List<Light> lights);
+        public abstract void SetDepthMapParameters(Light light);
+
         /// <summary>
         /// Draw the scene without shadows
         /// </summary>

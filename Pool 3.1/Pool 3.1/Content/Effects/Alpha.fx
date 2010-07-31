@@ -50,26 +50,28 @@ float4 NoMRTPixelShaderFunction(VS_ModelOutput input) : COLOR0
 {
     float4 Color = tex2D(ColorSampler, input.TexCoord);
     
-    float intensity = (Color.x + Color.y + Color.z) / 3.0f;
+    //float intensity = (Color.x + Color.y + Color.z) / 3.0f;
     //Color.xyz = intensity;
     
     float3 att = LightPosition - input.WorldPosition.xyz;
     
     
-	float alpha = saturate(1.0f - length(att) / 35.0f);
+	float alpha = (1.0f - length(att) / 35.0f);
 	//if (alpha < 0.0f) alpha = -alpha;
 	//if (alpha == 0.0f) alpha = 0.1f;
 	
 	
-	Color.a *= alpha;
-    return Color;
+	Color.a *= alpha * (1-alpha)* (1-alpha) * 6.7;
+	//Color *= Color.a;
+	//Color.a *= alpha;
+    return saturate(Color);
 }
 
 technique RenderHalf4
 {
     pass P0
     {
-
+		sampler[0] = <ColorSampler>;
         VertexShader = compile vs_3_0 VertexShaderFunction();
         PixelShader = compile ps_3_0 NoMRTPixelShaderFunction();
     }

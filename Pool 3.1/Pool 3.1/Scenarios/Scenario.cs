@@ -164,6 +164,7 @@ namespace XNA_PoolGame.Scenarios
         }
 
         public abstract void PrefetchData();
+
         /// <summary>
         /// 
         /// </summary>
