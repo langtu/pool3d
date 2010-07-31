@@ -18,7 +18,6 @@ namespace XNA_PoolGame.Graphics.Shadows
         public ScreenSpaceShadowMapping()
         {
             shadowMapSize = World.shadowMapSize;
-            //depthBias = 0.0042f; // 0.0035f;
 
             float texelSize = 0.75f / (float)shadowMapSize;
 
@@ -64,6 +63,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             for (int i = 0; i < LightManager.totalLights; ++i)
             {
                 RenderShadowMap(i);
+                SetDepthMapParameters(LightManager.lights[i]);
                 shadowMapTIU[i].Use();
                 World.scenario.DrawScene(gameTime);
                 ++lightpass;
@@ -72,6 +72,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             ///////////////// PASS 2 - PCF //////////////
             PostProcessManager.ChangeRenderMode(RenderMode.PCFShadowMapRender);
             RenderPCFShadowMap();
+            SetPCFParameters(ref LightManager.lights);
             shadowTIU.Use();
 
             World.scenario.DrawScene(gameTime);
@@ -95,13 +96,9 @@ namespace XNA_PoolGame.Graphics.Shadows
             PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
 
             //Render Shadow Map
-
-            // UPGRADE (MULTIPLE LIGHTS)
             PoolGame.device.DepthStencilBuffer = stencilBuffer;
             PoolGame.device.SetRenderTarget(0, ShadowMapRT[lightindex]);
             PoolGame.device.Clear(Color.White);
-
-
         }
 
         public void RenderPCFShadowMap()
@@ -211,6 +208,33 @@ namespace XNA_PoolGame.Graphics.Shadows
 
             World.scenario.DrawScene(gameTime);
 
+        }
+
+        public override string GetDepthMapTechnique()
+        {
+            return "DepthMap";
+        }
+
+        public override void SetPCFParameters(ref List<Light> lights)
+        {
+            PostProcessManager.PCFShadowMap.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
+
+            PostProcessManager.PCFShadowMap.Parameters["LightViewProjs"].SetValue(LightManager.viewprojections);
+            PostProcessManager.PCFShadowMap.Parameters["MaxDepths"].SetValue(LightManager.maxdepths);
+            PostProcessManager.PCFShadowMap.Parameters["totalLights"].SetValue(LightManager.totalLights);
+            for (int i = 0; i < LightManager.totalLights; ++i)
+            {
+                PostProcessManager.PCFShadowMap.Parameters["ShadowMap" + i].SetValue(ShadowMapRT[i].GetTexture());
+            }
+
+            PostProcessManager.PCFShadowMap.Parameters["PCFSamples"].SetValue(pcfSamples);
+            PostProcessManager.PCFShadowMap.Parameters["depthBias"].SetValue(LightManager.depthbias);
+        }
+
+        public override void SetDepthMapParameters(Light light)
+        {
+            PostProcessManager.DepthEffect.Parameters["ViewProj"].SetValue(light.LightViewProjection);
+            PostProcessManager.DepthEffect.Parameters["MaxDepth"].SetValue(light.LightFarPlane);
         }
     }
 }

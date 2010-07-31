@@ -1,4 +1,4 @@
-//#define DRAW_DEBUGTEXT
+#define DRAW_DEBUGTEXT
 
 #region Using Statements
 using XNA_PoolGame;
@@ -94,12 +94,13 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 1280;
-            graphics.PreferredBackBufferHeight = 720;
+            graphics.PreferredBackBufferWidth = 640;
+            graphics.PreferredBackBufferHeight = 480;
             graphics.SynchronizeWithVerticalRetrace = false;
             graphics.PreferMultiSampling = false;
-            
-            graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
+
+            //graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
+            graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
             //graphics.IsFullScreen = true;
 
             
@@ -524,19 +525,19 @@ namespace XNA_PoolGame
             if (World.displayShadows && World.displayShadowsTextures)
             {
                 Texture2D endTexture = null;
-                //endTexture = PostProcessManager.shadows.ShadowMapRT[0].GetTexture();
-                //endTexture = PostProcessManager.shadows.ShadowRT.GetTexture();
+                endTexture = PostProcessManager.shading.shadows.ShadowMapRT[0].GetTexture();
+                //endTexture = PostProcessManager.shading.shadows.ShadowRT.GetTexture();
                 
                 //endTexture = PostProcessManager.ssao.ssaoTIU.renderTarget.GetTexture();
                 //endTexture = PostProcessManager.ssao.normalTIU.renderTarget.GetTexture();
                 //endTexture = PostProcessManager.ssao.viewTIU.renderTarget.GetTexture();
                 //endTexture = ((DeferredShading)PostProcessManager.shading).normalTIU.renderTarget.GetTexture();
-                endTexture = ((DeferredShading)PostProcessManager.shading).normalTexture;
+                //endTexture = ((DeferredShading)PostProcessManager.shading).normalTexture;
                 //endTexture = ((DeferredShading)PostProcessManager.shading).normalTIU.renderTarget.GetTexture();
                 //if (World.dofType != DOFType.None || World.motionblurType != MotionBlurType.None) endTexture = PostProcessManager.depthRT.GetTexture();
                 Rectangle rect;
-                //rect = new Rectangle(0, 0, 128, 128);
-                rect = new Rectangle(0, 0, PoolGame.Width, PoolGame.Height);
+                rect = new Rectangle(0, 0, 128, 128);
+                //rect = new Rectangle(0, 0, PoolGame.Width, PoolGame.Height);
 
                 
                 batch.Begin(SpriteBlendMode.None);
@@ -544,6 +545,7 @@ namespace XNA_PoolGame
                 if (endTexture != null) batch.Draw(endTexture, rect, Color.White);
 
 
+                endTexture = PostProcessManager.shading.shadows.ShadowRT.GetTexture();
                 //endTexture = PostProcessManager.shadows.ShadowMapRT[1].GetTexture();
                 //endTexture = PostProcessManager.ssao.normalTIU.renderTarget.GetTexture();
                 //if (PostProcessManager.distortionsample != null) endTexture = PostProcessManager.distortionsample.renderTarget.GetTexture();

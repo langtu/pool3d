@@ -44,6 +44,7 @@ namespace XNA_PoolGame.Graphics
         public static Effect SSAOPrePassEffect;
         public static Effect pointLightEffect;
         public static Effect alphaEffect;
+        public static Effect VSMEffect;
 
         public static BasicEffect basicEffect;
 
@@ -141,6 +142,7 @@ namespace XNA_PoolGame.Graphics
             SSAOPrePassEffect = PoolGame.content.Load<Effect>("Effects\\SSAOPrePass");
             pointLightEffect = PoolGame.content.Load<Effect>("Effects\\PointLight");
             alphaEffect = PoolGame.content.Load<Effect>("Effects\\Alpha");
+            VSMEffect = PoolGame.content.Load<Effect>("Effects\\VSM");
 
             blurEffect = PoolGame.content.Load<Effect>("Effects\\Blur");
             DOFEffect = PoolGame.content.Load<Effect>("Effects\\DOF");
@@ -499,6 +501,7 @@ namespace XNA_PoolGame.Graphics
             SSAOPrePassEffect.Dispose();
             pointLightEffect.Dispose();
             alphaEffect.Dispose();
+            VSMEffect.Dispose();
 
             // DISPOSE RENDER TARGETS
             foreach (TextureInUse t in renderTargets)
@@ -575,7 +578,8 @@ namespace XNA_PoolGame.Graphics
             distortionsample = GetIntermediateTexture();
             
             PoolGame.device.SetRenderTarget(0, distortionsample.renderTarget);
-            PoolGame.device.Clear(ClearOptions.Target | ClearOptions.Stencil, Color.Black, 1.0f, 0);
+            PoolGame.device.Clear(ClearOptions.Target, Color.Black, 1.0f, 0);
+            //PoolGame.device.Clear(ClearOptions.Target | ClearOptions.Stencil, Color.Black, 1.0f, 0);
         }
 
         public static void DistortionParticlesCombine(RenderTarget2D source, RenderTarget2D result)

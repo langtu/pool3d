@@ -54,6 +54,11 @@ namespace XNA_PoolGame.Graphics.Models
         /// </summary>
         public bool occluder = true;
 
+        /// <summary>
+        /// List of textures
+        /// </summary>
+        protected List<Texture2D> textures;
+
         private float shineness = 96.0f;
         private Vector4 specularColor = Vector4.One;
         private Vector4 materialDiffuseColor = Vector4.One;
@@ -100,6 +105,7 @@ namespace XNA_PoolGame.Graphics.Models
         protected VolumeType volume;
         BoundingBox boundingBox;
         BoundingSphere boundingSphere;
+        protected BoundingBox[] boxes;
         protected bool useModelPartBB = true;
         public bool belongsToScenario = true;
 
@@ -120,8 +126,6 @@ namespace XNA_PoolGame.Graphics.Models
         private Matrix rotation;
         private Matrix preRotation;
         private Vector3 scale;
-        protected List<Texture2D> textures;
-        protected BoundingBox[] boxes;
         protected Matrix prelocalWorld;
 
         private bool worldDirty = true;
@@ -564,7 +568,7 @@ namespace XNA_PoolGame.Graphics.Models
                         if (!occluder) return;
 
                         frustum = LightManager.lights[PostProcessManager.shading.shadows.lightpass].Frustum;
-                        DrawModel(false, PostProcessManager.DepthEffect, "DepthMap", delegate { SetParametersShadowMap(LightManager.lights[PostProcessManager.shading.shadows.lightpass]); });
+                        DrawModel(false, PostProcessManager.DepthEffect, PostProcessManager.shading.shadows.GetDepthMapTechnique(), null);
                     }
                     break;
                 case RenderMode.PCFShadowMapRender:
@@ -572,7 +576,10 @@ namespace XNA_PoolGame.Graphics.Models
                         //if (!occluder) return;
 
                         frustum = World.camera.FrustumCulling;
-                        DrawModel(false, PostProcessManager.PCFShadowMap, "PCFSMTechnique", delegate { SetParametersPCFShadowMap(ref LightManager.lights); });
+                        if (World.shadowTechnique == ShadowTechnnique.VarianceShadowMapping)
+                        DrawModel(false, PostProcessManager.VSMEffect, "PCFSMTechnique", null);
+                        else
+                        DrawModel(false, PostProcessManager.PCFShadowMap, "PCFSMTechnique", null);
                     }
                     break;
                 case RenderMode.ScreenSpaceSoftShadowRender:
@@ -1147,11 +1154,7 @@ namespace XNA_PoolGame.Graphics.Models
             PostProcessManager.PCFShadowMap.Parameters["depthBias"].SetValue(LightManager.depthbias);
         }
 
-        public void SetParametersShadowMap(Light light)
-        {
-            PostProcessManager.DepthEffect.Parameters["ViewProj"].SetValue(light.LightViewProjection);
-            PostProcessManager.DepthEffect.Parameters["MaxDepth"].SetValue(light.LightFarPlane);
-        }
+        
 
         public void AddLight(Light light)
         {

@@ -17,6 +17,7 @@ namespace XNA_PoolGame.Graphics
         public static BoundingSphere bounds;
         public static int totalLights;
         public static Matrix[] viewprojections;
+        public static Matrix[] views;//, projs;
         public static float[] maxdepths;
         public static Vector4[] positions;
         public static Vector4[] diffuse;
@@ -32,6 +33,8 @@ namespace XNA_PoolGame.Graphics
             totalLights = lights.Count;
             totalLights = World.TotalLights;
             viewprojections = new Matrix[totalLights];
+            views = new Matrix[totalLights];
+            //projs = new Matrix[totalLights];
             maxdepths = new float[totalLights];
             positions = new Vector4[totalLights];
             diffuse = new Vector4[totalLights];
@@ -49,6 +52,8 @@ namespace XNA_PoolGame.Graphics
             for (int i = 0; i < totalLights; ++i)
             {
                 viewprojections[i] = lights[i].LightViewProjection;
+                views[i] = lights[i].LightView;
+                //projs[i] = lights[i].LightProjection;
                 maxdepths[i] = lights[i].LightFarPlane;
                 positions[i] = new Vector4(lights[i].Position.X, lights[i].Position.Y, lights[i].Position.Z, 1.0f);
                 diffuse[i] = lights[i].DiffuseColor;

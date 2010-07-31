@@ -66,6 +66,7 @@ namespace XNA_PoolGame.Screens
                     PostProcessManager.shading.shadows = new ScreenSpaceShadowMapping();
                     break;
                 case ShadowTechnnique.VarianceShadowMapping:
+                    PostProcessManager.shading.shadows = new VarianceShadowMapping();
                     break;
 
             }
@@ -231,8 +232,8 @@ namespace XNA_PoolGame.Screens
             resultTIU = PostProcessManager.shading.resultTIU;
             PoolGame.device.SetRenderTarget(0, resultTIU.renderTarget);
 
-            //PostProcessManager.ChangeRenderMode(RenderMode.RenderGBuffer);
-            //((CribsBasement)World.scenario).lightScatter.Draw(null);
+            PostProcessManager.ChangeRenderMode(RenderMode.RenderGBuffer);
+            ((CribsBasement)World.scenario).lightScatter.Draw(null);
 
             #region LIGHT'S POINT
             //PoolGame.game.PrepareRenderStates();
