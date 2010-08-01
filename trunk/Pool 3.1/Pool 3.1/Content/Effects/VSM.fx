@@ -11,7 +11,7 @@ float4x4 TexProj;
 
 
 //LIGHTS
-float4x4 LightViews[2];
+float4x4 LightViewProjs[2];
 //float4x4 LightProjs[2];
 float MaxDepths[2];
 float depthBias[2];
@@ -52,9 +52,9 @@ struct VertexShaderInput
 struct VertexShaderOutput
 {
 	float4 Position			: POSITION;
-	float3 LightViewPos[2]		: TEXCOORD0;
-	float4 TexLookupPos[2]     : TEXCOORD2;
-	float3 Normal     : TEXCOORD4;
+	float4 ShadowMapPos[2]		: TEXCOORD0;
+	float4 RealDistance[2]     : TEXCOORD2;
+	
 };
 
 //--------------------
@@ -67,27 +67,9 @@ VertexShaderOutput PCFSM_VS(VertexShaderInput input)
 	
 	for (int light_i = 0; light_i < totalLights; ++light_i)
     {
-		//transform position into light space
-		float4 LVP = mul(worldPosition, LightViews[light_i]);
-		output.LightViewPos[light_i] = LVP.xyz;
-		output.TexLookupPos[light_i] = mul(mul(LVP, Projection), TexProj);
-		//output.TexLookupPos[light_i] = mul(mul(LVP, LightProjs[light_i]), TexProj);
+		output.ShadowMapPos[light_i] = mul(worldPosition, LightViewProjs[light_i]);
+		output.RealDistance[light_i] = output.ShadowMapPos[light_i].z / MaxDepths[light_i];
 	}
-	
-	//////////////////////
-	//transform and project position onto screen
-    /*
-    float4 WorldPos = mul(Position, World);
-    Out.Pos = mul(mul(WorldPos, View), Proj);
-    
-    //transform position into light space
-    float4 LightViewPos = mul(WorldPos, LightView);
-    Out.LightViewPos = LightViewPos.xyz;
-    Out.TexLookupPos = mul(mul(LightViewPos, Proj), TexProj);
-    */
- 
-    //transform normal to the lights view space
-    output.Normal = mul(mul(input.Normal, World), LightViews[0]);
 	
 	return output;
 }
@@ -96,36 +78,39 @@ VertexShaderOutput PCFSM_VS(VertexShaderInput input)
 //--- PixelShader ---
 float4 PCFSM_PS(VertexShaderOutput input) : COLOR
 {
-    //get depth
-    float depth = (length(input.LightViewPos[0]) - depthBias[0]) / MaxDepths[0];
-
-    //get moments
-    float2 moments = tex2Dproj(ShadowMapSampler0, input.TexLookupPos[0]).rg;
-
-    //calculate variance    
-    float variance = moments.y - moments.x * moments.x;
-    variance = min(max(variance, 0) + epsilon, 1);
-
-    //depth comparison
-    float depth_diff = moments.x - depth;
-    float p_max = variance / (variance + depth_diff * depth_diff);
-    float light = max(depth <= moments.x, p_max);
-
-    //lookup spot light
-    //float spot = tex2Dproj(texSpotSample, In.TexLookupPos).r;
-    //spot = In.TexLookupPos.w < 10.0 ? 0.f : spot;
+	float2 ProjectedTexCoords;
+    float4 wt[2];
     
-    //compute diffuse lighting
-    float3 normal = normalize(input.Normal);
-    float diff = saturate( dot(normal, float3(0,0,-1)) );
-    
-    //compute final light
-    light = max(0.1f, light); 
-    //return light * diff;
-    float4 color;
-    color.rgb = max(0.1f, light);
-    color.a = 1.0f;
-    return color;
+    for (int j = 0; j < totalLights; ++j)
+    {
+		ProjectedTexCoords[0] = input.ShadowMapPos[j].x / input.ShadowMapPos[j].w / 2.0f + 0.5f;
+		ProjectedTexCoords[1] = -input.ShadowMapPos[j].y / input.ShadowMapPos[j].w / 2.0f + 0.5f;
+		
+		
+		float4 result0 = {1.0f,1.0f,1.0f,1.0f};
+		if ((saturate(ProjectedTexCoords.x) == ProjectedTexCoords.x) && (saturate(ProjectedTexCoords.y) == ProjectedTexCoords.y))
+		{
+			float len = input.RealDistance[j].x;
+			
+			float4 moments;
+			if (j == 0) moments = tex2D(ShadowMapSampler0, ProjectedTexCoords);
+			else moments = tex2D(ShadowMapSampler1, ProjectedTexCoords);
+					
+  			float E_x2 = moments.y;
+			float Ex_2 = moments.x * moments.x;
+			float variance = min(max(E_x2 - Ex_2, 0.0f) + 0.0005f, 1.0);
+			//float variance = min(max(E_x2 - Ex_2, 0.0f) + depthBias[j], 1.0);
+			float m_d = (moments.x - len);
+			float p = variance / (variance + m_d * m_d);
+			
+			result0 = max(step(len, moments.x), p);
+			result0.a = 1.0f;
+			
+		}
+		wt[j] = result0;
+    }
+    if (totalLights == 1) wt[1] = float4(1,1,1,1);
+    return saturate(wt[0]*wt[1]);
 }
 
 ////////////////////////////////////////////////////////////

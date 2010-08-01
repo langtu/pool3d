@@ -1,3 +1,9 @@
+/////////////////////////////////////////
+//
+/////////////////////////////////////////
+
+float4 AmbientColor;
+
 texture colorMap;
 texture lightMap;
 texture shadowOcclusion;
@@ -57,8 +63,8 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     float4 light = tex2D(lightSampler,input.TexCoord);
     float3 diffuseLight = light.rgb;
     float specularLight = light.a;
-    return float4(shadowTerm * (diffuseColor * diffuseLight + specularLight),1);
-    //return saturate(float4(shadowTerm * (diffuseColor * diffuseLight),1));
+    
+    return float4(shadowTerm * (diffuseColor * (diffuseLight + AmbientColor.xyz) + specularLight), 1);
 }
 
 technique Technique1

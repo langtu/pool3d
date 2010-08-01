@@ -231,9 +231,7 @@ namespace XNA_PoolGame.Screens
 
             resultTIU = PostProcessManager.shading.resultTIU;
             PoolGame.device.SetRenderTarget(0, resultTIU.renderTarget);
-
-            PostProcessManager.ChangeRenderMode(RenderMode.RenderGBuffer);
-            ((CribsBasement)World.scenario).lightScatter.Draw(null);
+            
 
             #region LIGHT'S POINT
             //PoolGame.game.PrepareRenderStates();
@@ -298,6 +296,13 @@ namespace XNA_PoolGame.Screens
                 resultTIU = PostProcessManager.ssao.resultTIU;
             }
 
+            if (World.volumetricLights)
+            {
+                PostProcessManager.scattering.Draw(resultTIU);
+                resultTIU.DontUse();
+                resultTIU = PostProcessManager.scattering.resultTIU;
+            }
+
             #region MOTION BLUR AND DEPTH OF FIELD
 
             if (World.motionblurType != MotionBlurType.None)
@@ -359,6 +364,7 @@ namespace XNA_PoolGame.Screens
             }
 
             #endregion
+
 
             for (int k = 0; k < useless.Count; ++k) useless[k].DontUse();
             useless.Clear(); useless = null;

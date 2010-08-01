@@ -52,8 +52,8 @@ namespace XNA_PoolGame
         // SHADOWS SETTINGS
         public static bool displayShadows = true;
         public static bool displayShadowsTextures = true;
-        public static int shadowMapSize = 1024 / 2;
-        public static ShadowTechnnique shadowTechnique = ShadowTechnnique.VarianceShadowMapping;
+        public static int shadowMapSize = 1024 * 2;
+        public static ShadowTechnnique shadowTechnique = ShadowTechnnique.ScreenSpaceShadowMapping;
         // NORMAL MAPPING
         public static DisplacementType displacementType = DisplacementType.None;
         public static Vector2 scaleBias = new Vector2(0.04f, -0.03f);
@@ -84,5 +84,7 @@ namespace XNA_PoolGame
 
         //
         public static ShadingTechnnique shadingTech = ShadingTechnnique.Deferred;
+
+        public static bool volumetricLights = true;
     }
 }

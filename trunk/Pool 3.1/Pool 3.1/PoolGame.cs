@@ -1,4 +1,4 @@
-#define DRAW_DEBUGTEXT
+//#define DRAW_DEBUGTEXT
 
 #region Using Statements
 using XNA_PoolGame;
@@ -94,14 +94,15 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 640;
-            graphics.PreferredBackBufferHeight = 480;
+            graphics.PreferredBackBufferWidth = 1280;
+            graphics.PreferredBackBufferHeight = 720;
             graphics.SynchronizeWithVerticalRetrace = false;
             graphics.PreferMultiSampling = false;
 
             //graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
+            //graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
             graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
-            //graphics.IsFullScreen = true;
+            graphics.IsFullScreen = false;
 
             
             graphics.MinimumVertexShaderProfile = ShaderProfile.VS_2_0;
@@ -525,12 +526,13 @@ namespace XNA_PoolGame
             if (World.displayShadows && World.displayShadowsTextures)
             {
                 Texture2D endTexture = null;
-                endTexture = PostProcessManager.shading.shadows.ShadowMapRT[0].GetTexture();
+                //endTexture = PostProcessManager.shading.shadows.ShadowMapRT[0].GetTexture();
                 //endTexture = PostProcessManager.shading.shadows.ShadowRT.GetTexture();
                 
                 //endTexture = PostProcessManager.ssao.ssaoTIU.renderTarget.GetTexture();
                 //endTexture = PostProcessManager.ssao.normalTIU.renderTarget.GetTexture();
                 //endTexture = PostProcessManager.ssao.viewTIU.renderTarget.GetTexture();
+                endTexture = ((DeferredShading)PostProcessManager.shading).scatterTIU.renderTarget.GetTexture();
                 //endTexture = ((DeferredShading)PostProcessManager.shading).normalTIU.renderTarget.GetTexture();
                 //endTexture = ((DeferredShading)PostProcessManager.shading).normalTexture;
                 //endTexture = ((DeferredShading)PostProcessManager.shading).normalTIU.renderTarget.GetTexture();
@@ -552,7 +554,7 @@ namespace XNA_PoolGame
                 //endTexture = ((DeferredShading)PostProcessManager.shading).diffuseColorTIU.renderTarget.GetTexture();
                 rect = new Rectangle(0, 128, 128, 128);
                 //rect = new Rectangle(0, 0, Width, Height);
-                //if (endTexture != null) batch.Draw(endTexture, rect, Color.White);
+                if (endTexture != null) batch.Draw(endTexture, rect, Color.White);
 
 
                 //endTexture = ((DeferredShading)PostProcessManager.shading).lightTIU.renderTarget.GetTexture();

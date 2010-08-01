@@ -111,6 +111,8 @@ namespace XNA_PoolGame.PoolTables
         {
             //this.DEM = true;
             loaded = false;
+ 
+
         }
         #endregion
 

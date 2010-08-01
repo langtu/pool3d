@@ -8,6 +8,9 @@ texture TexColor;
 float2 parallaxscaleBias;
 float3 CameraPosition;
 
+// SCATTERING
+bool isScatterObject;
+
 sampler diffuseSampler = sampler_state
 {
     Texture = (TexColor);
@@ -95,6 +98,7 @@ struct HalfPixelShaderOutput
     half4 Color : COLOR0;
     half4 Normal : COLOR1;
     half4 Depth : COLOR2;
+    half4 Scatter : COLOR3;
 };
 
 HalfPixelShaderOutput HalfPixelShaderFunction(VertexShaderOutput input, uniform bool bparallax)
@@ -136,6 +140,9 @@ HalfPixelShaderOutput HalfPixelShaderFunction(VertexShaderOutput input, uniform 
     output.Normal.a = specularAttributes.a;
 
     output.Depth = input.Depth.x / input.Depth.y;
+    
+    if (isScatterObject) output.Scatter = 0;
+    else output.Scatter = 1;
     return output;
 }
 

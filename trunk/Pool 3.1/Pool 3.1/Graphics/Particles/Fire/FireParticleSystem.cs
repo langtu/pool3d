@@ -20,7 +20,7 @@ namespace XNA_PoolGame.Graphics.Particles.Fire
 
         protected override void InitializeSettings(ParticleSettings settings)
         {
-            settings.TextureName = "fire";
+            settings.TextureName = "fire2";
 
             settings.MaxParticles = 2400;
 
@@ -38,11 +38,11 @@ namespace XNA_PoolGame.Graphics.Particles.Fire
             // Set gravity upside down, so the flames will 'fall' upward.
             settings.Gravity = new Vector3(0, 15, 0);
 
-            //settings.MinColor = new Color(255, 240, 240, 25);
-            //settings.MaxColor = new Color(255, 240, 240, 40);
-
-            settings.MinColor = new Color(255, 50, 120, 25);
+            settings.MinColor = new Color(50, 50, 120, 25);
             settings.MaxColor = new Color(255, 50, 120, 40);
+
+            //settings.MinColor = new Color(255, 50, 120, 25);
+            //settings.MaxColor = new Color(255, 50, 120, 40);
 
             settings.MinStartSize = 5 * 2;
             settings.MaxStartSize = 10 * 2;

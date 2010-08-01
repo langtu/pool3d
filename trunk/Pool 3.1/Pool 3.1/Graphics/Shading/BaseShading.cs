@@ -22,6 +22,8 @@ namespace XNA_PoolGame.Graphics.Shading
             shadows = null;
         }
 
+        public abstract void SetParameters();
+
         public abstract void Draw(GameTime gameTime);
 
         public abstract void DrawTextured(GameTime gameTime);

@@ -128,6 +128,11 @@ namespace XNA_PoolGame.Graphics.Shading
             return "ModelTechnique";
         }
 
+        public override void SetParameters()
+        {
+
+        }
+
         public override void FreeStuff()
         {
             
