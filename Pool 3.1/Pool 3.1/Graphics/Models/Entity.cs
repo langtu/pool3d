@@ -34,6 +34,7 @@ namespace XNA_PoolGame.Graphics.Models
         protected string textureAsset = null;
         protected bool drawboundingvolume = false;
 
+        public bool isScatterObject = false;
         /// <summary>
         /// 3D object. (2nd level detail)
         /// </summary>
@@ -955,8 +956,9 @@ namespace XNA_PoolGame.Graphics.Models
 
         private void SetParameterRenderGBuffer()
         {
-            PostProcessManager.renderGBuffer_DefEffect.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
-            PostProcessManager.renderGBuffer_DefEffect.Parameters["CameraPosition"].SetValue(World.camera.CameraPosition);
+            
+            PostProcessManager.renderGBuffer_DefEffect.Parameters["isScatterObject"].SetValue(isScatterObject);
+
             if ((this.customnormalMapAsset != null || useNormalMapTextures) && World.displacementType != DisplacementType.None)
             {
                 PoolGame.device.SamplerStates[2].AddressU = TEXTURE_ADDRESS_MODE;

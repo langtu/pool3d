@@ -18,7 +18,7 @@ namespace XNA_PoolGame.Graphics.Shading
     public class DeferredShading : BaseShading
     {
         private PresentationParameters pp;
-        public TextureInUse diffuseColorTIU, normalTIU, lightTIU, depthTIU, combineTIU;
+        public TextureInUse diffuseColorTIU, normalTIU, lightTIU, depthTIU, combineTIU, scatterTIU;
         private SurfaceFormat format = SurfaceFormat.HalfVector4;
         public Texture2D normalTexture;
         private Model sphereModel, model1;
@@ -46,6 +46,7 @@ namespace XNA_PoolGame.Graphics.Shading
             ClearGBuffer();
 
             PostProcessManager.ChangeRenderMode(RenderMode.RenderGBuffer);
+            SetParameters();
             World.scenario.DrawScene(gameTime);
             
             ResolveGBuffer();
@@ -53,6 +54,28 @@ namespace XNA_PoolGame.Graphics.Shading
             shadows.Draw(gameTime);
 
             shadows.PostDraw();
+
+            // Soft
+            if (PostProcessManager.shadowBlurTech == ShadowBlurTechnnique.SoftShadow)
+            {
+                TextureInUse tmp = PostProcessManager.GetIntermediateTexture();
+                PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurHEffect);
+                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurVEffect);
+
+                //Gaussian Blur H
+                PoolGame.device.SetRenderTarget(0, tmp.renderTarget);
+                PostProcessManager.DrawQuad(shadows.shadowTIU.renderTarget.GetTexture(), PostProcessManager.GBlurHEffect);
+
+                //Guassian Blur V
+                PoolGame.device.SetRenderTarget(0, shadows.shadowTIU.renderTarget);
+                PostProcessManager.DrawQuad(tmp.renderTarget.GetTexture(), PostProcessManager.GBlurVEffect);
+
+                PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurHEffect);
+                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurVEffect);
+
+                tmp.DontUse();
+                shadows.shadowTIU.Use();
+            }
             
             DepthStencilBuffer oldBuffer = PoolGame.device.DepthStencilBuffer;
             PoolGame.device.DepthStencilBuffer = stencilBuffer;
@@ -180,6 +203,7 @@ namespace XNA_PoolGame.Graphics.Shading
         }
         #endregion
 
+        #region Shapeless Light
         private void DrawShapelessLight(Vector3 lightPosition, float lightRadius, Color color, float lightIntensity, Model model, Matrix worldMatrix)
         {
             PoolGame.device.RenderState.CullMode = CullMode.None;
@@ -238,15 +262,19 @@ namespace XNA_PoolGame.Graphics.Shading
             PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
             PoolGame.device.RenderState.DepthBufferWriteEnable = true;
         }
+        #endregion
 
         private void SetGBuffer()
         {
             diffuseColorTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, format, pp.MultiSampleType, pp.MultiSampleQuality);
             normalTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, format, pp.MultiSampleType, pp.MultiSampleQuality);
+            scatterTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, format, pp.MultiSampleType, pp.MultiSampleQuality);
+
             PostProcessManager.depthTIU.Use();
             PoolGame.device.SetRenderTarget(0, diffuseColorTIU.renderTarget);
             PoolGame.device.SetRenderTarget(1, normalTIU.renderTarget);
             PoolGame.device.SetRenderTarget(2, PostProcessManager.depthRT);
+            PoolGame.device.SetRenderTarget(3, scatterTIU.renderTarget);
         }
 
         private void ClearGBuffer()
@@ -281,6 +309,7 @@ namespace XNA_PoolGame.Graphics.Shading
             PostProcessManager.combineFinal_DefEffect.Parameters["colorMap"].SetValue(diffuseColorTIU.renderTarget.GetTexture());
             PostProcessManager.combineFinal_DefEffect.Parameters["lightMap"].SetValue(lightTIU.renderTarget.GetTexture());
             PostProcessManager.combineFinal_DefEffect.Parameters["halfPixel"].SetValue(halfPixel);
+            PostProcessManager.combineFinal_DefEffect.Parameters["AmbientColor"].SetValue(World.scenario.AmbientColor);
             PostProcessManager.combineFinal_DefEffect.Parameters["shadowOcclusion"].SetValue(shadowOcclussion);
 
             PostProcessManager.combineFinal_DefEffect.Begin();
@@ -306,6 +335,7 @@ namespace XNA_PoolGame.Graphics.Shading
             PoolGame.device.SetRenderTarget(0, null);
             PoolGame.device.SetRenderTarget(1, null);
             PoolGame.device.SetRenderTarget(2, null);
+            PoolGame.device.SetRenderTarget(3, null);
         }
 
         /// <summary>
@@ -318,6 +348,7 @@ namespace XNA_PoolGame.Graphics.Shading
             ClearGBuffer();
 
             PostProcessManager.ChangeRenderMode(RenderMode.RenderGBuffer);
+            SetParameters();
             World.scenario.DrawScene(gameTime);
 
             ResolveGBuffer();
@@ -342,12 +373,19 @@ namespace XNA_PoolGame.Graphics.Shading
             return "RenderColor";
         }
 
+        public override void SetParameters()
+        {
+            PostProcessManager.renderGBuffer_DefEffect.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
+            PostProcessManager.renderGBuffer_DefEffect.Parameters["CameraPosition"].SetValue(World.camera.CameraPosition);
+        }
+
         public override void FreeStuff()
         {
             normalTIU.DontUse();
             combineTIU.DontUse();
             diffuseColorTIU.DontUse();
             lightTIU.DontUse();
+            scatterTIU.DontUse();
         }
     }
 }

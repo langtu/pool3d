@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 namespace XNA_PoolGame.Graphics
 {
     /// <summary>
-    /// Screen Space Ambient Occlussion
+    /// Screen Space Ambient Occlussion.
     /// </summary>
     public class SSAO : IDisposable
     {

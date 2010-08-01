@@ -39,12 +39,13 @@ namespace XNA_PoolGame.Scenarios
         public Entity smokeFireWoodKeeper = null;
         public Entity smokeFireWoodOut = null;
         public Entity carpet = null;
-        public AlphaEntity lightScatter = null;
 
         public Entity[] rooflamps;
 
         public ParticleSystem fireParticles = null;
         public ParticleSystem smokeParticles = null;
+
+        public Vector3[] smokeWoodPositions;
 
         // Distortion
         public ParticleSystem heatParticles = null;
@@ -94,6 +95,7 @@ namespace XNA_PoolGame.Scenarios
             core.AddParticlesFromMultiMap(distortionparticles);
             PoolGame.game.Components.Add(core);
 
+
             smokestack = new Entity(PoolGame.game, "Models\\Cribs\\smokestack");
             smokestack.Position = new Vector3(1150.0f - 120.0f, 0, 0);
             smokestack.SpecularColor = Vector4.Zero;
@@ -115,6 +117,10 @@ namespace XNA_PoolGame.Scenarios
             smokeStackFireWood.PreRotation = Matrix.CreateRotationY(-MathHelper.PiOver2);
             smokeStackFireWood.SpecularColor = Vector4.Zero;
             smokeStackFireWood.AditionalLights = smokestack.AditionalLights;
+
+            smokeWoodPositions = new Vector3[2];
+            smokeWoodPositions[0] = smokeStackFireWood.Position + new Vector3(0, 35, -20);
+            smokeWoodPositions[1] = smokeStackFireWood.Position + new Vector3(15, 45, 20);
 
             PoolGame.game.Components.Add(smokeStackFireWood);
 
@@ -288,6 +294,7 @@ namespace XNA_PoolGame.Scenarios
             floor.Position = new Vector3(-200.0f, 0.0f, 0.0f);
             floor.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
             floor.SpecularColor = Vector4.Zero;
+            
             //floor.UseNormalMapTextures = true;
             //floor.UseHeightMapTextures = floor.UseNormalMapTextures = floor.UseSSAOMapTextures = true;
             
@@ -366,6 +373,8 @@ namespace XNA_PoolGame.Scenarios
             rooflamps = new Entity[2];
             rooflamps[0] = new Entity(PoolGame.game, "Models\\Cribs\\rooflamp", true);
             rooflamps[0].Position = new Vector3(180.0f, 392.0f, 0.0f);
+            
+            PostProcessManager.scattering.Position = rooflamps[0].Position;
 
             rooflamps[1] = new Entity(PoolGame.game, "Models\\Cribs\\rooflamp", true);
             rooflamps[1].Position = new Vector3(-180.0f, 392.0f, 0.0f);
@@ -373,13 +382,14 @@ namespace XNA_PoolGame.Scenarios
             {
                 lamp.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
                 lamp.occluder = false;
+                lamp.isScatterObject = true;
                 PoolGame.game.Components.Add(lamp);
             }
-            lightScatter = new AlphaEntity(PoolGame.game, "Models\\cone");
-            lightScatter.Position = new Vector3(180.0f, 375, 0.0f);
-            lightScatter.TEXTURE_ADDRESS_MODE = TextureAddressMode.Clamp;
-            //lightScatter.Scale = new Vector3(5.0f);
-            PoolGame.game.Components.Add(lightScatter);
+            //lightScatter = new AlphaEntity(PoolGame.game, "Models\\cone", "Particles\\alphachannel");
+            //lightScatter.Position = new Vector3(180.0f, 375, 0.0f);
+            //lightScatter.TEXTURE_ADDRESS_MODE = TextureAddressMode.Clamp;
+            ////lightScatter.Scale = new Vector3(5.0f);
+            //PoolGame.game.Components.Add(lightScatter);
             ////////////////////////////////////////////////
             //World.scenario.Objects.Add(ballsinstanced);
             
@@ -423,7 +433,7 @@ namespace XNA_PoolGame.Scenarios
                 World.scenario.Objects.Add(lamp);
 
 
-            World.scenario.Objects.Add(lightScatter);
+            //World.scenario.Objects.Add(lightScatter);
 
             base.Initialize();
             LoadContent();
@@ -499,17 +509,20 @@ namespace XNA_PoolGame.Scenarios
                     for (int i = 0; i < 2; ++i)
                     {
                         //heatParticles.AddParticle(center + new Vector3(-45.0f + (float)Maths.random.NextDouble() * 95.0f, 45.0f + (float)Maths.random.NextDouble() * 20.0f, -20.0f + (float)Maths.random.NextDouble() * 40), Vector3.Zero);
-                        heatParticles.AddParticle(center + new Vector3(-45.0f, 45.0f , -20.0f), Vector3.Zero);
+                        heatParticles.AddParticle(center + new Vector3(-15.0f, 45.0f , -20.0f), Vector3.Zero);
                     }
                 }
             }
 
 
-            const int smokeParticlesPerFrame = 4;
+            const int smokeParticlesPerFrame = 4/2;
 
             for (int i = 0; i < smokeParticlesPerFrame; i++)
             {
-                smokeParticles.AddParticle(center + Vector3.Up * 25.0f, Vector3.Zero);
+                //smokeParticles.AddParticle(center + Vector3.Up * 25.0f, Vector3.Zero);
+                smokeParticles.AddParticle(smokeWoodPositions[0], Vector3.Zero);
+                smokeParticles.AddParticle(smokeWoodPositions[1], Vector3.Zero);
+                
             }
 
 
@@ -521,12 +534,14 @@ namespace XNA_PoolGame.Scenarios
 
         public override void Update(GameTime gameTime)
         {
+            float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
             smokestack.AditionalLights[0].Position = smokestack.Position + new Vector3(Maths.RamdomNumberBetween(-5.0f, 50.0f), Maths.RamdomNumberBetween(20.0f, 45.0f), Maths.RamdomNumberBetween(-40.0f, 40.0f));
             smokestack.AditionalLights[0].Radius = Maths.RamdomNumberBetween(150, 300);
 
             smokestack.UpdateLightsProperties();
             smokeStackFireWood.UpdateLightsProperties();
             floor.UpdateLightsProperties();
+
             base.Update(gameTime);
             
         }
@@ -607,8 +622,8 @@ namespace XNA_PoolGame.Scenarios
             if (ballsinstanced != null) ballsinstanced.Dispose();
             ballsinstanced = null;
 
-            if (lightScatter != null) lightScatter.Dispose();
-            lightScatter = null;
+            //if (lightScatter != null) lightScatter.Dispose();
+            //lightScatter = null;
             base.Dispose(disposing);
         }
         #endregion

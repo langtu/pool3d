@@ -51,6 +51,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             PostProcessManager.renderTargets.Add(shadowTIU);
 
             stencilBuffer = new DepthStencilBuffer(PoolGame.device, shadowMapSize, shadowMapSize, PoolGame.device.DepthStencilBuffer.Format);
+            
         }
 
         public override void Draw(GameTime gameTime)

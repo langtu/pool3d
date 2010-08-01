@@ -17,16 +17,22 @@ namespace XNA_PoolGame.Graphics.Models
     {
         private string modelName;
         private CustomModel model;
-
+        private string alphachannelAsset = null;
         private BoundingFrustum frustum;
 
         protected string textureAsset = null;
         protected Texture2D useTexture;
+        protected Texture2D alphaChannelTexture;
         /// <summary>
         /// List of textures
         /// </summary>
         protected List<Texture2D> textures;
         public TextureAddressMode TEXTURE_ADDRESS_MODE = TextureAddressMode.Clamp;
+
+        // Alpha blending settings.
+        public Blend SourceBlend = Blend.SourceAlpha; // color de la textura del modelo
+        public Blend DestinationBlend = Blend.DestinationColor;
+
 
         private Matrix prelocalWorld;
         private Matrix localWorld;
@@ -95,6 +101,23 @@ namespace XNA_PoolGame.Graphics.Models
 
             worldDirty = true;
         }
+        public AlphaEntity(Game _game, string _modelName, string _alphachannelAsset)
+            : base(_game)
+        {
+            this.modelName = _modelName;
+            this.alphachannelAsset = _alphachannelAsset;
+
+            scale = Vector3.One;
+            localWorld = Matrix.Identity;
+            rotation = Matrix.Identity;
+            preRotation = Matrix.Identity;
+            position = Vector3.Zero;
+            volume = VolumeType.BoundingBoxes;
+            prelocalWorld = Matrix.Identity;
+
+            worldDirty = true;
+        }
+        
         #endregion
 
         #region LoadContent
@@ -102,6 +125,7 @@ namespace XNA_PoolGame.Graphics.Models
         {
             GC.Collect();
             model = PoolGame.content.Load<CustomModel>(modelName);
+            if (alphachannelAsset != null) alphaChannelTexture = PoolGame.content.Load<Texture2D>(alphachannelAsset);
 
             // Setup model.
             textures = model.GetDiffuseTextures();
@@ -163,18 +187,24 @@ namespace XNA_PoolGame.Graphics.Models
                         string basicTechnique = PostProcessManager.shading.GetBasicRenderTechnique();
 
 
+                        // Set the alpha blend mode.
                         PoolGame.device.RenderState.AlphaBlendEnable = true;
                         PoolGame.device.RenderState.AlphaBlendOperation = BlendFunction.Add;
-                        //PoolGame.device.RenderState.AlphaDestinationBlend = Blend.One;
-                        //PoolGame.device.RenderState.AlphaSourceBlend = Blend.SourceAlpha;
-                        PoolGame.device.RenderState.SourceBlend = Blend.SourceAlpha;
-                        PoolGame.device.RenderState.DestinationBlend = Blend.One;
-                        //PoolGame.device.RenderState.SourceBlend = Blend.One;
-                        //PoolGame.device.RenderState.DestinationBlend = Blend.One;
-                        ////PoolGame.device.RenderState.AlphaTestEnable = true;
-                        ////PoolGame.device.RenderState.AlphaFunction = CompareFunction.Greater;
-                        ////PoolGame.device.RenderState.ReferenceAlpha = 0;
-                        ////PoolGame.device.RenderState.SeparateAlphaBlendEnabled = false;
+                        PoolGame.device.RenderState.SourceBlend = SourceBlend; // color de la textura del modelo
+                        PoolGame.device.RenderState.DestinationBlend = DestinationBlend; // color del framebuffer
+                        //PoolGame.device.RenderState.BlendFactor = new Color(64, 64, 64);
+                        
+                        ////PoolGame.device.RenderState.SourceBlend = Blend.SourceAlpha; // source rgb * source alpha
+                        //PoolGame.device.RenderState.AlphaSourceBlend = Blend.One; // don't modify source alpha
+                        ////PoolGame.device.RenderState.DestinationBlend = Blend.InverseSourceAlpha; // dest rgb * (255 - source alpha)
+                        //PoolGame.device.RenderState.AlphaDestinationBlend = Blend.InverseSourceAlpha; // dest alpha * (255 - source alpha)
+                        //PoolGame.device.RenderState.BlendFunction = BlendFunction.Add;
+
+
+                        // Set the alpha test mode.
+                        PoolGame.device.RenderState.AlphaTestEnable = true;
+                        PoolGame.device.RenderState.AlphaFunction = CompareFunction.Greater;
+                        PoolGame.device.RenderState.ReferenceAlpha = 0;
 
                         PoolGame.device.RenderState.CullMode = CullMode.CullClockwiseFace;
 
@@ -185,7 +215,7 @@ namespace XNA_PoolGame.Graphics.Models
                         DrawModel(true, PostProcessManager.alphaEffect, basicTechnique, delegate { SetParametersAlphaModel(); });
 
                         PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
-                        DrawModel(true, PostProcessManager.alphaEffect, basicTechnique, delegate { SetParametersAlphaModel(); });
+                        //DrawModel(true, PostProcessManager.alphaEffect, basicTechnique, delegate { SetParametersAlphaModel(); });
                         PoolGame.device.RenderState.AlphaTestEnable = false;
                         PoolGame.device.RenderState.AlphaBlendEnable = false;
                         PoolGame.device.RenderState.DepthBufferWriteEnable = depthbufferWrite_old;
@@ -412,6 +442,8 @@ namespace XNA_PoolGame.Graphics.Models
             PostProcessManager.alphaEffect.Parameters["World"].SetValue(localWorld);
             PostProcessManager.alphaEffect.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
             PostProcessManager.alphaEffect.Parameters["LightPosition"].SetValue(this.Position - Vector3.Up * 35.0f);
+            if (alphaChannelTexture != null) PostProcessManager.alphaEffect.Parameters["AlphaColor"].SetValue(alphaChannelTexture);
+            
         }
         #endregion
     }

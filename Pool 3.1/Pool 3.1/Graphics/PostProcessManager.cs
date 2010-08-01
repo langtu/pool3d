@@ -108,6 +108,9 @@ namespace XNA_PoolGame.Graphics
         public static SSAO ssao;
 
         //
+        public static Scattering scattering;
+
+        //
         public static FullScreenQuad quad;
 
         public static void Load()
@@ -171,6 +174,7 @@ namespace XNA_PoolGame.Graphics
             depthOfField.focalDistance = 550.0f;
 
             ssao = new SSAO();
+            scattering = new Scattering();
 
             quad = new FullScreenQuad(PoolGame.device);
         }

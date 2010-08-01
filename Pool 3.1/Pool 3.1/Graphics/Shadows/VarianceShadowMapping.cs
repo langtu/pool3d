@@ -74,6 +74,27 @@ namespace XNA_PoolGame.Graphics.Shadows
 
             World.scenario.DrawScene(gameTime);
 
+            // Soft
+            if (PostProcessManager.shadowBlurTech == ShadowBlurTechnnique.SoftShadow)
+            {
+                TextureInUse tmp = PostProcessManager.GetIntermediateTexture();
+                PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurHEffect);
+                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurVEffect);
+
+                //Gaussian Blur H
+                PoolGame.device.SetRenderTarget(0, tmp.renderTarget);
+                PostProcessManager.DrawQuad(shadowTIU.renderTarget.GetTexture(), PostProcessManager.GBlurHEffect);
+
+                //Guassian Blur V
+                PoolGame.device.SetRenderTarget(0, shadowTIU.renderTarget);
+                PostProcessManager.DrawQuad(tmp.renderTarget.GetTexture(), PostProcessManager.GBlurVEffect);
+
+                PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurHEffect);
+                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurVEffect);
+
+                tmp.DontUse();
+                shadowTIU.Use();
+            }
             shadowOcclussionTIU = shadowTIU;
         }
         
@@ -128,10 +149,9 @@ namespace XNA_PoolGame.Graphics.Shadows
         public override void SetPCFParameters(ref List<Light> lights)
         {
             PostProcessManager.VSMEffect.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
-            PostProcessManager.VSMEffect.Parameters["TexProj"].SetValue(textproj);
-            PostProcessManager.VSMEffect.Parameters["LightViews"].SetValue(LightManager.views);
-            PostProcessManager.VSMEffect.Parameters["Projection"].SetValue(lights[0].LightProjection);
-
+            
+            PostProcessManager.VSMEffect.Parameters["LightViewProjs"].SetValue(LightManager.viewprojections);
+            
             PostProcessManager.VSMEffect.Parameters["MaxDepths"].SetValue(LightManager.maxdepths);
             PostProcessManager.VSMEffect.Parameters["totalLights"].SetValue(LightManager.totalLights);
             for (int i = 0; i < LightManager.totalLights; ++i)
@@ -139,7 +159,6 @@ namespace XNA_PoolGame.Graphics.Shadows
                 PostProcessManager.VSMEffect.Parameters["ShadowMap" + i].SetValue(ShadowMapRT[i].GetTexture());
             }
 
-            //PostProcessManager.vsmEffect.Parameters["PCFSamples"].SetValue(pcfSamples);
             PostProcessManager.VSMEffect.Parameters["depthBias"].SetValue(LightManager.depthbias);
         }
 
