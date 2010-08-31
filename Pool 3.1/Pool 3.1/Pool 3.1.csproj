@@ -88,11 +88,13 @@
     <Compile Include="Cameras\EmptyCamera.cs" />
     <Compile Include="Graphics\DepthOfField.cs" />
     <Compile Include="Graphics\FullQuad.cs" />
+    <Compile Include="Graphics\LensFlare.cs" />
     <Compile Include="Graphics\Models\AlphaEntity.cs" />
     <Compile Include="Graphics\Models\InstancedEntity.cs" />
     <Compile Include="Graphics\Models\CustomModelPart.cs" />
     <Compile Include="Graphics\Models\InstancedModel.cs" />
     <Compile Include="Graphics\Models\InstancedModelPart.cs" />
+    <Compile Include="Graphics\Models\VolumetricLightEntity.cs" />
     <Compile Include="Graphics\MotionBlur.cs" />
     <Compile Include="Graphics\Particles\Fire\HeatParticleSystem.cs" />
     <Compile Include="Graphics\Scattering.cs" />
@@ -107,7 +109,7 @@
     <Compile Include="Graphics\SSAO.cs" />
     <Compile Include="Helpers\Tuple.cs" />
     <Compile Include="PoolTables\BallCollider.cs" />
-    <Compile Include="Scenarios\ParticlesCore.cs" />
+    <Compile Include="Graphics\Particles\ParticlesCore.cs" />
     <Compile Include="Threading\ThreadComponent.cs" />
     <Compile Include="Helpers\Maths.cs" />
     <Compile Include="PoolTables\Ball.cs" />

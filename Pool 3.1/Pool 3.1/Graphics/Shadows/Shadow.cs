@@ -1,10 +1,12 @@
-﻿using System;
+﻿#region Using Statements
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TextureInUse = XNA_PoolGame.Graphics.PostProcessManager.TextureInUse;
+#endregion
 
 namespace XNA_PoolGame.Graphics.Shadows
 {
@@ -32,12 +34,12 @@ namespace XNA_PoolGame.Graphics.Shadows
         public int shadowMapSize;
 
         /// <summary>
-        /// One RenderTarget per light
+        /// Depth map from light sources (0 nearest, 1 farest). One RenderTarget per light.
         /// </summary>
         public RenderTarget2D[] ShadowMapRT;
 
         /// <summary>
-        /// 
+        /// Shadow occlussion (1 fragment = litted).
         /// </summary>
         public RenderTarget2D ShadowRT;
 
@@ -68,12 +70,13 @@ namespace XNA_PoolGame.Graphics.Shadows
             {
                 PostProcessManager.renderTargets.Remove(shadowTIU);
                 shadowTIU = null;
-
             }
             if (stencilBuffer != null) stencilBuffer.Dispose();
+            stencilBuffer = null;
 
             depthBias = null;
         }
+
         public abstract void PostDraw();
         public abstract void Pass3(GameTime gameTime);
         public abstract void Pass4(GameTime gameTime);

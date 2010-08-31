@@ -21,15 +21,19 @@
 - DynamicEnvironmentmapping con 1 nivel de detalle (Listo)
 - Cambiar el formato de las texturas a jpg
 - DeferredRendering (listo)
-	- Agregar Point lights y luces con objetos sin forma
+	- Agregar Point lights y luces con objetos sin forma (listo)
 	
 - Modificar custom pipeline para reconocer texturas NormalMap, HeightMap, Specular, AOMap (es un desastre, olvidarse de esto)
 - SSAO (listo)
 	- http://www.gamedev.net/reference/programming/features/simpleSSAO/
 	- Owen Worley
-- Fresnel a las pelotas
+
+- Fresnel a las pelotas, investigar más sobre fresnel
 - Lensflare
 - Soft particles
 - Optimizar shaders (Vector4 to Vector3, etc..)
 - Multithreading (Listo)
 - BSP
+- Colocar los parametros de los efectos en las clases (effect.Parameters[""]) a variables para ser mas eficiente
+- Realizar Antialiasing a pata (Edge detection and blur)
+- Incluir chequeo de frustrum culling a las sombras

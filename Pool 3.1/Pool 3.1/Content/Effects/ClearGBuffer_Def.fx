@@ -14,7 +14,14 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     output.Position = float4(input.Position,1);
     return output;
 }
-struct PixelShaderOutput
+struct PS_Output
+{
+    half4 Color : COLOR0;
+    half4 Normal : COLOR1;
+    half4 Depth : COLOR2;
+};
+
+struct PSLS_Output
 {
     half4 Color : COLOR0;
     half4 Normal : COLOR1;
@@ -22,9 +29,25 @@ struct PixelShaderOutput
     half4 Scatter : COLOR3;
 };
 
-PixelShaderOutput PixelShaderFunction(VertexShaderOutput input)
+PS_Output PS(VertexShaderOutput input)
 {
-    PixelShaderOutput output;
+    PS_Output output;
+    //black color
+    output.Color = 0.0f;
+    output.Color.a = 0.0f;
+    //when transforming 0.5f into [-1,1], we will get 0.0f
+    output.Normal.rgb = 0.5f;
+    //no specular power
+    output.Normal.a = 0.0f;
+    //max depth
+    output.Depth = 1.0f;
+    
+    return output;
+}
+
+PSLS_Output PS_LS(VertexShaderOutput input)
+{
+    PSLS_Output output;
     //black color
     output.Color = 0.0f;
     output.Color.a = 0.0f;
@@ -39,11 +62,21 @@ PixelShaderOutput PixelShaderFunction(VertexShaderOutput input)
     return output;
 }
 
-technique Technique1
+technique ClearGBuffer
 {
-    pass Pass1
+    pass P0
     {
         VertexShader = compile vs_2_0 VertexShaderFunction();
-        PixelShader = compile ps_2_0 PixelShaderFunction();
+        PixelShader = compile ps_2_0 PS();
+    }
+}
+
+
+technique ClearGBufferLightShafts
+{
+    pass P0
+    {
+        VertexShader = compile vs_2_0 VertexShaderFunction();
+        PixelShader = compile ps_2_0 PS_LS();
     }
 }

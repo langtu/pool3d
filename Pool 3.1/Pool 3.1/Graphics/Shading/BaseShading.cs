@@ -15,7 +15,16 @@ namespace XNA_PoolGame.Graphics.Shading
         public Shadow shadows;
         public TextureInUse resultTIU;
         public DepthStencilBuffer stencilBuffer;
-        
+        protected SurfaceFormat format;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public SurfaceFormat Format
+        { 
+            get { return format; } 
+        }
+
         public virtual void Dispose()
         {
             if (shadows != null) shadows.Dispose();

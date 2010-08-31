@@ -10,7 +10,6 @@ namespace XNA_PoolGame.Helpers
 {
     public class VectorRenderComponent : DrawableGameComponent
     {
-
         #region Private Members
 
         private ContentManager content = null;
@@ -35,6 +34,8 @@ namespace XNA_PoolGame.Helpers
 
         private string vectorRendererEffectName = "";
 
+        private GraphicsDevice device;
+
         #endregion
 
         #region Constructor
@@ -58,7 +59,7 @@ namespace XNA_PoolGame.Helpers
                     (IGraphicsDeviceService)base.Game.Services.GetService(
                                                 typeof(IGraphicsDeviceService));
 
-                GraphicsDevice device = graphicsService.GraphicsDevice;
+                device = graphicsService.GraphicsDevice;
 
 
                 effect = content.Load<Effect>(vectorRendererEffectName);
@@ -155,12 +156,6 @@ namespace XNA_PoolGame.Helpers
         #region void DrawLine(Vector3 p0, Vector3 p1)
         public void DrawLine(Vector3 p0, Vector3 p1)
         {
-            IGraphicsDeviceService graphicsService =
-                    (IGraphicsDeviceService)base.Game.Services.GetService(
-                                                typeof(IGraphicsDeviceService));
-
-            GraphicsDevice device = graphicsService.GraphicsDevice;
-
 
             vertices[0].Position = p0;
             vertices[1].Position = p1;
@@ -175,10 +170,6 @@ namespace XNA_PoolGame.Helpers
         #region void DrawLine(int x0, int y0, int x1, int y1)
         public void DrawLine(int x0, int y0, int x1, int y1)
         {
-            IGraphicsDeviceService graphicsService = (IGraphicsDeviceService)
-                    base.Game.Services.GetService(typeof(IGraphicsDeviceService));
-
-            GraphicsDevice device = graphicsService.GraphicsDevice;
 
             vertices[0].Position = new Vector3(
                 -1.0f + 2.0f * x0 / device.PresentationParameters.BackBufferWidth,
@@ -203,15 +194,27 @@ namespace XNA_PoolGame.Helpers
         }
         #endregion
 
+        #region void DrawFrustumVolume(BoundingFrustum frustum)
+        public void DrawFrustumVolume(BoundingFrustum frustum)
+        {
+            Vector3[] corners = frustum.GetCorners();
+            for (int i = 0; i < 8; i++) vertices[i].Position = corners[i];
+
+            Predraw(0);
+            device.DrawUserIndexedPrimitives<VertexPositionColor>(
+                PrimitiveType.LineList, vertices,
+                0,
+                8,
+                indices,
+                0,
+                12);
+            Postdraw();
+        }
+        #endregion
+
         #region void DrawBoundingBox(BoundingBox box)
         public void DrawBoundingBox(BoundingBox box)
         {
-            IGraphicsDeviceService graphicsService =
-                    (IGraphicsDeviceService)base.Game.Services.GetService(
-                                                    typeof(IGraphicsDeviceService));
-
-            GraphicsDevice device = graphicsService.GraphicsDevice;
-
 
             vertices[0].Position = new Vector3(box.Min.X, box.Min.Y, box.Min.Z);
             vertices[1].Position = new Vector3(box.Max.X, box.Min.Y, box.Min.Z);
@@ -267,12 +270,6 @@ namespace XNA_PoolGame.Helpers
         #region void Predraw(int pass)
         private void Predraw(int pass)
         {
-            IGraphicsDeviceService graphicsService =
-                (IGraphicsDeviceService)base.Game.Services.GetService(
-                                            typeof(IGraphicsDeviceService));
-
-            GraphicsDevice device = graphicsService.GraphicsDevice;
-
             currentPass = pass;
 
             effect.Begin();

@@ -45,6 +45,7 @@ namespace XNA_PoolGame.Graphics
         public static Effect pointLightEffect;
         public static Effect alphaEffect;
         public static Effect VSMEffect;
+        public static Effect shaftsEffect;
 
         public static BasicEffect basicEffect;
 
@@ -113,6 +114,18 @@ namespace XNA_PoolGame.Graphics
         //
         public static FullScreenQuad quad;
 
+        /// <summary>
+        /// Returns if the current render mode is a final composited scene.
+        /// </summary>
+        /// <returns></returns>
+        public static bool isFinalSceneRenderMode()
+        {
+            return currentRenderMode == RenderMode.ScreenSpaceSoftShadowRender || 
+                currentRenderMode == RenderMode.BasicRender || 
+                currentRenderMode == RenderMode.RenderGBuffer;
+        }
+
+        #region LoadEffects
         public static void Load()
         {
             spriteBatch = new SpriteBatch(PoolGame.device);
@@ -146,6 +159,7 @@ namespace XNA_PoolGame.Graphics
             pointLightEffect = PoolGame.content.Load<Effect>("Effects\\PointLight");
             alphaEffect = PoolGame.content.Load<Effect>("Effects\\Alpha");
             VSMEffect = PoolGame.content.Load<Effect>("Effects\\VSM");
+            shaftsEffect = PoolGame.content.Load<Effect>("Effects\\Shafts");
 
             blurEffect = PoolGame.content.Load<Effect>("Effects\\Blur");
             DOFEffect = PoolGame.content.Load<Effect>("Effects\\DOF");
@@ -178,6 +192,7 @@ namespace XNA_PoolGame.Graphics
 
             quad = new FullScreenQuad(PoolGame.device);
         }
+        #endregion
 
         #region Gaussian Helper
         public static void SetBlurEffectParameters(float dx, float dy, Effect effect)
@@ -506,6 +521,7 @@ namespace XNA_PoolGame.Graphics
             pointLightEffect.Dispose();
             alphaEffect.Dispose();
             VSMEffect.Dispose();
+            shaftsEffect.Dispose();
 
             // DISPOSE RENDER TARGETS
             foreach (TextureInUse t in renderTargets)
@@ -599,7 +615,7 @@ namespace XNA_PoolGame.Graphics
         public static void RenderMotionBlur(RenderTarget2D source, RenderTarget2D result)
         {
             motionBlur.DoMotionBlur(source, result, depthRT,
-                    velocityRT, velocityRTLastFrame, World.camera, World.camera.PrevView * World.camera.Projection,
+                    velocityRT, velocityRTLastFrame, World.camera, World.camera.PreviousView * World.camera.Projection,
                     World.motionblurType);
 
             // Swap the velocity buffers

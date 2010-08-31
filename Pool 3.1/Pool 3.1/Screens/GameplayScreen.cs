@@ -23,7 +23,7 @@ using XNA_PoolGame.Graphics.Shading;
 namespace XNA_PoolGame.Screens
 {
     /// <summary>
-    /// Match screen
+    /// Match screen.
     /// </summary>
     public class GameplayScreen : Screen
     {
@@ -222,6 +222,14 @@ namespace XNA_PoolGame.Screens
             List<TextureInUse> useless = new List<TextureInUse>();
             TextureInUse distortionTIU = null;
 
+            if (!World.scenario.texcubeGenerated && World.dem != EnvironmentType.None)
+            {
+                PoolGame.device.SetRenderTarget(0, null);
+
+                World.scenario.DrawEnvironmetMappingScene(gameTime);
+                World.scenario.texcubeGenerated = true;
+            }
+
             #region SHADOW MAPPING
 
             if (World.displayShadows) PostProcessManager.shading.Draw(gameTime);
@@ -230,8 +238,13 @@ namespace XNA_PoolGame.Screens
             #endregion
 
             resultTIU = PostProcessManager.shading.resultTIU;
-            PoolGame.device.SetRenderTarget(0, resultTIU.renderTarget);
-            
+
+            //PoolGame.device.RenderState.DepthBufferWriteEnable = false;
+            //PoolGame.device.RenderState.DepthBufferEnable = false;
+            //World.poolTable.vectorRenderer.SetViewProjMatrix(World.camera.ViewProjection);
+            //World.poolTable.vectorRenderer.SetWorldMatrix(Matrix.Identity);
+            //World.poolTable.vectorRenderer.SetColor(Color.Red);
+            //World.poolTable.vectorRenderer.DrawFrustumVolume(World.camera.FrustumCulling);
 
             #region LIGHT'S POINT
             //PoolGame.game.PrepareRenderStates();
@@ -256,7 +269,7 @@ namespace XNA_PoolGame.Screens
                 World.scenario.Draw(gameTime);
             }
             #endregion
-            
+
             #region DISTORTION PARTICLES
             if (World.doDistortion)
             {
@@ -266,14 +279,14 @@ namespace XNA_PoolGame.Screens
                 World.scenario.Draw(gameTime);
             }
             #endregion
-            
+
             PoolGame.device.SetRenderTarget(0, null);
             if (World.motionblurType != MotionBlurType.None || World.dofType != DOFType.None)
             {
                 PoolGame.device.SetRenderTarget(1, null);
                 PoolGame.device.SetRenderTarget(2, null);
             }
-            
+
             #region DISTORTION COMBINE
 
             if (World.doDistortion)
@@ -288,20 +301,65 @@ namespace XNA_PoolGame.Screens
             }
 
             #endregion
-            
+
+            #region SSAO
             if (World.doSSAO)
             {
                 PostProcessManager.ssao.Draw(resultTIU);
                 resultTIU.DontUse();
                 resultTIU = PostProcessManager.ssao.resultTIU;
             }
+            #endregion
 
-            if (World.volumetricLights)
+            //TextureInUse vollightsample;
+            //{
+            //    vollightsample = PostProcessManager.GetIntermediateTexture();
+
+            //    PoolGame.device.SetRenderTarget(0, vollightsample.renderTarget);
+            //    PoolGame.device.Clear(ClearOptions.Target, Color.Black, 1.0f, 0);
+
+            //    foreach (VolumetricLightEntity light in World.scenario.volumetriclights)
+            //    {
+            //        light.Draw(gameTime);
+            //    }
+
+            //    TextureInUse tmp = PostProcessManager.GetIntermediateTexture();
+            //    PostProcessManager.SetBlurEffectParameters(1.0f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurHEffect);
+            //    PostProcessManager.SetBlurEffectParameters(0.0f, 1.0f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurVEffect);
+
+            //    //Gaussian Blur H
+            //    PoolGame.device.SetRenderTarget(0, tmp.renderTarget);
+            //    PostProcessManager.DrawQuad(vollightsample.renderTarget.GetTexture(), PostProcessManager.GBlurHEffect);
+
+            //    //Guassian Blur V
+            //    PoolGame.device.SetRenderTarget(0, vollightsample.renderTarget);
+            //    PostProcessManager.DrawQuad(tmp.renderTarget.GetTexture(), PostProcessManager.GBlurVEffect);
+
+
+            //    tmp.Use();
+            //    PoolGame.device.SetRenderTarget(0, tmp.renderTarget);
+            //    PoolGame.device.Clear(ClearOptions.Target, Color.Black, 1.0f, 0);
+
+            //    PostProcessManager.spriteBatch.Begin(SpriteBlendMode.Additive, SpriteSortMode.Immediate, SaveStateMode.SaveState);
+            //    PostProcessManager.spriteBatch.Draw(resultTIU.renderTarget.GetTexture(), Vector2.Zero, Color.White);
+            //    PostProcessManager.spriteBatch.Draw(vollightsample.renderTarget.GetTexture(), Vector2.Zero, Color.White);
+            //    PostProcessManager.spriteBatch.End();
+
+            //    resultTIU = tmp;
+
+
+            //    useless.Add(tmp);
+            //    PoolGame.device.SetRenderTarget(0, null);
+            //}
+
+            #region LIGHT SHAFTS
+            if (World.doLightshafts)
             {
                 PostProcessManager.scattering.Draw(resultTIU);
                 resultTIU.DontUse();
                 resultTIU = PostProcessManager.scattering.resultTIU;
             }
+            #endregion
 
             #region MOTION BLUR AND DEPTH OF FIELD
 
@@ -361,6 +419,8 @@ namespace XNA_PoolGame.Screens
                 PostProcessManager.spriteBatch.Begin(SpriteBlendMode.None, SpriteSortMode.Immediate, SaveStateMode.SaveState);
                 PostProcessManager.spriteBatch.Draw(resultTIU.renderTarget.GetTexture(), Vector2.Zero, Color.White);
                 PostProcessManager.spriteBatch.End();
+
+
             }
 
             #endregion
@@ -385,7 +445,7 @@ namespace XNA_PoolGame.Screens
                 }
 
                 World.camera.PrevViewProjection = World.camera.ViewProjection;
-                World.camera.PrevView = World.camera.View;
+                World.camera.PreviousView = World.camera.View;
             }
 
             // If the game is transitioning on or off, fade it out to black.

@@ -19,7 +19,7 @@ namespace XNA_PoolGame.Graphics.Shading
     {
         private PresentationParameters pp;
         public TextureInUse diffuseColorTIU, normalTIU, lightTIU, depthTIU, combineTIU, scatterTIU;
-        private SurfaceFormat format = SurfaceFormat.HalfVector4;
+        
         public Texture2D normalTexture;
         private Model sphereModel, model1;
 
@@ -28,6 +28,7 @@ namespace XNA_PoolGame.Graphics.Shading
         /// </summary>
         public DeferredShading()
         {
+            format = SurfaceFormat.HalfVector4;
             halfPixel.X = 0.5f / (float)PoolGame.device.PresentationParameters.BackBufferWidth;
             halfPixel.Y = 0.5f / (float)PoolGame.device.PresentationParameters.BackBufferHeight;
 
@@ -45,6 +46,7 @@ namespace XNA_PoolGame.Graphics.Shading
             SetGBuffer();
             ClearGBuffer();
 
+            World.camera.ItemsDrawn = 0;
             PostProcessManager.ChangeRenderMode(RenderMode.RenderGBuffer);
             SetParameters();
             World.scenario.DrawScene(gameTime);
@@ -112,10 +114,13 @@ namespace XNA_PoolGame.Graphics.Shading
             {
                 DrawDirectionalLight(LightManager.lights[i].Position, LightManager.lights[i].LightColor, "DirectionalPositionTechnique");
             }
-            DrawPointLight(((CribsBasement)World.scenario).smokestack.AditionalLights[0].Position, 
-                ((CribsBasement)World.scenario).smokestack.AditionalLights[0].LightColor, 
-                ((CribsBasement)World.scenario).smokestack.AditionalLights[0].Radius, 5.0f);
 
+            if (World.drawParticles)
+            {
+                DrawPointLight(((CribsBasement)World.scenario).smokestack.AditionalLights[0].Position,
+                    ((CribsBasement)World.scenario).smokestack.AditionalLights[0].LightColor,
+                    ((CribsBasement)World.scenario).smokestack.AditionalLights[0].Radius, 5.0f);
+            }
             //DrawShapelessLight(((CribsBasement)World.scenario).lightScatter.Position, 1, Color.White, 10.0f, model1, ((CribsBasement)World.scenario).lightScatter.LocalWorld);
         }
 
@@ -268,18 +273,22 @@ namespace XNA_PoolGame.Graphics.Shading
         {
             diffuseColorTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, format, pp.MultiSampleType, pp.MultiSampleQuality);
             normalTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, format, pp.MultiSampleType, pp.MultiSampleQuality);
-            scatterTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, format, pp.MultiSampleType, pp.MultiSampleQuality);
+            scatterTIU = null;
+            if (World.doLightshafts) scatterTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, format, pp.MultiSampleType, pp.MultiSampleQuality);
 
             PostProcessManager.depthTIU.Use();
             PoolGame.device.SetRenderTarget(0, diffuseColorTIU.renderTarget);
             PoolGame.device.SetRenderTarget(1, normalTIU.renderTarget);
             PoolGame.device.SetRenderTarget(2, PostProcessManager.depthRT);
-            PoolGame.device.SetRenderTarget(3, scatterTIU.renderTarget);
+            if (World.doLightshafts) PoolGame.device.SetRenderTarget(3, scatterTIU.renderTarget);
         }
 
         private void ClearGBuffer()
         {
-            
+            string basicTechnique = "ClearGBuffer";
+            if (World.doLightshafts) basicTechnique += "LightShafts";
+
+            PostProcessManager.clearGBuffer_DefEffect.CurrentTechnique = PostProcessManager.clearGBuffer_DefEffect.Techniques[basicTechnique];
             PostProcessManager.clearGBuffer_DefEffect.Begin();
             PostProcessManager.clearGBuffer_DefEffect.Techniques[0].Passes[0].Begin();
             PostProcessManager.quad.Draw(PoolGame.device);
@@ -326,7 +335,6 @@ namespace XNA_PoolGame.Graphics.Shading
             diffuseColorTIU.DontUse();
 
             
-
             resultTIU = combineTIU;
         }
 
@@ -335,7 +343,7 @@ namespace XNA_PoolGame.Graphics.Shading
             PoolGame.device.SetRenderTarget(0, null);
             PoolGame.device.SetRenderTarget(1, null);
             PoolGame.device.SetRenderTarget(2, null);
-            PoolGame.device.SetRenderTarget(3, null);
+            if (World.doLightshafts) PoolGame.device.SetRenderTarget(3, null);
         }
 
         /// <summary>
@@ -385,7 +393,7 @@ namespace XNA_PoolGame.Graphics.Shading
             combineTIU.DontUse();
             diffuseColorTIU.DontUse();
             lightTIU.DontUse();
-            scatterTIU.DontUse();
+            if (scatterTIU != null) scatterTIU.DontUse();
         }
     }
 }

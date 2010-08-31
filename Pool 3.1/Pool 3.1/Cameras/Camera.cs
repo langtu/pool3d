@@ -141,7 +141,6 @@ namespace XNA_PoolGame.Cameras
             {
                 if (viewDirty)
                 {
-                    //prevviewMatrix = viewMatrix;
                     UpdateCameraMatrices();
 
                     #if USE_DIRTY_STATES
@@ -154,7 +153,7 @@ namespace XNA_PoolGame.Cameras
             }
             set { }
         }
-        public Matrix PrevView
+        public Matrix PreviousView
         {
             get
             {
@@ -269,6 +268,9 @@ namespace XNA_PoolGame.Cameras
         #endregion
 
         #region Camara Position
+        /// <summary>
+        /// Camera position.
+        /// </summary>
         public Vector3 CameraPosition
         {
             get { return cameraPosition; }
@@ -290,7 +292,7 @@ namespace XNA_PoolGame.Cameras
         }
 
         #endregion
-
+        
         #endregion
 
         #region Constructor

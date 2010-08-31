@@ -10,6 +10,7 @@ float3 CameraPosition;
 
 // SCATTERING
 bool isScatterObject;
+bool bDEM = false;
 
 sampler diffuseSampler = sampler_state
 {
@@ -52,6 +53,12 @@ sampler2D heightSampler = sampler_state
 	MINFILTER = ANISOTROPIC;
 	MIPFILTER = ANISOTROPIC;
 };
+
+texture EnvironmentMap;
+samplerCUBE EnvironmentMapSampler = sampler_state 
+{ 
+    texture = <EnvironmentMap>;     
+};
 ////////////////////////////////////////
 
 struct VertexShaderInput
@@ -93,17 +100,17 @@ VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
     return output;
 }
 
-struct HalfPixelShaderOutput
+struct HalfPS_Output
 {
     half4 Color : COLOR0;
     half4 Normal : COLOR1;
     half4 Depth : COLOR2;
-    half4 Scatter : COLOR3;
 };
 
-HalfPixelShaderOutput HalfPixelShaderFunction(VertexShaderOutput input, uniform bool bparallax)
+
+HalfPS_Output HalfPS(VertexShaderOutput input, uniform bool bparallax)
 {
-    HalfPixelShaderOutput output;
+    HalfPS_Output output;
     
     float2 texCoord;
 	float3 ViewDir = normalize(CameraPosition - input.PositionWS);
@@ -136,6 +143,90 @@ HalfPixelShaderOutput HalfPixelShaderFunction(VertexShaderOutput input, uniform 
     //output the normal, in [0,1] space
     output.Normal.rgb = 0.5f * (normalFromMap + 1.0f);
 
+	//fresnel, dynamic enviornment mappong
+	if (bDEM)
+	{
+		float3 ViewDir = normalize(CameraPosition - input.PositionWS);
+		float3 Reflection = reflect(input.PositionWS - CameraPosition, normalFromMap);
+		// Approximate a Fresnel coefficient for the environment map.
+		// This makes the surface less reflective when you are looking
+		// straight at it, and more reflective when it is viewed edge-on.
+		float3 Fresnel = saturate(1.0f + dot(-ViewDir, normalFromMap));
+	    
+		float3 envmap = texCUBE(EnvironmentMapSampler, Reflection);
+		
+		output.Color = float4(lerp(output.Color, envmap, Fresnel), 1.0f);
+		//output.Color = float4(envmap, 1.0f);
+    
+	}
+	
+    //specular Power
+    output.Normal.a = specularAttributes.a;
+
+    output.Depth = input.Depth.x / input.Depth.y;
+    
+    return output;
+}
+
+struct HalfPSLS_Output
+{
+    half4 Color : COLOR0;
+    half4 Normal : COLOR1;
+    half4 Depth : COLOR2;
+    half4 Scatter : COLOR3;
+};
+HalfPSLS_Output HalfPS_LS(VertexShaderOutput input, uniform bool bparallax)
+{
+    HalfPSLS_Output output;
+    
+    float2 texCoord;
+	float3 ViewDir = normalize(CameraPosition - input.PositionWS);
+	if (bparallax == true)
+    {
+		float3 ViewDirTBN = mul(ViewDir, input.TBN);
+		
+        float height = tex2D(heightSampler, input.TexCoord).r;
+        
+        height = height * parallaxscaleBias.x + parallaxscaleBias.y;
+        texCoord = input.TexCoord + (height * ViewDirTBN.xy);
+    }
+    else
+        texCoord = input.TexCoord;
+        
+    output.Color = tex2D(diffuseSampler, texCoord);
+    
+    float4 specularAttributes = tex2D(specularSampler, texCoord);
+    //specular Intensity
+    output.Color.a = specularAttributes.r;
+    
+    // read the normal from the normal map
+    float3 normalFromMap = tex2D(normalSampler, texCoord);
+    //tranform to [-1,1]
+    normalFromMap = 2.0f * normalFromMap - 1.0f;
+    //transform into world space
+    normalFromMap = mul(normalFromMap, input.TBN);
+    //normalize the result
+    normalFromMap = normalize(normalFromMap);
+    //output the normal, in [0,1] space
+    output.Normal.rgb = 0.5f * (normalFromMap + 1.0f);
+
+	//fresnel, dynamic enviornment mappong
+	if (bDEM)
+	{
+		float3 ViewDir = normalize(CameraPosition - input.PositionWS);
+		float3 Reflection = reflect(input.PositionWS - CameraPosition, normalFromMap);
+		// Approximate a Fresnel coefficient for the environment map.
+		// This makes the surface less reflective when you are looking
+		// straight at it, and more reflective when it is viewed edge-on.
+		float3 Fresnel = saturate(1.0f + dot(-ViewDir, normalFromMap));
+	    
+		//float3 envmap = texCUBE(EnvironmentMapSampler, Reflection);
+		float3 envmap = float3(1,1,1);
+		output.Color = float4(lerp(output.Color, envmap, Fresnel), 1.0f);
+		//output.Color = float4(envmap, 1.0f);
+    
+	}
+
     //specular Power
     output.Normal.a = specularAttributes.a;
 
@@ -156,7 +247,10 @@ struct ColorPixelShaderOutput
 ColorPixelShaderOutput ColorPixelShaderFunction(VertexShaderOutput input)
 {
     ColorPixelShaderOutput output;
+    
     output.Color = tex2D(diffuseSampler, input.TexCoord);
+    
+    
     
     float4 specularAttributes = tex2D(specularSampler, input.TexCoord);
     //specular Intensity
@@ -173,6 +267,23 @@ ColorPixelShaderOutput ColorPixelShaderFunction(VertexShaderOutput input)
     //output the normal, in [0,1] space
     output.Normal.rgb = 0.5f * (normalFromMap + 1.0f);
 
+    //fresnel, dynamic enviornment mappong
+	if (bDEM)
+	{
+		float3 ViewDir = normalize(CameraPosition - input.PositionWS);
+		float3 Reflection = reflect(input.PositionWS - CameraPosition, normalFromMap);
+		// Approximate a Fresnel coefficient for the environment map.
+		// This makes the surface less reflective when you are looking
+		// straight at it, and more reflective when it is viewed edge-on.
+		float3 Fresnel = saturate(1.0f + dot(-ViewDir, normalFromMap));
+	    
+		float3 envmap = texCUBE(EnvironmentMapSampler, Reflection);
+		
+		output.Color = float4(lerp(output.Color, envmap, Fresnel), 1.0f);
+		//output.Color = float4(envmap, 1.0f);
+    
+	}
+	
     //specular Power
     output.Normal.a = specularAttributes.a;
 
@@ -185,7 +296,16 @@ technique RenderHalf4
     pass Pass1
     {
         VertexShader = compile vs_2_0 VertexShaderFunction();
-        PixelShader = compile ps_2_0 HalfPixelShaderFunction(false);
+        PixelShader = compile ps_2_0 HalfPS(false);
+    }
+}
+
+technique RenderHalf4LightShafts
+{
+    pass Pass1
+    {
+        VertexShader = compile vs_2_0 VertexShaderFunction();
+        PixelShader = compile ps_2_0 HalfPS_LS(false);
     }
 }
 
@@ -200,7 +320,7 @@ technique ParallaxMappingRenderHalf4
 		sampler[3] = <heightSampler>;
 		
         VertexShader = compile vs_2_0 VertexShaderFunction();
-        PixelShader = compile ps_2_0 HalfPixelShaderFunction(true);
+        PixelShader = compile ps_2_0 HalfPS(true);
     }
 }
 

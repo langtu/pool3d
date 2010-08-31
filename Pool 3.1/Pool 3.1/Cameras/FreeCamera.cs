@@ -175,6 +175,7 @@ namespace XNA_PoolGame.Cameras
             viewMatrix *= Matrix.CreateRotationY(angle.Y);
             viewMatrix *= Matrix.CreateRotationX(angle.X);
         }
+
         public override void MovePicthYaw(Vector2 movement)
         {
             if (isMoveablePitchAndYaw)
