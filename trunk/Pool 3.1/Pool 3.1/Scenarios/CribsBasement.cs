@@ -47,6 +47,8 @@ namespace XNA_PoolGame.Scenarios
 
         public Vector3[] smokeWoodPositions;
 
+        public VolumetricLightEntity lightScatter;
+
         // Distortion
         public ParticleSystem heatParticles = null;
 
@@ -67,7 +69,7 @@ namespace XNA_PoolGame.Scenarios
             ///////// INSTANCED MODEL ///////
             ballsinstanced = new InstancedEntity(PoolGame.game, "Models\\Balls\\instanced_newball");
             ballsinstanced.DrawOrder = 5;
-            ballsinstanced.delegateupdate = delegate { UpdateInstanceWorldMatrix(); };
+            ballsinstanced.delegateupdate = delegate { UpdateInstancedWorldMatrix(); };
             PoolGame.game.Components.Add(ballsinstanced);
 
             /////////// PARTICLES /////////// 
@@ -374,7 +376,7 @@ namespace XNA_PoolGame.Scenarios
             rooflamps[0] = new Entity(PoolGame.game, "Models\\Cribs\\rooflamp", true);
             rooflamps[0].Position = new Vector3(180.0f, 392.0f, 0.0f);
             
-            PostProcessManager.scattering.Position = rooflamps[0].Position;
+            PostProcessManager.scattering.Position = lights[0].Position + Vector3.Down * 100.0f;
 
             rooflamps[1] = new Entity(PoolGame.game, "Models\\Cribs\\rooflamp", true);
             rooflamps[1].Position = new Vector3(-180.0f, 392.0f, 0.0f);
@@ -385,18 +387,21 @@ namespace XNA_PoolGame.Scenarios
                 lamp.isScatterObject = true;
                 PoolGame.game.Components.Add(lamp);
             }
-            //lightScatter = new AlphaEntity(PoolGame.game, "Models\\cone", "Particles\\alphachannel");
-            //lightScatter.Position = new Vector3(180.0f, 375, 0.0f);
-            //lightScatter.TEXTURE_ADDRESS_MODE = TextureAddressMode.Clamp;
+            lightScatter = new VolumetricLightEntity(PoolGame.game, "Models\\cone", "Models\\god rays alpha");
+            lightScatter.Position = new Vector3(180.0f, 375, 0.0f);
+            lightScatter.TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;
+            lightScatter.LightPosition = new Vector3(0, -45, 0) + lightScatter.Position;
+            lightScatter.LightView = Matrix.CreateLookAt(lightScatter.LightPosition, lightScatter.LightPosition + Vector3.Down, Vector3.Right);
             ////lightScatter.Scale = new Vector3(5.0f);
             //PoolGame.game.Components.Add(lightScatter);
+
             ////////////////////////////////////////////////
             //World.scenario.Objects.Add(ballsinstanced);
             
             World.scenario.Objects.Add(smokestack);
             World.scenario.Objects.Add(smokeStackFireWood);
             World.scenario.Objects.Add(smokeFireWoodKeeper);
-            World.scenario.Objects.Add(smokeFireWoodOut);
+            //World.scenario.Objects.Add(smokeFireWoodOut);
             
 
             for (int i = 0; i < tabourets.Length; ++i)
@@ -433,7 +438,8 @@ namespace XNA_PoolGame.Scenarios
                 World.scenario.Objects.Add(lamp);
 
 
-            //World.scenario.Objects.Add(lightScatter);
+            //World.scenario.objects.Add(lightScatter);
+            //volumetriclights.Add(lightScatter);
 
             base.Initialize();
             LoadContent();
@@ -474,20 +480,24 @@ namespace XNA_PoolGame.Scenarios
             LightManager.Load();
         }
 
-        private void UpdateInstanceWorldMatrix()
+        private void UpdateInstancedWorldMatrix()
         {
-            ballsinstanced.totalinstances = poolBallsOnCueRack.Length;
-            Array.Resize(ref ballsinstanced.transforms, ballsinstanced.totalinstances);
-            for (int i = 0; i < ballsinstanced.totalinstances; ++i)
+            if (ballsinstanced.totalinstances != poolBallsOnCueRack.Length)
             {
-                ballsinstanced.transforms[i] = poolBallsOnCueRack[i].LocalWorld;
+                ballsinstanced.totalinstances = poolBallsOnCueRack.Length;
+                Array.Resize(ref ballsinstanced.transforms, ballsinstanced.totalinstances);
             }
+
+            for (int i = 0; i < ballsinstanced.totalinstances; ++i)
+                ballsinstanced.transforms[i] = poolBallsOnCueRack[i].LocalWorld;
+            
         }
 
         public override void LoadContent()
         {
             base.LoadContent();
         }
+
         public override void UpdateParticles(GameTime gameTime)
         {
             const int fireParticlesPerFrame = 13;

@@ -1,6 +1,6 @@
 ﻿//#define DRAW_BOUNDINGVOLUME
 
-#region Statements
+#region Using Statements
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -87,10 +87,10 @@ namespace XNA_PoolGame.Graphics.Models
         private bool useHeightMapTextures = false;
         private bool useSSAOMapTextures = false;
         private bool useSpecularMapTextures = false;
-        private bool useDEM = false;
+        private EnvironmentType emType = EnvironmentType.None;
         public RenderTargetCube refCubeMap = null;
         public TextureCube environmentMap;
-        public static DepthStencilBuffer depthDEM;
+        public static DepthStencilBuffer DEMdepthstencil;
         #endregion
 
         #region //// FRUSTUM CULLING ////
@@ -200,11 +200,11 @@ namespace XNA_PoolGame.Graphics.Models
             set { useSSAOMapTextures = value; }
         }
 
-        
-        public bool DEM
+
+        public EnvironmentType EMType
         {
-            get { return useDEM; }
-            set { useDEM = value; }
+            get { return emType; }
+            set { emType = value; }
         }
 
         public float Shinennes
@@ -265,7 +265,7 @@ namespace XNA_PoolGame.Graphics.Models
         }
         #endregion
 
-        #region Constructor
+        #region Constructors
 
         public Entity(Game _game, string _modelNameL1)
             : base(_game)
@@ -338,17 +338,18 @@ namespace XNA_PoolGame.Graphics.Models
 
             if (modelNameL2 != null)
             {
-                World.scenario.dems_basicrender.Add(this);
-                if (DEM) World.scenario.dems.Add(this);
+                if (EMType == EnvironmentType.Dynamic)
+                {
+                    World.scenario.dems_basicrender.Add(this);
+                    World.scenario.dems.Add(this);
+                }
                 modelL2 = PoolGame.content.Load<CustomModel>(modelNameL2);
             }
 
-            if (DEM && refCubeMap == null && World.dem == EnvironmentType.Dynamic)
+            if (EMType == EnvironmentType.Dynamic && refCubeMap == null && World.dem == EnvironmentType.Dynamic)
             {
-                PresentationParameters pp = PoolGame.device.PresentationParameters;
-                depthDEM = new DepthStencilBuffer(PoolGame.device, PoolGame.Width, PoolGame.Height, pp.AutoDepthStencilFormat);
-
-                refCubeMap = new RenderTargetCube(PoolGame.device, 64, 1, pp.BackBufferFormat);
+                DEMdepthstencil = new DepthStencilBuffer(PoolGame.device, PoolGame.Width, PoolGame.Height, PoolGame.device.PresentationParameters.AutoDepthStencilFormat);
+                refCubeMap = new RenderTargetCube(PoolGame.device, World.EMSize, 1, PoolGame.device.PresentationParameters.BackBufferFormat);
             }
 
             // Load custom texture
@@ -578,9 +579,9 @@ namespace XNA_PoolGame.Graphics.Models
 
                         frustum = World.camera.FrustumCulling;
                         if (World.shadowTechnique == ShadowTechnnique.VarianceShadowMapping)
-                        DrawModel(false, PostProcessManager.VSMEffect, "PCFSMTechnique", null);
+                            DrawModel(false, PostProcessManager.VSMEffect, "PCFSMTechnique", null);
                         else
-                        DrawModel(false, PostProcessManager.PCFShadowMap, "PCFSMTechnique", null);
+                            DrawModel(false, PostProcessManager.PCFShadowMap, "PCFSMTechnique", null);
                     }
                     break;
                 case RenderMode.ScreenSpaceSoftShadowRender:
@@ -591,7 +592,7 @@ namespace XNA_PoolGame.Graphics.Models
                         if (World.displacementType != DisplacementType.None && (this.customnormalMapAsset != null || useNormalMapTextures))
                             basicTechnique = World.displacementType.ToString() + basicTechnique;
                         
-                        if (DEM && World.dem != EnvironmentType.None) basicTechnique = "EM" + basicTechnique;
+                        if (EMType != EnvironmentType.None && World.dem != EnvironmentType.None) basicTechnique = "EM" + basicTechnique;
                         if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) basicTechnique = "NoMRT" + basicTechnique;
                         
                         DrawModel(true, PostProcessManager.SSSoftShadow_MRT, basicTechnique, delegate { SetParametersSoftShadowMRT(ref LightManager.lights); });
@@ -609,7 +610,7 @@ namespace XNA_PoolGame.Graphics.Models
                         string basicTechnique = "ModelTechnique";
                         if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) basicTechnique = "NoMRT" + basicTechnique;
                         CustomModel tmpmodel = modelL1;
-                        modelL1 = modelL2;
+                        if (modelL2 != null) modelL1 = modelL2;
                         DrawModel(true, PostProcessManager.modelEffect, basicTechnique, delegate { SetParametersModelEffectMRT(ref LightManager.lights); });
                         modelL1 = tmpmodel;
                     }
@@ -631,14 +632,15 @@ namespace XNA_PoolGame.Graphics.Models
                         if (World.displacementType == DisplacementType.ParallaxMapping && (this.customheightMapAsset != null || useHeightMapTextures))
                             basicTechnique = "ParallaxMapping" + basicTechnique;
 
+                        if (World.doLightshafts) basicTechnique += "LightShafts";
                         DrawModel(true, PostProcessManager.renderGBuffer_DefEffect, basicTechnique, delegate { SetParameterRenderGBuffer(); });
                     }
                     break;
 
                 #region Dynamic Environment Mapping
-                case RenderMode.DEM:
+                case RenderMode.DEMPass:
                     {
-                        if (DEM)
+                        if (EMType == EnvironmentType.Dynamic)
                         {
                             PostProcessManager.ChangeRenderMode(RenderMode.DEMBasicRender);
                             Camera oldCamera = World.camera;
@@ -692,7 +694,7 @@ namespace XNA_PoolGame.Graphics.Models
                                 }
 
                                 PoolGame.device.SetRenderTarget(0, refCubeMap, cubeMapFace);
-                                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target | ClearOptions.Stencil, Color.White, 1.0f, 0);
+                                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target, Color.White, 1.0f, 0);
                                 World.emptycamera.ViewProjection = World.emptycamera.View * World.emptycamera.Projection;
                                 World.scenario.DrawDEMBasicRenderObjects(gameTime);
                             }
@@ -701,7 +703,7 @@ namespace XNA_PoolGame.Graphics.Models
                             environmentMap = refCubeMap.GetTexture();
 
                             World.camera = oldCamera;
-                            PostProcessManager.ChangeRenderMode(RenderMode.DEM);
+                            PostProcessManager.ChangeRenderMode(RenderMode.DEMPass);
                             this.Visible = true;
                         }
                     }
@@ -735,11 +737,11 @@ namespace XNA_PoolGame.Graphics.Models
             }
             effect.CurrentTechnique = effect.Techniques[technique];
 
-            bool drawvolume = PostProcessManager.currentRenderMode == RenderMode.ScreenSpaceSoftShadowRender || PostProcessManager.currentRenderMode == RenderMode.BasicRender || PostProcessManager.currentRenderMode == RenderMode.RenderGBuffer;
+            bool drawvolume = PostProcessManager.isFinalSceneRenderMode();
 #if !DRAW_BOUNDINGVOLUME
             drawvolume &= drawboundingvolume;
 #endif
-            //effect.CommitChanges();
+
             int i = 0, j = 0;
 
             if (!UseModelPartBB && !ModelInFrustumVolume()) return;
@@ -851,15 +853,13 @@ namespace XNA_PoolGame.Graphics.Models
 
                 ++i; j++;
             }
-            if (j != 0) ++World.camera.ItemsDrawn;
+            if (j != 0 && PostProcessManager.isFinalSceneRenderMode()) ++World.camera.ItemsDrawn;
 
         }
 
         public void DrawBoundingSphere()
         {
-            if (PostProcessManager.currentRenderMode != RenderMode.ScreenSpaceSoftShadowRender &&
-                PostProcessManager.currentRenderMode != RenderMode.BasicRender) return;
-
+            if (!PostProcessManager.isFinalSceneRenderMode()) return;
 
             PoolGame.device.RenderState.DepthBufferEnable = false;
             PoolGame.device.RenderState.DepthBufferWriteEnable = false;
@@ -875,15 +875,13 @@ namespace XNA_PoolGame.Graphics.Models
                 vectorRenderer.DrawBoundingSphere(boundingSphere);
             }
 
-
             PoolGame.device.RenderState.DepthBufferEnable = true;
             PoolGame.device.RenderState.DepthBufferWriteEnable = true;
         }
 
         public void DrawBoundingBox(BoundingBox box)
         {
-            if (PostProcessManager.currentRenderMode != RenderMode.ScreenSpaceSoftShadowRender &&
-                PostProcessManager.currentRenderMode != RenderMode.BasicRender) return;
+            if (!PostProcessManager.isFinalSceneRenderMode()) return;
 
             VectorRenderComponent vectorRenderer = World.poolTable.vectorRenderer;
 
@@ -892,17 +890,13 @@ namespace XNA_PoolGame.Graphics.Models
             
             {
                 vectorRenderer.SetColor(Color.Red);
-
                 
                 Vector3 _min = Vector3.Transform(box.Min, localWorld);
                 Vector3 _max = Vector3.Transform(box.Max, localWorld);
 
-
                 Vector3 min = Vector3.Min(_min, _max);
                 Vector3 max = Vector3.Max(_min, _max);
 
-                
-                
                 vectorRenderer.DrawBoundingBox(new BoundingBox(min, max));
                                 
             }
@@ -956,7 +950,11 @@ namespace XNA_PoolGame.Graphics.Models
 
         private void SetParameterRenderGBuffer()
         {
+            PostProcessManager.renderGBuffer_DefEffect.Parameters["bDEM"].SetValue(EMType != EnvironmentType.None && World.dem != EnvironmentType.None);
+            if (EMType != EnvironmentType.None && World.dem != EnvironmentType.None)
+                PostProcessManager.renderGBuffer_DefEffect.Parameters["EnvironmentMap"].SetValue(environmentMap);
             
+
             PostProcessManager.renderGBuffer_DefEffect.Parameters["isScatterObject"].SetValue(isScatterObject);
 
             if ((this.customnormalMapAsset != null || useNormalMapTextures) && World.displacementType != DisplacementType.None)
@@ -990,7 +988,7 @@ namespace XNA_PoolGame.Graphics.Models
         {
             PostProcessManager.modelEffect.Parameters["MaxDepth"].SetValue(World.camera.FarPlane);
             PostProcessManager.modelEffect.Parameters["View"].SetValue(World.camera.View);
-            PostProcessManager.modelEffect.Parameters["PrevWorldViewProj"].SetValue(this.prelocalWorld * World.camera.PrevView * World.camera.Projection);
+            PostProcessManager.modelEffect.Parameters["PrevWorldViewProj"].SetValue(this.prelocalWorld * World.camera.PreviousView * World.camera.Projection);
             PostProcessManager.modelEffect.Parameters["totalLights"].SetValue(LightManager.totalLights);
 
             PostProcessManager.modelEffect.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
@@ -1057,7 +1055,7 @@ namespace XNA_PoolGame.Graphics.Models
         {
             PostProcessManager.SSSoftShadow_MRT.Parameters["MaxDepth"].SetValue(World.camera.FarPlane);
             PostProcessManager.SSSoftShadow_MRT.Parameters["View"].SetValue(World.camera.View);
-            PostProcessManager.SSSoftShadow_MRT.Parameters["PrevWorldViewProj"].SetValue(this.prelocalWorld * World.camera.PrevView * World.camera.Projection);
+            PostProcessManager.SSSoftShadow_MRT.Parameters["PrevWorldViewProj"].SetValue(this.prelocalWorld * World.camera.PreviousView * World.camera.Projection);
             PostProcessManager.SSSoftShadow_MRT.Parameters["totalLights"].SetValue(LightManager.totalLights);
 
             PostProcessManager.SSSoftShadow_MRT.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
@@ -1113,7 +1111,7 @@ namespace XNA_PoolGame.Graphics.Models
                     PostProcessManager.SSSoftShadow_MRT.Parameters["SSAOMap"].SetValue(PostProcessManager.whiteTexture);
             }
 
-            if (DEM && World.dem != EnvironmentType.None)
+            if (EMType != EnvironmentType.None && World.dem != EnvironmentType.None)
             {
                 PostProcessManager.SSSoftShadow_MRT.Parameters["EnvironmentMap"].SetValue(environmentMap);
             }

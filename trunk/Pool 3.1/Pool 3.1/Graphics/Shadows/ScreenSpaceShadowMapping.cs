@@ -129,8 +129,8 @@ namespace XNA_PoolGame.Graphics.Shadows
                 PoolGame.device.SetRenderTarget(0, shadowOcclussionTIU.renderTarget);
                 PostProcessManager.DrawQuad(tmp.renderTarget.GetTexture(), PostProcessManager.GBlurVEffect);
 
-                PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurHEffect);
-                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurVEffect);
+                //PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurHEffect);
+                //PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurVEffect);
 
                 tmp.DontUse();
             }
@@ -149,7 +149,8 @@ namespace XNA_PoolGame.Graphics.Shadows
                 PostProcessManager.clearGBufferEffect.CurrentTechnique = PostProcessManager.clearGBufferEffect.Techniques["ClearGBufferTechnnique"];
                 PostProcessManager.DrawQuad(PostProcessManager.whiteTexture, PostProcessManager.clearGBufferEffect);
 
-                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
+                //PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
+                PoolGame.device.Clear(ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
             }
             else
             {
@@ -159,7 +160,8 @@ namespace XNA_PoolGame.Graphics.Shadows
                     PoolGame.device.SetRenderTarget(1, null);
                     PoolGame.device.SetRenderTarget(2, null);
 
-                    PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target | ClearOptions.Stencil, Color.CornflowerBlue, 1.0f, 0);
+                    //PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target | ClearOptions.Stencil, Color.CornflowerBlue, 1.0f, 0);
+                    PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target, Color.CornflowerBlue, 1.0f, 0);
                 }
             }
 
@@ -192,7 +194,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             ///////////////// PASS 3 - DEM //////////////
             if (World.dem == EnvironmentType.Dynamic)
             {
-                PostProcessManager.ChangeRenderMode(RenderMode.DEM);
+                PostProcessManager.ChangeRenderMode(RenderMode.DEMPass);
                 RenderDEM();
 
                 World.scenario.DrawDEMObjects(gameTime);

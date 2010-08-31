@@ -1,17 +1,18 @@
-﻿
-#define USE_DIRTY_STATES
+﻿#define USE_DIRTY_STATES
 
+#region Using Statements
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#endregion
 
 namespace XNA_PoolGame.Graphics.Shadows
 {
     /// <summary>
-    /// Light.
+    /// Light source.
     /// </summary>
     public class Light
     {
@@ -71,7 +72,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             get {
                 if (frustumDirty)
                 {
-                    frustum = new BoundingFrustum(LightViewProjection);
+                    frustum.Matrix = LightViewProjection;
 #if USE_DIRTY_STATES
                     frustumDirty = false;
 #endif
@@ -142,7 +143,7 @@ namespace XNA_PoolGame.Graphics.Shadows
                     //projectionMatrix = Matrix.CreateOrthographic(800.0f, 800.0f, 1.0f, 1800.0f);
 
 #if USE_DIRTY_STATES
-                    projDirty = false; viewProjDirty = true;
+                    projDirty = false; viewProjDirty = true; frustumDirty = true;
 #endif
                 }
                 return projectionMatrix;
@@ -197,9 +198,9 @@ namespace XNA_PoolGame.Graphics.Shadows
             //this.ambientColor = new Vector4(0.1843f, 0.3098f, 0.3098f, 1);
             //this.diffuseColor = new Vector4(0.3921f, 0.5843f, 0.9294f, 1);
 
-            this.diffuseColor = new Vector4(1f, 1f, 1f, 1);
-            this.specularColor = new Vector4(1, 1, 1, 1);
-            this.lightPower = 1f;
+            this.diffuseColor = Vector4.One;
+            this.specularColor = Vector4.One;
+            this.lightPower = 1.0f;
 
             frustum = new BoundingFrustum(LightViewProjection);
         }

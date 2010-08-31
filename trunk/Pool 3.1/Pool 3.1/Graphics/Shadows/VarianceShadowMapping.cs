@@ -1,15 +1,17 @@
-﻿using System;
+﻿#region Using Statments
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TextureInUse = XNA_PoolGame.Graphics.PostProcessManager.TextureInUse;
+#endregion
 
 namespace XNA_PoolGame.Graphics.Shadows
 {
     /// <summary>
-    /// Variance Shadow Mapping
+    /// Variance Shadow Mapping.
     /// </summary>
     public class VarianceShadowMapping : Shadow
     {
@@ -138,7 +140,51 @@ namespace XNA_PoolGame.Graphics.Shadows
 
         public override void Pass4(GameTime gameTime)
         {
-            
+            ///////////////// PASS 4 - SSSM /////////////
+            World.camera.ItemsDrawn = 0;
+            PostProcessManager.ChangeRenderMode(RenderMode.ScreenSpaceSoftShadowRender);
+            RenderSoftShadow();
+
+            World.scenario.DrawScene(gameTime);
+        }
+
+        private void RenderSoftShadow()
+        {
+            //Screen Space Shadow
+            PostProcessManager.mainTIU.Use();
+            PoolGame.device.SetRenderTarget(0, PostProcessManager.mainRT);
+
+            if (World.motionblurType != MotionBlurType.None || World.dofType != DOFType.None)
+            {
+                PostProcessManager.depthTIU.Use(); PostProcessManager.velocityTIU.Use(); PostProcessManager.velocityLastFrameTIU.Use();
+                PoolGame.device.SetRenderTarget(1, PostProcessManager.depthRT);
+                PoolGame.device.SetRenderTarget(2, PostProcessManager.velocityRT);
+
+
+                PostProcessManager.clearGBufferEffect.CurrentTechnique = PostProcessManager.clearGBufferEffect.Techniques["ClearGBufferTechnnique"];
+                PostProcessManager.DrawQuad(PostProcessManager.whiteTexture, PostProcessManager.clearGBufferEffect);
+
+                //PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
+                PoolGame.device.Clear(ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
+            }
+            else
+            {
+                PostProcessManager.depthTIU.DontUse(); PostProcessManager.velocityTIU.DontUse(); PostProcessManager.velocityLastFrameTIU.DontUse();
+
+                {
+                    PoolGame.device.SetRenderTarget(1, null);
+                    PoolGame.device.SetRenderTarget(2, null);
+
+                    //PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target | ClearOptions.Stencil, Color.CornflowerBlue, 1.0f, 0);
+                    PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target, Color.CornflowerBlue, 1.0f, 0);
+                }
+            }
+
+            PoolGame.device.RenderState.DepthBufferEnable = true;
+            PoolGame.device.RenderState.DepthBufferWriteEnable = true;
+            PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
+
+            resultTIU = PostProcessManager.mainTIU;
         }
 
         public override string GetDepthMapTechnique()

@@ -109,8 +109,8 @@ float4 PCFSM_PS(VertexShaderOutput input) : COLOR
 		}
 		wt[j] = result0;
     }
-    if (totalLights == 1) wt[1] = float4(1,1,1,1);
-    return saturate(wt[0]*wt[1]);
+    if (totalLights == 1) return saturate(wt[0]);
+    else return saturate(wt[0]*wt[1]);
 }
 
 ////////////////////////////////////////////////////////////

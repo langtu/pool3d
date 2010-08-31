@@ -61,6 +61,7 @@ namespace XNA_PoolGame.Cameras
                 return frustum;
             }
         }
+
         protected override void Dispose(bool disposing)
         {
             World.emptycamera = null;

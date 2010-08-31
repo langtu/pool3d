@@ -94,8 +94,8 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 1280;
-            graphics.PreferredBackBufferHeight = 720;
+            graphics.PreferredBackBufferWidth = 640;
+            graphics.PreferredBackBufferHeight = 480;
             graphics.SynchronizeWithVerticalRetrace = false;
             graphics.PreferMultiSampling = false;
 
@@ -263,6 +263,11 @@ namespace XNA_PoolGame
                 World.doSSAO = !World.doSSAO;
             }
 
+            if (kb.IsKeyDown(Keys.F12) && lastkb.IsKeyUp(Keys.F12))
+            {
+                World.doLightshafts = !World.doLightshafts;
+            }
+
             if (kb.IsKeyDown(Keys.Y) && lastkb.IsKeyUp(Keys.Y))
             {
                 World.displayShadows = !World.displayShadows;
@@ -356,7 +361,7 @@ namespace XNA_PoolGame
                     }
 
                     World.camera.PrevViewProjection = World.camera.ViewProjection;
-                    World.camera.PrevView = World.camera.View;
+                    World.camera.PreviousView = World.camera.View;
                 }
                 World.motionblurType = (MotionBlurType)(((int)World.motionblurType + 1) % 10);
                 World.scenario.SetParticleEffectTechnique();

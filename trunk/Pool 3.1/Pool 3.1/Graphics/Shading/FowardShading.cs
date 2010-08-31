@@ -16,6 +16,7 @@ namespace XNA_PoolGame.Graphics.Shading
         /// </summary>
         public FowardShading()
         {
+            format = SurfaceFormat.Color;
             pp = PoolGame.device.PresentationParameters;
             stencilBuffer = new DepthStencilBuffer(PoolGame.device, PoolGame.Width, PoolGame.Height, PoolGame.device.DepthStencilBuffer.Format, pp.MultiSampleType, pp.MultiSampleQuality);
         }
@@ -32,7 +33,8 @@ namespace XNA_PoolGame.Graphics.Shading
                 DepthStencilBuffer oldbuffer = PoolGame.device.DepthStencilBuffer;
 
                 PoolGame.device.DepthStencilBuffer = stencilBuffer;
-                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.CornflowerBlue, 1.0f, 0);
+                //PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.CornflowerBlue, 1.0f, 0);
+                PoolGame.device.Clear(ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
 
 
                 PoolGame.device.SetRenderTarget(0, PostProcessManager.ssao.normalTIU.renderTarget);

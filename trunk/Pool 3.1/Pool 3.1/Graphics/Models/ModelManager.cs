@@ -145,7 +145,7 @@ namespace XNA_PoolGame.Graphics
             }
             public static bool operator !=(ModelBoundingBoxTexture p1, ModelBoundingBoxTexture p2)
             {
-                return !(p1 != p2);
+                return !(p1 == p2);
             }
 
             public static bool operator ==(ModelBoundingBoxTexture p1, ModelBoundingBoxTexture p2)

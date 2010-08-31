@@ -72,6 +72,7 @@ namespace XNA_PoolGame.Match
         {
             ballsPottedThisRound = new List<Ball>();
         }
+
         public void EndRound()
         {
             ballHitFirstThisRound = null;

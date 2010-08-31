@@ -653,6 +653,16 @@
     <None Include="Effects\pp_Common.fxh">
       <Name>pp_Common</Name>
     </None>
+    <Compile Include="Models\god rays alpha.tga">
+      <Name>god rays alpha</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Effects\Shafts.fx">
+      <Name>Shafts</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
     <Compile Include="Effects\Scatter.fx">
       <Name>Scatter</Name>
       <Importer>EffectImporter</Importer>
@@ -1566,6 +1576,46 @@
   <ItemGroup>
     <Compile Include="Particles\fire2.png">
       <Name>fire2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\noise1.jpg">
+      <Name>noise1</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="Textures\noise2.jpg">
+      <Name>noise2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\god rays.jpg">
+      <Name>god rays</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\860-olive-9.jpg">
+      <Name>860-olive-9</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\PlasterWhite0074_S.jpg">
+      <Name>PlasterWhite0074_S</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\stick.bmp">
+      <Name>stick</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

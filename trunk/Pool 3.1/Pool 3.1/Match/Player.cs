@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region Using Statements
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,7 @@ using XNA_PoolGame.Sticks;
 using XNA_PoolGame.PoolTables;
 using XNA_PoolGame.GameControllers;
 using XNA_PoolGame.Match;
+#endregion
 
 namespace XNA_PoolGame
 {

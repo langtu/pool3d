@@ -84,6 +84,12 @@ namespace XNA_PoolGame.Graphics.Models
             List<string> list = new List<string>();
             foreach (CustomModelPart modelPart in modelParts)
             {
+                if (modelPart.TextureFileName == null)
+                {
+                    list.Add(null);
+                    continue;
+                }
+
                 string folder = "";//Path.GetFileName(Path.GetDirectoryName(str));
                 string st = Path.GetDirectoryName(modelPart.TextureFileName);
                 while (!Path.GetFileName(st).Equals("Content"))

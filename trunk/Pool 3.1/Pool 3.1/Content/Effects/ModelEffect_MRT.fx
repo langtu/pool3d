@@ -30,6 +30,32 @@ sampler ColorSampler = sampler_state
     MipFilter = Linear;
 };
 
+texture EnvironmentMap;
+samplerCUBE EnvironmentMapSampler = sampler_state 
+{ 
+    texture = <EnvironmentMap>;     
+};
+
+texture NormalMap;
+sampler2D normalSampler = sampler_state
+{
+	Texture = <NormalMap>;
+	
+	MAGFILTER = Linear;
+	MINFILTER = Linear;
+	MIPFILTER = Linear;
+};
+
+texture HeightMap;
+sampler2D heightSampler = sampler_state
+{
+	Texture = <HeightMap>;
+	
+	MAGFILTER = Linear;
+	MINFILTER = Linear;
+	MIPFILTER = Linear;
+};
+
 struct VS_ModelInput
 {
     float4 Position : POSITION;
