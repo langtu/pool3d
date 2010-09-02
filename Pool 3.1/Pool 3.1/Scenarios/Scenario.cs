@@ -112,11 +112,13 @@ namespace XNA_PoolGame.Scenarios
 
         public virtual void Draw(GameTime gameTime) 
         {
-            if (PostProcessManager.currentRenderMode == RenderMode.ParticleSystem)
+
+            if (PostProcessManager.currentRenderMode == RenderMode.ParticleSystem && World.drawParticles)
             {
                 foreach (ParticleSystem pa in particles)
                     pa.Draw(gameTime);
-            } else if (PostProcessManager.currentRenderMode == RenderMode.DistortionParticleSystem)
+            }
+            else if (PostProcessManager.currentRenderMode == RenderMode.DistortionParticleSystem && World.doDistortion)
             {
                 foreach (ParticleSystem pa in distortionparticles)
                     pa.Draw(gameTime);

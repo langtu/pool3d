@@ -75,9 +75,13 @@ namespace XNA_PoolGame.Graphics
                 effect.Parameters["InvertViewProjection"].SetValue(World.camera.InvViewProjection);
             }
             else
+            {
                 effect.Parameters["PositionMap"].SetValue(viewTIU.renderTarget.GetTexture());
+                effect.Parameters["InvertViewProjection"].SetValue(World.camera.InvViewProjection);
+            }
 
-            effect.Parameters["calculatePosition"].SetValue(World.shadingTech == ShadingTechnnique.Deferred);
+            //effect.Parameters["calculatePosition"].SetValue(World.shadingTech == ShadingTechnnique.Deferred);
+            effect.Parameters["calculatePosition"].SetValue(true);
 
             effect.CommitChanges();
 

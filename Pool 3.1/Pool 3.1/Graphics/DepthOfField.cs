@@ -11,6 +11,9 @@ using TextureInUse = XNA_PoolGame.Graphics.PostProcessManager.TextureInUse;
 
 namespace XNA_PoolGame.Graphics
 {
+    /// <summary>
+    /// DOF
+    /// </summary>
     public class DepthOfField
     {
         public float focalDistance, focalWidth;

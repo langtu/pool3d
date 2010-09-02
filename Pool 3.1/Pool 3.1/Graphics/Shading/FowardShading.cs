@@ -27,8 +27,9 @@ namespace XNA_PoolGame.Graphics.Shading
 
             if (World.doSSAO || World.doNormalPositionPass)
             {
+                PostProcessManager.depthTIU.Use();
                 PostProcessManager.ssao.normalTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, SurfaceFormat.HalfVector4, PoolGame.device.PresentationParameters.MultiSampleType, PoolGame.device.PresentationParameters.MultiSampleQuality);
-                PostProcessManager.ssao.viewTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, SurfaceFormat.HalfVector4, PoolGame.device.PresentationParameters.MultiSampleType, PoolGame.device.PresentationParameters.MultiSampleQuality);
+                PostProcessManager.ssao.viewTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, SurfaceFormat.Single, PoolGame.device.PresentationParameters.MultiSampleType, PoolGame.device.PresentationParameters.MultiSampleQuality);
 
                 DepthStencilBuffer oldbuffer = PoolGame.device.DepthStencilBuffer;
 
@@ -87,7 +88,7 @@ namespace XNA_PoolGame.Graphics.Shading
                 DepthStencilBuffer oldbuffer = PoolGame.device.DepthStencilBuffer;
 
                 PoolGame.device.DepthStencilBuffer = stencilBuffer;
-                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.CornflowerBlue, 1.0f, 0);
+                PoolGame.device.Clear(ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
 
 
                 PoolGame.device.SetRenderTarget(0, PostProcessManager.ssao.normalTIU.renderTarget);

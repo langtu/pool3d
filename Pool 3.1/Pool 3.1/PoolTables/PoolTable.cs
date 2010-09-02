@@ -111,8 +111,10 @@ namespace XNA_PoolGame.PoolTables
         {
             //this.DEM = true;
             loaded = false;
- 
 
+
+            /////
+            this.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
         }
         #endregion
 
@@ -140,9 +142,10 @@ namespace XNA_PoolGame.PoolTables
             this.SpecularColor = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
             
 
-            cueBall = new Ball(PoolGame.game, 0, "Models\\Balls\\newball", "Textures\\Balls\\ball 3", this, World.ballRadius);
+            cueBall = new Ball(PoolGame.game, 0, "Models\\Balls\\newball", "Textures\\Balls\\white", this, World.ballRadius);
             cueBall.EMType = EnvironmentType.Static;
             cueBall.DrawOrder = 2;
+
             if (!World.Debug)
                 cueBall.SetCenter(cueBallStartPosition);
             else
@@ -161,6 +164,7 @@ namespace XNA_PoolGame.PoolTables
             {
                 poolBalls[i].EMType = EnvironmentType.Static;
                 poolBalls[i].UseThread = World.UseThreads;
+
                 PoolGame.game.Components.Add(poolBalls[i]);
                 World.scenario.Objects.Add(poolBalls[i]);
             }
@@ -172,6 +176,15 @@ namespace XNA_PoolGame.PoolTables
             loaded = true;
         }
 
+        public void LagForBreak()
+        {
+            for (int i = 0; i < TotalBalls; ++i)
+            {
+                poolBalls[i].Enabled = false;
+                poolBalls[i].Visible = false;
+            }
+            Ball ballforlag1 = new Ball(PoolGame.game, 0, "Models\\Balls\\newball", "Textures\\Balls\\white", this, World.ballRadius);
+        }
         public void Reset()
         {
             loaded = false;
