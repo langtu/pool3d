@@ -95,12 +95,27 @@ namespace XNA_PoolGame.Helpers
         }
 
         /// <summary>
-        /// Removes a entire blocks of values given a key
+        /// Removes a entire blocks of values given a key.
         /// </summary>
-        /// <param name="key">The key for removing</param>
+        /// <param name="key">The key to remove</param>
         public void Remove(TKey key)
         {
             multimap.Remove(key);
+            --count;
+        }
+
+        /// <summary>
+        /// Removes a value.
+        /// </summary>
+        /// <param name="value">The value to remove</param>
+        public void Remove(TValue value)
+        {
+            List<TValue> list;
+            if (multimap.TryGetValue(((IKey<TKey>)value).Key, out list))
+            {
+                list.Remove(value);
+                if (list.Count == 0) multimap.Remove(((IKey<TKey>)value).Key);
+            }
             --count;
         }
 

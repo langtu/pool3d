@@ -13,6 +13,9 @@ using XNA_PoolGame.Helpers;
 
 namespace XNA_PoolGame.Scenarios
 {
+    /// <summary>
+    /// Cribs basement.
+    /// </summary>
     public class CribsBasement : Scenario
     {
         public Entity floor = null;
@@ -286,7 +289,7 @@ namespace XNA_PoolGame.Scenarios
             /////////////// ROOF
             roof = new Entity(PoolGame.game, "Models\\Cribs\\roof", true);
 
-            roof.Position = new Vector3(0, 700, 0);
+            roof.Position = new Vector3(20, 700, 0);
             roof.Scale = new Vector3(2.0f);
             roof.TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;
             roof.SpecularColor = Vector4.Zero;

@@ -18,6 +18,7 @@ using XNA_PoolGame.Graphics.Models;
 using XNA_PoolGame.Graphics.Shadows;
 using TextureInUse = XNA_PoolGame.Graphics.PostProcessManager.TextureInUse;
 using XNA_PoolGame.Graphics.Shading;
+using XNA_PoolGame.Match;
 #endregion
 
 namespace XNA_PoolGame.Screens
@@ -40,8 +41,9 @@ namespace XNA_PoolGame.Screens
         public override void LoadContent()
         {
             // CAMERA
-            World.camera = new ChaseCamera(PoolGame.game);
-            World.camera.CameraPosition = Vector3.Zero;
+            //World.camera = new ChaseCamera(PoolGame.game);
+            World.camera = new FreeCamera(PoolGame.game);
+            World.camera.CameraPosition = new Vector3(0, 600, 0);
             World.camera.FarPlane = 5500.0f;
             if (World.emptycamera == null) World.emptycamera = new EmptyCamera(PoolGame.game);
 
@@ -71,7 +73,7 @@ namespace XNA_PoolGame.Screens
 
             }
 
-            // SCENARIO
+            // Scenario
             switch (World.scenarioType)
             {
                 case ScenarioType.Cribs:
@@ -82,10 +84,11 @@ namespace XNA_PoolGame.Screens
                     break;
             }
 
-            // MAIN POOLTABLE
+            // Main Pooltable
             World.poolTable = new Classic(PoolGame.game);
             World.poolTable.PreRotation = Matrix.CreateRotationY(MathHelper.Pi);
             World.poolTable.DrawOrder = 1;
+            World.poolTable.CreatePoolBalls();
             
             //World.poolTable.UseThread = true;
 
@@ -95,9 +98,10 @@ namespace XNA_PoolGame.Screens
             LightManager.sphereModel.LoadContent();
 
             /////// PLAYERS
-            World.playerCount = 1;
+            World.playerCount = 2;
             World.playerInTurn = 0;
-            World.players[0] = new Player(PoolGame.game, (int)PlayerIndex.One, new KeyBoard(PlayerIndex.One), TeamNumber.One, World.poolTable);
+            World.players[0] = new Player(PoolGame.game, (int)PlayerIndex.Two, new KeyBoard(PlayerIndex.Two), TeamNumber.One, World.poolTable);
+            World.players[1] = new Player(PoolGame.game, (int)PlayerIndex.One, new XboxPad(PlayerIndex.One), TeamNumber.Two, World.poolTable);
 
             PoolGame.game.Components.Add(World.camera);
             PoolGame.game.Components.Add(World.scenario);
@@ -112,6 +116,9 @@ namespace XNA_PoolGame.Screens
                     PoolGame.game.Components.Add(World.players[i]);
             }
 
+            World.referee = new Referee(PoolGame.game, World.poolTable, World.players[0], World.players[1]);
+            World.poolTable.referee = World.referee;
+            PoolGame.game.Components.Add(World.referee);
 
             // A real game would probably have more content than this sample, so
             // it would take longer to load. We simulate that by delaying for a
@@ -132,6 +139,8 @@ namespace XNA_PoolGame.Screens
             ModelManager.AbortAllThreads();
             World.playerInTurn = -1;
             World.playerCount = 0;
+
+            World.referee.Dispose();
 
             for (int i = 0; i < 4; i++)
             {

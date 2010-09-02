@@ -94,13 +94,12 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 1280;
-            graphics.PreferredBackBufferHeight = 720;
+            graphics.PreferredBackBufferWidth = 640;
+            graphics.PreferredBackBufferHeight = 480;
             graphics.SynchronizeWithVerticalRetrace = false;
             graphics.PreferMultiSampling = false;
 
             //graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
-            //graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
             graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
             graphics.IsFullScreen = false;
 
@@ -111,12 +110,6 @@ namespace XNA_PoolGame
             graphics.PreparingDeviceSettings +=
                new EventHandler<PreparingDeviceSettingsEventArgs>(graphics_PreparingDeviceSettings);
 
-            //graphics.MinimumPixelShaderProfile = ShaderProfile.PS_2_0;
-
-            //graphics.MinimumPixelShaderProfile = ShaderProfile.PS_3_0;
-            //graphics.MinimumVertexShaderProfile = ShaderProfile.VS_3_0;
-
-            //graphics.PreferMultiSampling = true;
             graphics.ApplyChanges();
             //GraphicsDevice.Reset();
 
@@ -443,7 +436,7 @@ namespace XNA_PoolGame
 
             ////////////////////////////////////////// LIGHTS
 
-            if (LightManager.sphereModel != null)
+            if (LightManager.sphereModel != null && false)
             {
                 
                 if (kb.IsKeyDown(Keys.C) && lastkb.IsKeyUp(Keys.C)) currentlight = (currentlight + 1) % LightManager.totalLights;

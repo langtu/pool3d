@@ -24,7 +24,7 @@ namespace XNA_PoolGame.Graphics.Shading
         private Model sphereModel, model1;
 
         /// <summary>
-        /// Creates a new instance of the class.
+        /// Creates a new instance of DeferredShading class.
         /// </summary>
         public DeferredShading()
         {

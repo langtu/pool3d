@@ -93,6 +93,13 @@ namespace XNA_PoolGame
         PauseMenuMode
 
     }
+    public enum MatchPhase
+    {
+        None,
+        LaggingShot,
+        Playing
+    }
+
 
     public enum RenderMode
     {

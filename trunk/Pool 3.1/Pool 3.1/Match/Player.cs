@@ -36,6 +36,9 @@ namespace XNA_PoolGame
         public List<Ball> ballsPotted = new List<Ball>();
         public TeamNumber teamNumber = TeamNumber.One;
 
+        public bool waitingforOther;
+        public bool aimLagShot;
+
         #region Constructors
         public Player(Game game, int playerIndex, GameController controller)
             : base(game)
@@ -69,7 +72,7 @@ namespace XNA_PoolGame
         /// </summary>
         public void CreateStick()
         {
-            if (stick == null) stick = new Stick(PoolGame.game, table.cueBall, playerIndex);
+            if (stick == null) stick = new Stick(PoolGame.game, null, playerIndex);
             stick.DrawOrder = 3;
             stick.PreRotation = Matrix.CreateRotationZ(MathHelper.ToRadians(90.0f));
             stick.AngleY = 0.0f;
@@ -83,11 +86,10 @@ namespace XNA_PoolGame
         public override void Initialize()
         {
             CreateStick();
-
+            waitingforOther = false;
+            aimLagShot = true;
             this.UpdateOrder = 5; //this.DrawOrder = 5;
             base.Initialize();
-
-            
 
         }
 
@@ -96,86 +98,123 @@ namespace XNA_PoolGame
         {
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (World.playerInTurn == -1 || playerIndex != World.playerInTurn) { base.Update(gameTime); return; }
+            if (World.playerInTurn == -1 || (playerIndex != World.playerInTurn && table.phase == MatchPhase.Playing)) { base.Update(gameTime); return; }
             
             GameController prevcontroller = (GameController)controller.Clone();
             controller.Update();
 
             if (controller.isYPressed && !prevcontroller.isYPressed) table.Reset();
 
-            if (!table.ballsMoving)
+            switch (table.phase)
             {
-                if (controller.RightStick != Vector2.Zero) 
-                    World.camera.MovePicthYaw(controller.RightStick * 200.0f * dt);
-
-                if (!stick.charging)
-                {
-                    if (!stick.Visible) stick.Visible = true;
-
-                    if (controller.isXPressed && table.roundInfo.cueBallInHand)
+                case MatchPhase.LaggingShot:
+                    if (!stick.charging && aimLagShot)
                     {
-                        
-                        if (controller.LeftStick.Y != 0.0f)
-                        {
-                            Vector3 newPosition = stick.ballTarget.Position + controller.LeftStick.Y * stick.Direction;
-                            //newPosition = Vector3.Max(table.headDelimiters[0], Vector3.Min(newPosition, table.headDelimiters[1]));
-                            
-                            stick.ballTarget.Position = newPosition;
-                        }
-                        if (controller.LeftStick.X != 0.0f)
-                        {
+                        if (prevcontroller.LeftStick.X > 0.0f && controller.LeftStick.X > 0.0f) repeater = MathHelper.Clamp(repeater + 0.04f, 1.0f, 6.0f);
+                        else if (prevcontroller.LeftStick.X < 0.0f && controller.LeftStick.X < 0.0f) repeater = MathHelper.Clamp(repeater + 0.04f, 1.0f, 6.0f);
 
-                            Vector3 newPosition = stick.ballTarget.Position - controller.LeftStick.X * stick.AxisOfRotation;
-                            //newPosition = Vector3.Max(table.headDelimiters[0], Vector3.Min(newPosition, table.headDelimiters[1]));
+                        if (prevcontroller.LeftStick.X != 0.0f && controller.LeftStick.X == 0.0f) repeater = 1.0f;
 
-                            stick.ballTarget.Position = newPosition;
-                        }
+
+                        stick.AngleY -= controller.LeftStick.X * repeater * dt * 10.0f;
+
+                        if (!prevcontroller.isAPressed && controller.isAPressed) stick.charging = true;
                     }
                     else
                     {
-                        if (controller.isLeftShoulderPressed)
+                        if (stick.Power >= stick.MAX_POWER || prevcontroller.isAPressed && !controller.isAPressed)
                         {
-                            if (controller.LeftStick.X > 0.2f) stick.AngleY = 90.0f;
-                            else if (controller.LeftStick.X < -0.2f) stick.AngleY = 270.0f;
-                            if (controller.LeftStick.Y > 0.2f) stick.AngleY = 0.0f;
-                            else if (controller.LeftStick.Y < -0.2f) stick.AngleY = 180.0f;
+                            if (stick.Power > 0)
+                            {
+                                //    stick.Visible = false;
+                                //    TakeShot();
+                                
+                                aimLagShot = false;
+                                waitingforOther = true;
+                            }
+                            stick.charging = false;
+                        }
+                        else if (prevcontroller.isAPressed && controller.isAPressed)
+                            stick.Power = MathHelper.Clamp(stick.Power + (controller.RightTrigger - controller.LeftStick.Y * 10.0f) * dt * 40.0f, 0.0f, stick.MAX_POWER);
+
+                    }
+                    break;
+
+                case MatchPhase.Playing:
+
+                if (!table.ballsMoving)
+                {
+                    if (controller.RightStick != Vector2.Zero) 
+                        World.camera.MovePicthYaw(controller.RightStick * 200.0f * dt);
+
+                    if (!stick.charging)
+                    {
+                        if (!stick.Visible) stick.Visible = true;
+
+                        if (controller.isXPressed && table.roundInfo.cueBallInHand)
+                        {
+                            
+                            if (controller.LeftStick.Y != 0.0f)
+                            {
+                                Vector3 newPosition = stick.ballTarget.Position + controller.LeftStick.Y * stick.Direction;
+                                //newPosition = Vector3.Max(table.headDelimiters[0], Vector3.Min(newPosition, table.headDelimiters[1]));
+                                
+                                stick.ballTarget.Position = newPosition;
+                            }
+                            if (controller.LeftStick.X != 0.0f)
+                            {
+
+                                Vector3 newPosition = stick.ballTarget.Position - controller.LeftStick.X * stick.AxisOfRotation;
+                                //newPosition = Vector3.Max(table.headDelimiters[0], Vector3.Min(newPosition, table.headDelimiters[1]));
+
+                                stick.ballTarget.Position = newPosition;
+                            }
                         }
                         else
                         {
-                            if (prevcontroller.LeftStick.X > 0.0f && controller.LeftStick.X > 0.0f) repeater = MathHelper.Clamp(repeater + 0.04f, 1.0f, 6.0f);
-                            else if (prevcontroller.LeftStick.X < 0.0f && controller.LeftStick.X < 0.0f) repeater = MathHelper.Clamp(repeater + 0.04f, 1.0f, 6.0f);
+                            if (controller.isLeftShoulderPressed)
+                            {
+                                if (controller.LeftStick.X > 0.2f) stick.AngleY = 90.0f;
+                                else if (controller.LeftStick.X < -0.2f) stick.AngleY = 270.0f;
+                                if (controller.LeftStick.Y > 0.2f) stick.AngleY = 0.0f;
+                                else if (controller.LeftStick.Y < -0.2f) stick.AngleY = 180.0f;
+                            }
+                            else
+                            {
+                                if (prevcontroller.LeftStick.X > 0.0f && controller.LeftStick.X > 0.0f) repeater = MathHelper.Clamp(repeater + 0.04f, 1.0f, 6.0f);
+                                else if (prevcontroller.LeftStick.X < 0.0f && controller.LeftStick.X < 0.0f) repeater = MathHelper.Clamp(repeater + 0.04f, 1.0f, 6.0f);
 
-                            if (prevcontroller.LeftStick.X != 0.0f && controller.LeftStick.X == 0.0f) repeater = 1.0f;
+                                if (prevcontroller.LeftStick.X != 0.0f && controller.LeftStick.X == 0.0f) repeater = 1.0f;
 
 
-                            stick.AngleY -= controller.LeftStick.X * repeater * dt * 10.0f;
+                                stick.AngleY -= controller.LeftStick.X * repeater * dt * 10.0f;
+                            }
                         }
+
+                        if (!prevcontroller.isAPressed && controller.isAPressed) stick.charging = true;
                     }
-
-                    if (!prevcontroller.isAPressed && controller.isAPressed) stick.charging = true;
-                }
-                else
-                {
-                    
-
-                    if (prevcontroller.isAPressed && !controller.isAPressed && controller.RightTrigger > 0.0f)
+                    else
                     {
-                        //CancelShot();
-                    }
-
-                    if (stick.Power >= stick.MAX_POWER || prevcontroller.isAPressed && !controller.isAPressed)
-                    {
-                        if (stick.Power > 0)
+                        if (prevcontroller.isAPressed && !controller.isAPressed && controller.RightTrigger > 0.0f)
                         {
-                            stick.Visible = false;
-                            TakeShot();
+                            //CancelShot();
                         }
-                        stick.charging = false;
-                    }
-                    else if (prevcontroller.isAPressed && controller.isAPressed)
-                        stick.Power = MathHelper.Clamp(stick.Power + (controller.RightTrigger - controller.LeftStick.Y * 10.0f) * dt * 40.0f, 0.0f, stick.MAX_POWER);
 
+                        if (stick.Power >= stick.MAX_POWER || prevcontroller.isAPressed && !controller.isAPressed)
+                        {
+                            if (stick.Power > 0)
+                            {
+                                TakeShot();
+                            }
+                            stick.charging = false;
+                        }
+                        else if (prevcontroller.isAPressed && controller.isAPressed)
+                            stick.Power = MathHelper.Clamp(stick.Power + (controller.RightTrigger - controller.LeftStick.Y * 10.0f) * dt * 40.0f, 0.0f, stick.MAX_POWER);
+
+                    }
                 }
+                break;
+
             }
            
             
@@ -195,7 +234,7 @@ namespace XNA_PoolGame
         {
             if (stick.Power >= stick.MIN_POWER)
             {
-                
+                stick.Visible = false;
                 table.roundInfo.ballsState = new List<PoolBallState>();
 
                 for (int i = 0; i < table.TotalBalls; i++)
