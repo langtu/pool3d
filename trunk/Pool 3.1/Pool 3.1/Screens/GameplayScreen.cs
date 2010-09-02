@@ -86,7 +86,7 @@ namespace XNA_PoolGame.Screens
             World.poolTable = new Classic(PoolGame.game);
             World.poolTable.PreRotation = Matrix.CreateRotationY(MathHelper.Pi);
             World.poolTable.DrawOrder = 1;
-
+            
             //World.poolTable.UseThread = true;
 
             LightManager.sphereModel = new Entity(PoolGame.game, "Models\\Balls\\newball", VolumeType.BoundingSpheres);

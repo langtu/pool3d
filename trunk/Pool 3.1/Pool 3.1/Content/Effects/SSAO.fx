@@ -62,6 +62,7 @@ struct VertexShaderOutput
 float3 getPosition(in float2 uv)
 {
 	float3 position;
+	float4 w;
 	if (calculatePosition)
 	{
 		float depthVal = tex2D(g_buffer_pos, uv).r;
@@ -76,7 +77,12 @@ float3 getPosition(in float2 uv)
 		pos4 /= pos4.w;
 		position = pos4.xyz;
     }
-	else position = tex2D(g_buffer_pos,uv).xyz;
+	else 
+	{
+		w = tex2D(g_buffer_pos,uv);
+		position = w.xyz;
+		position /= w.w;
+	}
 	
 	return position;
 }

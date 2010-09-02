@@ -39,7 +39,8 @@ struct VS_SSAO_Output
     float4 Position			: POSITION;
     float2 TexCoord			: TEXCOORD0;
     float4 WorldPosition	: TEXCOORD1;
-    float4 PositionViewS	: TEXCOORD2;
+    //float4 PositionViewS	: TEXCOORD2;
+    float2 PositionViewS	: TEXCOORD2;
     float3x3 TBN				: TEXCOORD3;
     
 };
@@ -57,7 +58,9 @@ VS_SSAO_Output VS_SSAOPrePass(VS_Input input)
 	output.WorldPosition = mul(input.Position, World);
     output.Position = mul(output.WorldPosition, ViewProj);
 	//
-	output.PositionViewS = mul(output.WorldPosition, View);
+	//output.PositionViewS = mul(output.WorldPosition, View);
+	output.PositionViewS.x = output.Position.z;
+	output.PositionViewS.y = output.Position.w;
 	
 	//
 	output.TexCoord = input.TexCoord;
@@ -100,7 +103,8 @@ PS_SSAO_Output PS_SSAOPrePass(VS_SSAO_Output input, uniform bool bnormalmapping,
 		
 	
     output.Normal = float4((Normal + 1.0f) * 0.5f , 1.0f);
-    output.ViewS = input.PositionViewS;
+    //output.ViewS = input.PositionViewS;
+    output.ViewS = input.PositionViewS.x / input.PositionViewS.y;
 	
 	return output;
 }

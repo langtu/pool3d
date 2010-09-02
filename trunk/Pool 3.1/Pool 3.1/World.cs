@@ -52,8 +52,11 @@ namespace XNA_PoolGame
         // SHADOWS SETTINGS
         public static bool displayShadows = true;
         public static bool displayShadowsTextures = false;
-        public static int shadowMapSize = 1024 / 2;
+        public static int shadowMapSize = 1024 * 2;
         public static ShadowTechnnique shadowTechnique = ShadowTechnnique.VarianceShadowMapping;
+        //
+        public static ShadingTechnnique shadingTech = ShadingTechnnique.Foward;
+
         // NORMAL MAPPING
         public static DisplacementType displacementType = DisplacementType.None;
         public static Vector2 scaleBias = new Vector2(0.04f, -0.03f);
@@ -74,7 +77,7 @@ namespace XNA_PoolGame
 
         // DISTORTION
         public static bool doDistortion = false;
-        public static bool drawParticles = false;
+        public static bool drawParticles = true;
 
         // INSTANCING MODELS
         public static InstancingTechnique instancingTech = InstancingTechnique.HardwareInstancing;
@@ -82,8 +85,6 @@ namespace XNA_PoolGame
         //
         public static EnvironmentType dem = EnvironmentType.None;
         public static int EMSize = 64;
-        //
-        public static ShadingTechnnique shadingTech = ShadingTechnnique.Foward;
 
         public static bool doLightshafts = false;
     }

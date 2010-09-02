@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using XNA_PoolGame.Helpers;
 using XNA_PoolGame.Graphics;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace XNA_PoolGame.PoolTables
 {
@@ -46,13 +47,15 @@ namespace XNA_PoolGame.PoolTables
             FRICTION_SURFACE = 0.99f;
 
             headDelimiters = new Vector3[2];
-            //headDelimiters[0] = new Vector3(MIN_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, MIN_HEAD_Z);
-            //headDelimiters[1] = new Vector3(MAX_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, MAX_HEAD_Z);
-            headDelimiters[0] = new Vector3(MIN_X + World.ballRadius + float.Epsilon, SURFACE_POSITION_Y + World.ballRadius, MIN_Z + World.ballRadius + float.Epsilon);
-            headDelimiters[1] = new Vector3(MAX_X - World.ballRadius - float.Epsilon, SURFACE_POSITION_Y + World.ballRadius, MAX_Z - World.ballRadius - float.Epsilon);
+            headDelimiters[0] = new Vector3(MIN_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, MIN_HEAD_Z);
+            headDelimiters[1] = new Vector3(MAX_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, MAX_HEAD_Z);
+            //headDelimiters[0] = new Vector3(MIN_X + World.ballRadius + float.Epsilon, SURFACE_POSITION_Y + World.ballRadius, MIN_Z + World.ballRadius + float.Epsilon);
+            //headDelimiters[1] = new Vector3(MAX_X - World.ballRadius - float.Epsilon, SURFACE_POSITION_Y + World.ballRadius, MAX_Z - World.ballRadius - float.Epsilon);
 
             cueBallStartPosition = new Vector3(MIN_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, 0.0f);
             maximumBallsInPocket = 2;
+
+
         }
 
         public override void BuildPockets()
