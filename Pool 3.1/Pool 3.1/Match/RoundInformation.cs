@@ -40,6 +40,7 @@ namespace XNA_PoolGame.Match
         public RoundInformation()
         {
             ballsPottedThisRound = new List<Ball>();
+            ballsState = new List<PoolBallState>();
             table = null;
         }
 
@@ -53,8 +54,8 @@ namespace XNA_PoolGame.Match
 
             ballHitFirstThisRound = null;
             firstShotOfSet = true;
-            ballsPottedThisRound = new List<Ball>();
-            ballsState = new List<PoolBallState>();
+            ballsPottedThisRound.Clear();
+            ballsState.Clear();
             cueballRailHits = 0;
 
             for (int i = 0; i < table.TotalBalls; i++)
@@ -70,7 +71,7 @@ namespace XNA_PoolGame.Match
         }
         public void StartRound()
         {
-            ballsPottedThisRound = new List<Ball>();
+            ballsPottedThisRound.Clear();
         }
 
         public void EndRound()

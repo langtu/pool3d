@@ -10,6 +10,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace XNA_PoolGame.Graphics.Models
 {
+    /// <summary>
+    /// Custom Model Part.
+    /// </summary>
     public class CustomModelPart
     {
         #region Constants

@@ -78,6 +78,12 @@ namespace XNA_PoolGame
         public Trajectory currentTrajectory = Trajectory.Motion;
         public float min_Altitute = World.ballRadius + World.poolTable.SURFACE_POSITION_Y;
 
+        /// <summary>
+        /// Determinate if this ball is in lagging phase.
+        /// </summary>
+        private bool isLagging = false;
+        public List<int> ballRailHitsIndexes;
+
         #region Properties
         public float Radius
         {
@@ -103,7 +109,13 @@ namespace XNA_PoolGame
 
         public float Diameter
         {
-            get { return radius * 2; }
+            get { return radius * 2.0f; }
+        }
+
+        public bool IsLagging
+        {
+            get { return isLagging; }
+            set { isLagging = value; }
         }
 
         public bool IsMoving()
@@ -152,7 +164,7 @@ namespace XNA_PoolGame
             pocketWhereAt = -1;
             volume = VolumeType.BoundingSpheres;
             rightVector = Vector3.Zero;
-
+            ballRailHitsIndexes = new List<int>();
 #if DRAWBALL_BOUNDINGVOLUME
             drawboundingvolume = true;
 #endif
@@ -167,9 +179,7 @@ namespace XNA_PoolGame
 
         public override void Initialize()
         {
-            //this.UpdateOrder = 4 + ballNumber; this.DrawOrder = 4 + ballNumber;
             this.UpdateOrder = 4; //this.DrawOrder = 4;
-
 
             MIN_SPEED_SQUARED = MIN_SPEED * MIN_SPEED;
 
@@ -178,7 +188,7 @@ namespace XNA_PoolGame
         #endregion
 
         /// <summary>
-        /// Set Ball's Oriented Bounding Box for check inside pockect-ball collision.
+        /// Set Ball's Oriented Bounding Box for check inside pocket-ball collision.
         /// This must be called everytime the direction vector changes.
         /// </summary>
         private void SetOBB()
@@ -255,7 +265,7 @@ namespace XNA_PoolGame
 
                         for (int i = 0; i < table.TotalBalls; ++i)
                         {
-                            if (!pelotasVisitadas[table.poolBalls[i]] && Vector3.Distance(this.Position, table.poolBalls[i].Position) <= 2.0f * this.radius)
+                            if (table.poolBalls[i].Visible && !pelotasVisitadas[table.poolBalls[i]] && Vector3.Distance(this.Position, table.poolBalls[i].Position) <= 2.0f * this.radius)
                             {
                                 collisionResult = CheckBallWithBallCollision(this, table.poolBalls[i], remainingTime, out remainingTime);
                                 cola.Enqueue(table.poolBalls[i]);
@@ -268,13 +278,18 @@ namespace XNA_PoolGame
                 }
 
                 //angularVelocity
-                int rail;
-                if ((rail = CheckBallWithRailCollision(remainingTime)) != -1)
+                int railIndex;
+                if ((railIndex = CheckBallWithRailCollision(remainingTime)) != -1)
                 {
                     if (this == table.cueBall)
                     {
                         // cue ball hit a side
-                        table.roundInfo.cueBallHitRail(rail);
+                        table.roundInfo.cueBallHitRail(railIndex);
+                    }
+                    else if (IsLagging)
+                    {
+                        ballRailHitsIndexes.Add(railIndex);
+
                     }
                 }
                 else

@@ -9,6 +9,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace XNA_PoolGame.PoolTables
 {
+    /// <summary>
+    /// Classic pool table.
+    /// </summary>
     public class Classic : PoolTable
     {
         public Classic(Game _game, string _modelName)
@@ -53,9 +56,9 @@ namespace XNA_PoolGame.PoolTables
             //headDelimiters[1] = new Vector3(MAX_X - World.ballRadius - float.Epsilon, SURFACE_POSITION_Y + World.ballRadius, MAX_Z - World.ballRadius - float.Epsilon);
 
             cueBallStartPosition = new Vector3(MIN_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, 0.0f);
+            cueBallStartLagPositionTeam1 = new Vector3(MIN_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, World.ballRadius * 4.0f);
+            cueBallStartLagPositionTeam2 = new Vector3(MIN_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, -World.ballRadius * 4.0f);
             maximumBallsInPocket = 2;
-
-
         }
 
         public override void BuildPockets()
@@ -177,11 +180,9 @@ namespace XNA_PoolGame.PoolTables
 
 
             for (int i = 0; i < pockets.Length; ++i) pockets[i].SetReady();
-
-            base.BuildPockets();
         }
 
-        public override void Initialize()
+        public override void BuildRails()
         {
 
             ////////// 1 ////////// 2 ///////////
@@ -232,8 +233,8 @@ namespace XNA_PoolGame.PoolTables
 
             for (int i = 0; i < 6; ++i)
                 planes[i] = new Plane(railsNormals[i], -Vector3.Dot((rails[i].Max + railsNormals[i] * World.ballRadius), railsNormals[i]));
-            
-            
+
+
             //planes[0] = new Plane(railsNormals[0], -Vector3.Dot((rails[0].Max + railsNormals[0] * World.ballRadius), railsNormals[0]));
             //planes[1] = new Plane(railsNormals[1], -Vector3.Dot((rails[1].Max + railsNormals[1] * World.ballRadius), railsNormals[1]));
             //planes[2] = new Plane(railsNormals[2], -Vector3.Dot((rails[2].Max + railsNormals[2] * World.ballRadius), railsNormals[2]));
@@ -241,12 +242,17 @@ namespace XNA_PoolGame.PoolTables
             //planes[4] = new Plane(railsNormals[4], -Vector3.Dot((rails[4].Min + railsNormals[4] * World.ballRadius), railsNormals[4]));
             //planes[5] = new Plane(railsNormals[5], -Vector3.Dot((rails[5].Min + railsNormals[5] * World.ballRadius), railsNormals[5]));
 
+            footCushionIndex = 0;
+            headCushionIndex = 3;
+        }
+
+        public override void Initialize()
+        {
+            BuildRails();
 
             ballstuckposition = new Vector3(0, 0, 0);
             BuildPockets();
-
             
-
             base.Initialize();
         }
     }

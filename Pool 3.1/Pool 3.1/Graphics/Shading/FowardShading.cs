@@ -12,7 +12,7 @@ namespace XNA_PoolGame.Graphics.Shading
         PresentationParameters pp;
 
         /// <summary>
-        /// Create a new instance of FowardShading class
+        /// Create a new instance of FowardShading class.
         /// </summary>
         public FowardShading()
         {

@@ -21,7 +21,7 @@ namespace XNA_PoolGame.PoolTables
     /// <summary>
     /// Pool table
     /// </summary>
-    public class PoolTable : Entity
+    public abstract class PoolTable : Entity
     {
         public float FRICTION_SURFACE = 0.99f;
         public float BORDER_FRITCION = 0.95f;
@@ -32,7 +32,17 @@ namespace XNA_PoolGame.PoolTables
         public Vector3 cueBallStartPosition;
 
         /// <summary>
-        /// The cueball
+        /// Start position of the cueball for the team 1 in lagging shot.
+        /// </summary>
+        public Vector3 cueBallStartLagPositionTeam1;
+
+        /// <summary>
+        /// Start position of the cueball for the team 2 in lagging shot.
+        /// </summary>
+        public Vector3 cueBallStartLagPositionTeam2;
+
+        /// <summary>
+        /// The cueball.
         /// </summary>
         public Ball cueBall = null;
 
@@ -59,7 +69,7 @@ namespace XNA_PoolGame.PoolTables
         public bool ballsMoving = false;
 
         /// <summary>
-        /// Collection of pockets for this pool table
+        /// Collection of pockets for this pool table.
         /// </summary>
         public Pocket[] pockets;
 
@@ -69,7 +79,7 @@ namespace XNA_PoolGame.PoolTables
         public VectorRenderComponent vectorRenderer;
 
         /// <summary>
-        /// 
+        /// Pocket radius.
         /// </summary>
         public float pocket_radius;
 
@@ -96,6 +106,20 @@ namespace XNA_PoolGame.PoolTables
         protected bool loaded = false;
 
         /// <summary>
+        /// Far rail index in lagging shot.
+        /// </summary>
+        public int footCushionIndex;
+        /// <summary>
+        /// Near rail index in lagging shot.
+        /// </summary>
+        public int headCushionIndex;
+
+        public Ball[] ballslag;
+        private Ball[] tempPoolBalls;
+
+        public Referee referee;
+
+        /// <summary>
         /// Maximum number of balls that supports the pocket.
         /// </summary>
         public int maximumBallsInPocket;
@@ -104,6 +128,9 @@ namespace XNA_PoolGame.PoolTables
         /// Position of a ball after maximum number of balls supported is over.
         /// </summary>
         public Vector3 ballstuckposition;
+
+
+        public MatchPhase phase;
 
         #region Constructor
         public PoolTable(Game game, string modelName)
@@ -129,6 +156,7 @@ namespace XNA_PoolGame.PoolTables
 
             PoolGame.game.Components.Add(vectorRenderer);
 
+
             CommonInitialization();
 
             base.Initialize();
@@ -139,27 +167,32 @@ namespace XNA_PoolGame.PoolTables
         /// </summary>
         public void CommonInitialization()
         {
-            this.SpecularColor = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
-            
+            this.SpecularColor = Vector4.Zero;
 
+
+            roundInfo = new RoundInformation();
+            roundInfo.table = this;
+
+            phase = MatchPhase.None;
+            loaded = true;
+        }
+
+        public void CreatePoolBalls()
+        {
             cueBall = new Ball(PoolGame.game, 0, "Models\\Balls\\newball", "Textures\\Balls\\white", this, World.ballRadius);
             cueBall.EMType = EnvironmentType.Static;
             cueBall.DrawOrder = 2;
+            cueBall.Scale = new Vector3(poolballscaleFactor);
 
             if (!World.Debug)
                 cueBall.SetCenter(cueBallStartPosition);
             else
                 cueBall.SetCenter(new Vector3(MIN_X + World.ballRadius * 3.5f, SURFACE_POSITION_Y + World.ballRadius, MIN_Z / 2 - World.ballRadius));
 
-            cueBall.Scale = new Vector3(poolballscaleFactor);
-
-
-
             BuildBallsTriangle(new Vector3(MIN_X / 3, SURFACE_POSITION_Y + World.ballRadius, -World.ballRadius), World.gameMode, World.ballRadius);
-
+            
             //TotalBalls = 1;
             poolBalls[0] = cueBall;
-
             for (int i = 0; i < TotalBalls; i++)
             {
                 poolBalls[i].EMType = EnvironmentType.Static;
@@ -169,11 +202,6 @@ namespace XNA_PoolGame.PoolTables
                 World.scenario.Objects.Add(poolBalls[i]);
             }
 
-            roundInfo = new RoundInformation();
-            roundInfo.table = this;
-
-            roundInfo.StartSet();
-            loaded = true;
         }
 
         public void LagForBreak()
@@ -183,8 +211,66 @@ namespace XNA_PoolGame.PoolTables
                 poolBalls[i].Enabled = false;
                 poolBalls[i].Visible = false;
             }
-            Ball ballforlag1 = new Ball(PoolGame.game, 0, "Models\\Balls\\newball", "Textures\\Balls\\white", this, World.ballRadius);
+
+            // Prepare lag balls for determinate who play first.
+            ballslag = new Ball[2];
+            ballslag[0] = new Ball(PoolGame.game, 0, "Models\\Balls\\newball", "Textures\\Balls\\white", this, World.ballRadius);
+            ballslag[0].IsLagging = true;
+            ballslag[0].DrawOrder = 24;
+            ballslag[0].Scale = new Vector3(poolballscaleFactor);
+            ballslag[0].SetCenter(cueBallStartLagPositionTeam1);
+
+            ballslag[1] = new Ball(PoolGame.game, 0, "Models\\Balls\\newball", "Textures\\Balls\\white", this, World.ballRadius);
+            ballslag[1].IsLagging = true;
+            ballslag[1].DrawOrder = 25;
+            ballslag[1].Scale = new Vector3(poolballscaleFactor);
+            ballslag[1].SetCenter(cueBallStartLagPositionTeam2);
+
+            PoolGame.game.Components.Add(ballslag[0]);
+            PoolGame.game.Components.Add(ballslag[1]);
+
+            World.scenario.Objects.Add(ballslag[0]);
+            World.scenario.Objects.Add(ballslag[1]);
+
+            tempPoolBalls = poolBalls;
+            poolBalls = ballslag;
+            TotalBalls = 2;
+
+            phase = MatchPhase.LaggingShot;
         }
+
+        /// <summary>
+        /// Set the pool balls for the match.
+        /// </summary>
+        public void InitializeMatch()
+        {
+            poolBalls = tempPoolBalls;
+            TotalBalls = poolBalls.Length;
+
+            for (int i = 0; i < TotalBalls; ++i)
+            {
+                poolBalls[i].Enabled = true;
+                poolBalls[i].Visible = true;
+            }
+            World.scenario.Objects.Remove(ballslag[0]);
+            World.scenario.Objects.Remove(ballslag[1]);
+
+            PoolGame.game.Components.Remove(ballslag[0]);
+            PoolGame.game.Components.Remove(ballslag[1]);
+            ballslag[0] = ballslag[1] = null;
+
+            for (int i = 0; i < 4; ++i)
+            {
+                if (World.players[i] != null)
+                {
+                    World.players[i].stick.ballTarget = cueBall;
+                }
+            }
+
+            this.phase = MatchPhase.Playing;
+            roundInfo.StartSet();
+        }
+
         public void Reset()
         {
             loaded = false;
@@ -232,8 +318,8 @@ namespace XNA_PoolGame.PoolTables
         /// <summary>
         /// Pick randomly a ball.
         /// </summary>
-        /// <param name="ballReady"></param>
-        /// <returns></returns>
+        /// <param name="ballReady">Array of balls that have already been selected.</param>
+        /// <returns>A number.</returns>
         public int findRandomBall(bool[] ballReady)
         {
             bool IsDone = true;
@@ -266,7 +352,7 @@ namespace XNA_PoolGame.PoolTables
             {
                 #region Black Mode
                 case GameMode.Black:
-                    float ballDiameter = 2.0f * (ballRadius+0.1f);
+                    float ballDiameter = 2.0f * (ballRadius + 0.1f);
                     poolBalls = new Ball[15 + 1];
                     
                     ballsReady = new bool[15];
@@ -342,10 +428,9 @@ namespace XNA_PoolGame.PoolTables
         /// <summary>
         /// 
         /// </summary>
-        public virtual void BuildPockets()
-        {
+        public abstract void BuildPockets();
 
-        }
+        public abstract void BuildRails();
         #endregion
 
         #region Update
@@ -358,11 +443,20 @@ namespace XNA_PoolGame.PoolTables
             bool ballMovingState = ballsMoving;
             if (!CheckBallMovement() && ballMovingState)
             {
-                roundInfo.EndRound();
-                if (roundInfo.cueballPotted)
+                switch (phase)
                 {
-                    roundInfo.cueBallInHand = true;
-                    UnpottedcueBall();
+                    case MatchPhase.Playing:
+                        roundInfo.EndRound();
+                        if (roundInfo.cueballPotted)
+                        {
+                            roundInfo.cueBallInHand = true;
+                            UnpottedcueBall();
+                        }
+                        break;
+
+                    case MatchPhase.LaggingShot:
+                        referee.CheckLagPlayersStatus();
+                        break;
                 }
             }
             base.Update(gameTime);
@@ -521,8 +615,6 @@ namespace XNA_PoolGame.PoolTables
             base.Dispose(disposing);
         }
         #endregion
-
-
 
         public void StopAllBalls()
         {

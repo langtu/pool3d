@@ -22,7 +22,7 @@ namespace XNA_PoolGame.Graphics.Shadows
         public DepthStencilBuffer stencilBuffer;
 
         /// <summary>
-        /// 
+        /// Old depth buffer.
         /// </summary>
         public DepthStencilBuffer oldBuffer;
 
@@ -39,7 +39,7 @@ namespace XNA_PoolGame.Graphics.Shadows
         public RenderTarget2D[] ShadowMapRT;
 
         /// <summary>
-        /// Shadow occlussion (1 fragment = litted).
+        /// Shadow occlussion (white fragment = litted).
         /// </summary>
         public RenderTarget2D ShadowRT;
 

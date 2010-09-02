@@ -7,6 +7,7 @@ using XNA_PoolGame.Cameras;
 using XNA_PoolGame.Scenarios;
 using Microsoft.Xna.Framework;
 using XNA_PoolGame.Graphics;
+using XNA_PoolGame.Match;
 
 namespace XNA_PoolGame
 {
@@ -40,6 +41,10 @@ namespace XNA_PoolGame
         public static int playerInTurn = -1;
         public static int playerCount = 0;
 
+        /// <summary>
+        /// Match referee.
+        /// </summary>
+        public static Referee referee;
         public static ScenarioType scenarioType = ScenarioType.Cribs;
         public static GameMode gameMode = GameMode.Black;
 
@@ -52,7 +57,7 @@ namespace XNA_PoolGame
         // SHADOWS SETTINGS
         public static bool displayShadows = true;
         public static bool displayShadowsTextures = false;
-        public static int shadowMapSize = 1024 * 2;
+        public static int shadowMapSize = 1024 / 2;
         public static ShadowTechnnique shadowTechnique = ShadowTechnnique.VarianceShadowMapping;
         //
         public static ShadingTechnnique shadingTech = ShadingTechnnique.Foward;

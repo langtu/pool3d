@@ -19,6 +19,10 @@ namespace XNA_PoolGame.PoolTables
         public Vector3[] insideNormal;
         public OrientedBoundingBox[] insideBands;
 
+        /// <summary>
+        /// Creates a new instance of a Pocket.
+        /// </summary>
+        /// <param name="bounds"></param>
         public Pocket(BoundingSphere bounds)
         {
             this.bounds = bounds;

@@ -108,6 +108,7 @@
     <Compile Include="Graphics\Skybox.cs" />
     <Compile Include="Graphics\SSAO.cs" />
     <Compile Include="Helpers\Tuple.cs" />
+    <Compile Include="Match\Referee.cs" />
     <Compile Include="PoolTables\BallCollider.cs" />
     <Compile Include="Graphics\Particles\ParticlesCore.cs" />
     <Compile Include="Threading\ThreadComponent.cs" />
