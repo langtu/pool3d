@@ -10,7 +10,7 @@ using XNA_PoolGame.Threading;
 namespace XNA_PoolGame.Graphics
 {
     /// <summary>
-    /// Drawable component that might use a thread
+    /// Drawable component that might use a thread.
     /// </summary>
     public class DrawableComponent : ThreadComponent, IDrawable, IKey<int>
     {

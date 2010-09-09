@@ -49,6 +49,13 @@ namespace XNA_PoolGame.PoolTables
 
             FRICTION_SURFACE = 0.99f;
 
+            minLongString = new Vector3(MIN_X, SURFACE_POSITION_Y + World.ballRadius, 0.0f);
+            maxLongString = new Vector3(MAX_X, SURFACE_POSITION_Y + World.ballRadius, 0.0f);
+
+            longStringPlanes = new Plane[2];
+            longStringPlanes[0] = new Plane(Vector3.UnitZ, 0.0f);
+            longStringPlanes[1] = new Plane(-Vector3.UnitZ, 0.0f);
+
             headDelimiters = new Vector3[2];
             headDelimiters[0] = new Vector3(MIN_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, MIN_HEAD_Z);
             headDelimiters[1] = new Vector3(MAX_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, MAX_HEAD_Z);

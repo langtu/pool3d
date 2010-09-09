@@ -58,6 +58,7 @@ namespace XNA_PoolGame.Screens
                     PostProcessManager.shading = new DeferredShading();
                     break;
             }
+
             // SET SHADOW TECHNIQUE
             switch (World.shadowTechnique)
             {
@@ -100,15 +101,16 @@ namespace XNA_PoolGame.Screens
             /////// PLAYERS
             World.playerCount = 2;
             World.playerInTurn = 0;
-            World.players[0] = new Player(PoolGame.game, (int)PlayerIndex.Two, new KeyBoard(PlayerIndex.Two), TeamNumber.One, World.poolTable);
-            World.players[1] = new Player(PoolGame.game, (int)PlayerIndex.One, new XboxPad(PlayerIndex.One), TeamNumber.Two, World.poolTable);
+            World.players[0] = new Player(PoolGame.game, (int)PlayerIndex.One, new XboxPad(PlayerIndex.One), TeamNumber.One, World.poolTable);
+            World.players[1] = new Player(PoolGame.game, (int)PlayerIndex.Two, new KeyBoard(PlayerIndex.Two), TeamNumber.Two, World.poolTable);
+            
 
             PoolGame.game.Components.Add(World.camera);
             PoolGame.game.Components.Add(World.scenario);
             PoolGame.game.Components.Add(World.poolTable);
 
             World.scenario.Objects.Add(World.poolTable);
-           
+
 
             for (int i = 0; i < 4; i++)
             {
@@ -119,6 +121,8 @@ namespace XNA_PoolGame.Screens
             World.referee = new Referee(PoolGame.game, World.poolTable, World.players[0], World.players[1]);
             World.poolTable.referee = World.referee;
             PoolGame.game.Components.Add(World.referee);
+
+            World.gameMode = GameMode.EightBalls;
 
             // A real game would probably have more content than this sample, so
             // it would take longer to load. We simulate that by delaying for a

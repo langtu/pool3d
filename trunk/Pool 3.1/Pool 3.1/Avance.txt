@@ -36,4 +36,5 @@
 - BSP
 - Colocar los parametros de los efectos en las clases (effect.Parameters[""]) a variables para ser mas eficiente
 - Realizar Antialiasing a pata (Edge detection and blur)
-- Incluir chequeo de frustrum culling a las sombras
+- Incluir buen chequeo de frustrum culling a las sombras
+- 

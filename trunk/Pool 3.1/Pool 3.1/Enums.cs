@@ -49,6 +49,7 @@ namespace XNA_PoolGame
         NormalMapping,
         ParallaxMapping
     }
+
     public enum IntermediateBuffer
     {
         PreBloom,
@@ -71,17 +72,20 @@ namespace XNA_PoolGame
         Free,
         English
     }
+    
     public enum GameMode
     {
-        Black,
+        EightBalls,
         NineBalls,
         ESPN
     }
+    
     public enum TeamNumber
     {
-        One,
-        Two
+        One = 0,
+        Two = 1
     }
+
     public enum MenuState
     {
         None,
@@ -169,6 +173,7 @@ namespace XNA_PoolGame
         Bar,
         CristalHotel
     }
+
     public enum BallCollisionType
     {
         None,

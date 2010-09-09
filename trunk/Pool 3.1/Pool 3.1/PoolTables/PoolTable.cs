@@ -64,9 +64,10 @@ namespace XNA_PoolGame.PoolTables
         public RoundInformation roundInfo = null;
 
         /// <summary>
-        /// Determines if the balls are in motion
+        /// Determines whether the balls are in motion.
         /// </summary>
         public bool ballsMoving = false;
+        public bool previousBallsMoving = false;
 
         /// <summary>
         /// Collection of pockets for this pool table.
@@ -104,6 +105,12 @@ namespace XNA_PoolGame.PoolTables
 
         protected const float poolballscaleFactor = 1.0f; //1.85f;
         protected bool loaded = false;
+
+        public Vector3 minLongString;
+        public Vector3 maxLongString;
+
+        public Plane[] longStringPlanes;
+        
 
         /// <summary>
         /// Far rail index in lagging shot.
@@ -204,6 +211,7 @@ namespace XNA_PoolGame.PoolTables
 
         }
 
+
         public void LagForBreak()
         {
             for (int i = 0; i < TotalBalls; ++i)
@@ -240,7 +248,7 @@ namespace XNA_PoolGame.PoolTables
         }
 
         /// <summary>
-        /// Set the pool balls for the match.
+        /// Set visible the pool balls for the match.
         /// </summary>
         public void InitializeMatch()
         {
@@ -351,7 +359,7 @@ namespace XNA_PoolGame.PoolTables
             switch (gameMode)
             {
                 #region Black Mode
-                case GameMode.Black:
+                case GameMode.EightBalls:
                     float ballDiameter = 2.0f * (ballRadius + 0.1f);
                     poolBalls = new Ball[15 + 1];
                     
@@ -430,6 +438,9 @@ namespace XNA_PoolGame.PoolTables
         /// </summary>
         public abstract void BuildPockets();
 
+        /// <summary>
+        /// 
+        /// </summary>
         public abstract void BuildRails();
         #endregion
 
@@ -439,26 +450,10 @@ namespace XNA_PoolGame.PoolTables
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (!loaded || cueBall == null || pockets == null) return;
 
-            // Gets if there is a new state of the balls, including cueball
-            bool ballMovingState = ballsMoving;
-            if (!CheckBallMovement() && ballMovingState)
-            {
-                switch (phase)
-                {
-                    case MatchPhase.Playing:
-                        roundInfo.EndRound();
-                        if (roundInfo.cueballPotted)
-                        {
-                            roundInfo.cueBallInHand = true;
-                            UnpottedcueBall();
-                        }
-                        break;
+            // Gets if there is a new state of the balls, including cueball.
+            previousBallsMoving = ballsMoving;
+            CheckBallMovement();
 
-                    case MatchPhase.LaggingShot:
-                        referee.CheckLagPlayersStatus();
-                        break;
-                }
-            }
             base.Update(gameTime);
             
         }
@@ -559,7 +554,8 @@ namespace XNA_PoolGame.PoolTables
 
         #region Get out the cue ball from pocket
         /// <summary>
-        /// Restore cueball position. Check if cueBallStartPosition is a valid position.
+        /// Restore cueball position after a scratch. 
+        /// Check if cueBallStartPosition is a valid position.
         /// </summary>
         public void UnpottedcueBall()
         {
@@ -601,6 +597,18 @@ namespace XNA_PoolGame.PoolTables
             pockets = null;
             rails = null;
 
+            if (phase == MatchPhase.LaggingShot && ballslag != null)
+            {
+                ballslag[0].Dispose();
+                ballslag[1].Dispose();
+
+                ballslag[0] = null;
+                ballslag[1] = null;
+                ballslag = null;
+
+                poolBalls = tempPoolBalls;
+                TotalBalls = poolBalls.Length;
+            }
             for (int i = 0; i < TotalBalls; i++)
             {
                 poolBalls[i].Dispose();
@@ -610,8 +618,12 @@ namespace XNA_PoolGame.PoolTables
             
             poolBalls = null;
             cueBall = null;
+            tempPoolBalls = null;
+
             if (World.ballcollider != null) World.ballcollider.Dispose();
             World.ballcollider = null;
+
+            longStringPlanes = null;
             base.Dispose(disposing);
         }
         #endregion
