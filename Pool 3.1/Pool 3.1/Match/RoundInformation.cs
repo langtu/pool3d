@@ -25,16 +25,40 @@ namespace XNA_PoolGame.Match
 
     public class RoundInformation
     {
+        /// <summary>
+        /// The first ball hit in this round.
+        /// </summary>
         public Ball ballHitFirstThisRound = null;
+        
         public List<Ball> ballsPottedThisRound;
+        
+        /// <summary>
+        /// Collection of ball states.
+        /// </summary>
         public List<PoolBallState> ballsState;
         public PoolBallState cueballState;
+
+        /// <summary>
+        /// Counts the cue ball hits.
+        /// </summary>
         public int cueballRailHits;
+
+        /// <summary>
+        /// Index of the first rail hit.
+        /// </summary>
         public int cueballRailHitIndex;
         public PoolTable table;
-        public bool cueballPotted = false;
-        public bool cueBallInHand = true;
-        public bool firstShotOfSet = true;
+
+        /// <summary>
+        /// Determinate whether the cue ball was potted in a pocket.
+        /// </summary>
+        public bool cueballPotted;
+
+        /// <summary>
+        /// Determinate whether the cue ball can be moved.
+        /// </summary>
+        public bool cueBallInHand;
+        public bool firstShotOfSet;
         public float stickRotation;
 
         public RoundInformation()
@@ -45,7 +69,7 @@ namespace XNA_PoolGame.Match
         }
 
         /// <summary>
-        /// 
+        /// Sets all states before a game set.
         /// </summary>
         public void StartSet()
         {
@@ -62,13 +86,13 @@ namespace XNA_PoolGame.Match
             {
                 this.ballsState.Add(new PoolBallState(table.poolBalls[i].Position, table.poolBalls[i].PreRotation, table.poolBalls[i].pocketWhereAt,
                     table.poolBalls[i].currentTrajectory));
-
                 
             }
 
             this.cueballState = this.ballsState[0];
 
         }
+
         public void StartRound()
         {
             ballsPottedThisRound.Clear();

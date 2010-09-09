@@ -569,7 +569,8 @@ namespace XNA_PoolGame.Graphics.Models
                     {
                         if (!occluder) return;
 
-                        frustum = LightManager.lights[PostProcessManager.shading.shadows.lightpass].Frustum;
+                        frustum = World.camera.FrustumCulling;
+                        //frustum = LightManager.lights[PostProcessManager.shading.shadows.lightpass].Frustum;
                         DrawModel(false, PostProcessManager.DepthEffect, PostProcessManager.shading.shadows.GetDepthMapTechnique(), null);
                     }
                     break;
@@ -1185,11 +1186,10 @@ namespace XNA_PoolGame.Graphics.Models
         {
             if (disposing)
             {
-                ModelManager.AbortAllThreads();
+                //ModelManager.AbortAllThreads();
                 PoolGame.game.Components.Remove(this);
                 modelL1 = null; modelL2 = null;
 
-                
                 boxes = null;
                 modelNameL1 = null;
                 textureAsset = null;

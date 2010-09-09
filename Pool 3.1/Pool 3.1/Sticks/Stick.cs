@@ -9,6 +9,9 @@ using XNA_PoolGame.Graphics.Models;
 
 namespace XNA_PoolGame.Sticks
 {
+    /// <summary>
+    /// Stick.
+    /// </summary>
     public class Stick : Entity
     {
         public bool charging = false;
@@ -24,13 +27,14 @@ namespace XNA_PoolGame.Sticks
         protected float width = 483.291f + 7.0f;
 
         /// <summary>
-        /// Ball targeting. (Cue ball).
+        /// Ball targeting. (Typically a cue ball).
         /// </summary>
         public Ball ballTarget;
         public float angle = 0.0f;
 
         public int playerIndex;
 
+        #region Properties
         public float Power
         {
             get { return power; }
@@ -54,6 +58,9 @@ namespace XNA_PoolGame.Sticks
             }
         }
 
+        #endregion
+
+        #region Constructors
         public Stick(Game game, Ball ballTarget, int playerIndex)
             : base(game, "Models\\Sticks\\stick_universal")
         {
@@ -67,6 +74,7 @@ namespace XNA_PoolGame.Sticks
             this.ballTarget = balltarget;
             this.playerIndex = playerIndex;
         }
+        #endregion
 
         public override void Initialize()
         {

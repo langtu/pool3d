@@ -17,7 +17,14 @@ namespace XNA_PoolGame
     /// </summary>
     public class Player : GameComponent
     {
+        /// <summary>
+        /// Player Name.
+        /// </summary>
         public string playerName = "";
+
+        /// <summary>
+        /// Player's stick.
+        /// </summary>
         public Stick stick = null;
         public GameController controller;
         public PoolTable table = null;

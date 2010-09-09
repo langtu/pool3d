@@ -37,6 +37,9 @@ namespace XNA_PoolGame
         public static PoolTable poolTable = null;
         public static float ballRadius = 11.275f; //8.75f;
 
+        /// <summary>
+        /// Collection of players.
+        /// </summary>
         public static Player[] players = new Player[4];
         public static int playerInTurn = -1;
         public static int playerCount = 0;
@@ -46,7 +49,7 @@ namespace XNA_PoolGame
         /// </summary>
         public static Referee referee;
         public static ScenarioType scenarioType = ScenarioType.Cribs;
-        public static GameMode gameMode = GameMode.Black;
+        public static GameMode gameMode = GameMode.EightBalls;
 
         // DOF SETTINGS
         public static DOFType dofType = DOFType.None;

@@ -17,7 +17,7 @@ using XNA_PoolGame.Graphics.Models;
 namespace XNA_PoolGame
 {
     /// <summary>
-    /// The Ball
+    /// The Ball.
     /// </summary>
     public class Ball : Entity
     {
@@ -58,12 +58,12 @@ namespace XNA_PoolGame
         public volatile int pocketWhereAt = -1;
 
         /// <summary>
-        /// Index of the previous rail hitted
+        /// Index of the previous rail hit.
         /// </summary>
         public int previousHitRail = -1;
 
         /// <summary>
-        /// Index of the previous inside rail hitted
+        /// Index of the previous inside rail hit.
         /// </summary>
         public int previousInsideHitRail = -1;
 
@@ -251,6 +251,7 @@ namespace XNA_PoolGame
 
                 if (this.pocketWhereAt == -1 && table.cueBall != null)
                 {
+                    #region BFS
                     int collisionResult = 0;
                     Dictionary<Ball, bool> pelotasVisitadas = new Dictionary<Ball, bool>();
 
@@ -275,6 +276,7 @@ namespace XNA_PoolGame
                         }
 
                     }
+                    #endregion
                 }
 
                 //angularVelocity
