@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using XNA_PoolGame.Screens.Screen_Manager;
 using XNA_PoolGame.Graphics;
 
-namespace XNA_PoolGame.Screens
+namespace XNA_PoolGame.Screens.Entries
 {
     /// <summary>
     /// Helper class represents a single entry in a MenuScreen. By default this

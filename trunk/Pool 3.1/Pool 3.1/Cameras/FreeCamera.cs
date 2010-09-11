@@ -11,7 +11,10 @@ using XNA_PoolGame.Helpers;
 
 namespace XNA_PoolGame.Cameras
 {
-    class FreeCamera : Camera
+    /// <summary>
+    /// Free camera.
+    /// </summary>
+    public class FreeCamera : Camera
     {
         public FreeCamera(Game game)
             : base(game)

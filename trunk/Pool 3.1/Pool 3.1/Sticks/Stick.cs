@@ -96,7 +96,7 @@ namespace XNA_PoolGame.Sticks
                 //Direction = new Vector3((float)-Math.Cos(MathHelper.ToRadians(angleY)), (float)-Math.Sin(MathHelper.ToRadians(angle)), (float)Math.Sin(MathHelper.ToRadians(angleY)));
                 Direction = new Vector3((float)-Math.Cos(MathHelper.ToRadians(angleY)), 0.0f, (float)Math.Sin(MathHelper.ToRadians(angleY)));
                 Direction.Normalize();
-                if (World.camera is ChaseCamera && World.playerInTurn == this.playerIndex && this.playerIndex != -1)
+                if (World.camera is ChaseCamera && World.playerInTurnIndex == this.playerIndex && this.playerIndex != -1)
                 {
                     ((ChaseCamera)World.camera).ChasePosition = ballTarget.Position;
                     ((ChaseCamera)World.camera).ChaseDirection = new Vector3(Direction.X, 0, Direction.Z);
@@ -125,7 +125,6 @@ namespace XNA_PoolGame.Sticks
         protected override void Dispose(bool disposing)
         {
             ballTarget = null;
-            PoolGame.game.Components.Remove(this);
             base.Dispose(disposing);
         }
 

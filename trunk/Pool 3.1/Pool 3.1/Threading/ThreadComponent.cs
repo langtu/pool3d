@@ -137,6 +137,7 @@ namespace XNA_PoolGame.Threading
                 mutex.Close();
                 stopped.Close();
                 thread.Abort();
+                ModelManager.allthreads.Remove(this);
             }
             base.Dispose(disposing);
         }

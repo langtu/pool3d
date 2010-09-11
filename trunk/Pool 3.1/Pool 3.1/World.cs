@@ -8,6 +8,7 @@ using XNA_PoolGame.Scenarios;
 using Microsoft.Xna.Framework;
 using XNA_PoolGame.Graphics;
 using XNA_PoolGame.Match;
+using XNA_PoolGame.PoolTables.Racks;
 
 namespace XNA_PoolGame
 {
@@ -41,7 +42,10 @@ namespace XNA_PoolGame
         /// Collection of players.
         /// </summary>
         public static Player[] players = new Player[4];
-        public static int playerInTurn = -1;
+        /// <summary>
+        /// Index of the current player.
+        /// </summary>
+        public static int playerInTurnIndex = -1;
         public static int playerCount = 0;
 
         /// <summary>
@@ -50,6 +54,12 @@ namespace XNA_PoolGame
         public static Referee referee;
         public static ScenarioType scenarioType = ScenarioType.Cribs;
         public static GameMode gameMode = GameMode.EightBalls;
+        public static Dictionary<GameMode, RackFactory> racksfactory;
+
+        /// <summary>
+        /// Match teams.
+        /// </summary>
+        public static Team[] teams = new Team[2];
 
         // DOF SETTINGS
         public static DOFType dofType = DOFType.None;

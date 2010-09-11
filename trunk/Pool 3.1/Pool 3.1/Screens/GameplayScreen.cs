@@ -28,6 +28,7 @@ namespace XNA_PoolGame.Screens
     /// </summary>
     public class GameplayScreen : Screen
     {
+
         #region Initialization
         /// <summary>
         /// Constructor.
@@ -74,7 +75,7 @@ namespace XNA_PoolGame.Screens
 
             }
 
-            // Scenario
+            ////////////// SCENARIO //////////////
             switch (World.scenarioType)
             {
                 case ScenarioType.Cribs:
@@ -84,8 +85,12 @@ namespace XNA_PoolGame.Screens
                 case ScenarioType.Garage:
                     break;
             }
+            World.gameMode = GameMode.EightBalls;
 
-            // Main Pooltable
+            ////////////// FACTORY //////////////
+
+
+            ////////////// MAIN POOLTABLE //////////////
             World.poolTable = new Classic(PoolGame.game);
             World.poolTable.PreRotation = Matrix.CreateRotationY(MathHelper.Pi);
             World.poolTable.DrawOrder = 1;
@@ -98,19 +103,43 @@ namespace XNA_PoolGame.Screens
             LightManager.sphereModel.Position = LightManager.lights[0].Position;
             LightManager.sphereModel.LoadContent();
 
-            /////// PLAYERS
+            ////////////// PLAYERS //////////////
             World.playerCount = 2;
-            World.playerInTurn = 0;
-            World.players[0] = new Player(PoolGame.game, (int)PlayerIndex.One, new XboxPad(PlayerIndex.One), TeamNumber.One, World.poolTable);
-            World.players[1] = new Player(PoolGame.game, (int)PlayerIndex.Two, new KeyBoard(PlayerIndex.Two), TeamNumber.Two, World.poolTable);
-            
+            World.playerInTurnIndex = 0;
+            World.players[0] = new Player(PoolGame.game, "Edgar", (int)PlayerIndex.One, new XboxPad(PlayerIndex.One), TeamNumber.One, World.poolTable);
+            World.players[1] = new Player(PoolGame.game, "Adry", (int)PlayerIndex.Two, new KeyBoard(PlayerIndex.Two), TeamNumber.Two, World.poolTable);
 
+            ////////////// REFEREE //////////////
+            World.referee = new Referee(PoolGame.game, World.poolTable, World.players[0], World.players[1]);
+            World.poolTable.referee = World.referee;
+
+            ////////////// TEAMS //////////////
+            Player[] team1 = new Player[1];
+            Player[] team2 = new Player[1];
+            team1[0] = World.players[0];
+            team2[0] = World.players[1];
+
+            switch(World.gameMode)
+            {
+                case GameMode.EightBalls:
+                    World.teams[0] = new Team(team1, TeamNumber.One);
+                    World.teams[1] = new Team(team2, TeamNumber.Two);
+                    break;
+
+                case GameMode.NineBalls:
+                    World.teams[0] = new Team(team1, TeamNumber.One);
+                    World.teams[1] = new Team(team2, TeamNumber.Two);
+                    break;
+            }
+            foreach (Team team in World.teams)
+                team.SetReadyForMatch();
+
+            //////////////////////////////////////////////////////////////////////////
             PoolGame.game.Components.Add(World.camera);
             PoolGame.game.Components.Add(World.scenario);
             PoolGame.game.Components.Add(World.poolTable);
 
             World.scenario.Objects.Add(World.poolTable);
-
 
             for (int i = 0; i < 4; i++)
             {
@@ -118,11 +147,8 @@ namespace XNA_PoolGame.Screens
                     PoolGame.game.Components.Add(World.players[i]);
             }
 
-            World.referee = new Referee(PoolGame.game, World.poolTable, World.players[0], World.players[1]);
-            World.poolTable.referee = World.referee;
             PoolGame.game.Components.Add(World.referee);
 
-            World.gameMode = GameMode.EightBalls;
 
             // A real game would probably have more content than this sample, so
             // it would take longer to load. We simulate that by delaying for a
@@ -141,7 +167,7 @@ namespace XNA_PoolGame.Screens
         public override void UnloadContent()
         {
             ModelManager.AbortAllThreads();
-            World.playerInTurn = -1;
+            World.playerInTurnIndex = -1;
             World.playerCount = 0;
 
             World.referee.Dispose();
@@ -324,47 +350,6 @@ namespace XNA_PoolGame.Screens
             }
             #endregion
 
-            //TextureInUse vollightsample;
-            //{
-            //    vollightsample = PostProcessManager.GetIntermediateTexture();
-
-            //    PoolGame.device.SetRenderTarget(0, vollightsample.renderTarget);
-            //    PoolGame.device.Clear(ClearOptions.Target, Color.Black, 1.0f, 0);
-
-            //    foreach (VolumetricLightEntity light in World.scenario.volumetriclights)
-            //    {
-            //        light.Draw(gameTime);
-            //    }
-
-            //    TextureInUse tmp = PostProcessManager.GetIntermediateTexture();
-            //    PostProcessManager.SetBlurEffectParameters(1.0f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurHEffect);
-            //    PostProcessManager.SetBlurEffectParameters(0.0f, 1.0f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurVEffect);
-
-            //    //Gaussian Blur H
-            //    PoolGame.device.SetRenderTarget(0, tmp.renderTarget);
-            //    PostProcessManager.DrawQuad(vollightsample.renderTarget.GetTexture(), PostProcessManager.GBlurHEffect);
-
-            //    //Guassian Blur V
-            //    PoolGame.device.SetRenderTarget(0, vollightsample.renderTarget);
-            //    PostProcessManager.DrawQuad(tmp.renderTarget.GetTexture(), PostProcessManager.GBlurVEffect);
-
-
-            //    tmp.Use();
-            //    PoolGame.device.SetRenderTarget(0, tmp.renderTarget);
-            //    PoolGame.device.Clear(ClearOptions.Target, Color.Black, 1.0f, 0);
-
-            //    PostProcessManager.spriteBatch.Begin(SpriteBlendMode.Additive, SpriteSortMode.Immediate, SaveStateMode.SaveState);
-            //    PostProcessManager.spriteBatch.Draw(resultTIU.renderTarget.GetTexture(), Vector2.Zero, Color.White);
-            //    PostProcessManager.spriteBatch.Draw(vollightsample.renderTarget.GetTexture(), Vector2.Zero, Color.White);
-            //    PostProcessManager.spriteBatch.End();
-
-            //    resultTIU = tmp;
-
-
-            //    useless.Add(tmp);
-            //    PoolGame.device.SetRenderTarget(0, null);
-            //}
-
             #region LIGHT SHAFTS
             if (World.doLightshafts)
             {
@@ -438,7 +423,6 @@ namespace XNA_PoolGame.Screens
 
             #endregion
 
-
             for (int k = 0; k < useless.Count; ++k) useless[k].DontUse();
             useless.Clear(); useless = null;
             resultTIU.DontUse();
@@ -452,9 +436,9 @@ namespace XNA_PoolGame.Screens
 
             if (World.motionblurType != MotionBlurType.None)
             {
-                foreach (DrawableComponent e in World.scenario.objects)
+                foreach (DrawableComponent obj in World.scenario.objects)
                 {
-                    if (e is Entity) ((Entity)e).SetPreviousWorld();
+                    if (obj is Entity) ((Entity)obj).SetPreviousWorld();
                 }
 
                 World.camera.PrevViewProjection = World.camera.ViewProjection;

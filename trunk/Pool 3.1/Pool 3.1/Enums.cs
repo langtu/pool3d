@@ -166,6 +166,13 @@ namespace XNA_PoolGame
         Foward,
         Deferred
     }
+
+    public enum BallGroupType
+    {
+        None,
+        Stripe,
+        Solid
+    }
     public enum ScenarioType
     {
         Cribs,

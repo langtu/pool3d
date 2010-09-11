@@ -6,6 +6,9 @@ using Microsoft.Xna.Framework;
 
 namespace XNA_PoolGame.Cameras
 {
+    /// <summary>
+    /// Chase Camera.
+    /// </summary>
     public class ChaseCamera : Camera
     {
         #region Chased object properties (set externally each frame)
@@ -145,7 +148,7 @@ namespace XNA_PoolGame.Cameras
         private Vector3 velocity;
 
         /// <summary>
-        /// Minimum speed of camera. If the speed is less than MIN_CAMERA_SPEED, then stop de camera.
+        /// Minimum speed of camera. If the speed is less than MIN_CAMERA_SPEED, then stops de camera.
         /// </summary>
         private const float MIN_CAMERA_SPEED = 0.01333f;//0.02999f;//0.10f;
 
@@ -187,6 +190,7 @@ namespace XNA_PoolGame.Cameras
 
             UpdateCameraMatrices();
         }
+
         /// <summary>
         /// Rebuilds object space values in world space. Invoke before publicly
         /// returning or privately accessing world space values.
@@ -233,7 +237,6 @@ namespace XNA_PoolGame.Cameras
             Vector3 acceleration = force / mass;
             velocity += acceleration * elapsed;
 
-            
             // Apply velocity
             cameraPosition += velocity * elapsed;
 
@@ -241,7 +244,6 @@ namespace XNA_PoolGame.Cameras
 
             if (CameraIsMoving())
             {
-                
                 if (velocity.Length() < MIN_CAMERA_SPEED) Reset(); // Force the camera to be in the desired position (stop it).
             }
             if (viewDirty) UpdateCameraMatrices();

@@ -41,11 +41,11 @@ namespace XNA_PoolGame.PoolTables
             //surface1 = new Vector3(MAX_X, SURFACEPOS_Y, MIN_Z);
             //surface2 = new Vector3(MIN_X, SURFACEPOS_Y, MAX_X);
 
-            MIN_HEAD_X = MAX_X / 2;
-            MIN_HEAD_Z = MIN_Z + World.ballRadius;
+            MIN_HEAD_STRING_X = MAX_X / 2;
+            MIN_HEAD_STRING_Z = MIN_Z + World.ballRadius;
 
-            MAX_HEAD_X = MAX_X - World.ballRadius;
-            MAX_HEAD_Z = MAX_Z - World.ballRadius;
+            MAX_HEAD_STRING_X = MAX_X - World.ballRadius;
+            MAX_HEAD_STRING_Z = MAX_Z - World.ballRadius;
 
             FRICTION_SURFACE = 0.99f;
 
@@ -57,14 +57,16 @@ namespace XNA_PoolGame.PoolTables
             longStringPlanes[1] = new Plane(-Vector3.UnitZ, 0.0f);
 
             headDelimiters = new Vector3[2];
-            headDelimiters[0] = new Vector3(MIN_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, MIN_HEAD_Z);
-            headDelimiters[1] = new Vector3(MAX_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, MAX_HEAD_Z);
+            headDelimiters[0] = new Vector3(MIN_HEAD_STRING_X, SURFACE_POSITION_Y + World.ballRadius, MIN_HEAD_STRING_Z);
+            headDelimiters[1] = new Vector3(MAX_HEAD_STRING_X, SURFACE_POSITION_Y + World.ballRadius, MAX_HEAD_STRING_Z);
             //headDelimiters[0] = new Vector3(MIN_X + World.ballRadius + float.Epsilon, SURFACE_POSITION_Y + World.ballRadius, MIN_Z + World.ballRadius + float.Epsilon);
             //headDelimiters[1] = new Vector3(MAX_X - World.ballRadius - float.Epsilon, SURFACE_POSITION_Y + World.ballRadius, MAX_Z - World.ballRadius - float.Epsilon);
 
-            cueBallStartPosition = new Vector3(MIN_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, 0.0f);
-            cueBallStartLagPositionTeam1 = new Vector3(MIN_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, World.ballRadius * 4.0f);
-            cueBallStartLagPositionTeam2 = new Vector3(MIN_HEAD_X, SURFACE_POSITION_Y + World.ballRadius, -World.ballRadius * 4.0f);
+            footSpotPosition = new Vector3(-38.0f - 82.0f, SURFACE_POSITION_Y + World.ballRadius, 0.0f);
+
+            cueBallStartPosition = new Vector3(MIN_HEAD_STRING_X, SURFACE_POSITION_Y + World.ballRadius, 0.0f);
+            cueBallStartLagPositionTeam1 = new Vector3(MIN_HEAD_STRING_X, SURFACE_POSITION_Y + World.ballRadius, World.ballRadius * 4.0f);
+            cueBallStartLagPositionTeam2 = new Vector3(MIN_HEAD_STRING_X, SURFACE_POSITION_Y + World.ballRadius, -World.ballRadius * 4.0f);
             maximumBallsInPocket = 2;
         }
 
