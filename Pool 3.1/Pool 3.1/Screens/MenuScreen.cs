@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using XNA_PoolGame.Screens.Screen_Manager;
 using XNA_PoolGame.Graphics;
+using XNA_PoolGame.Screens.Entries;
 
 namespace XNA_PoolGame.Screens
 {

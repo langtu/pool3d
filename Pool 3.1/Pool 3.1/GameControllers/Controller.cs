@@ -1,13 +1,20 @@
-﻿using System;
+﻿#region Using Statements
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+#endregion
 
 namespace XNA_PoolGame.GameControllers
 {
+    /// <summary>
+    /// Game controller. Used to retrieval players interaction in
+    /// a game match. Abstract class of all types of controllers.
+    /// </summary>
     public abstract class GameController : ICloneable, IEquatable<GameController>
     {
+        #region Variables
         protected PlayerIndex playerIndex;
 
         protected Vector2 leftStick = Vector2.Zero;
@@ -22,6 +29,7 @@ namespace XNA_PoolGame.GameControllers
         protected bool YPressed;
         protected bool BPressed;
         protected bool leftShoulderPressed;
+        #endregion
 
         #region Properties
 
@@ -78,12 +86,14 @@ namespace XNA_PoolGame.GameControllers
 
         #endregion
 
-        public GameController(PlayerIndex index)
+        protected GameController(PlayerIndex index)
         {
             this.playerIndex = index;
         }
 
-        //
+        /// <summary>
+        /// Update method.
+        /// </summary>
         public abstract void Update();
 
         public void ResetButtons()
@@ -105,8 +115,6 @@ namespace XNA_PoolGame.GameControllers
                 && leftTrigger == 0.0f && rightTrigger == 0.0f && !leftShoulderPressed && !XPressed && !YPressed);
         }
 
-
-        
 
         #region Cloneable
 

@@ -1,4 +1,5 @@
-﻿//#define DRAWBALL_BOUNDINGVOLUME
+﻿#define DRAWBALL_BV
+#define DRAWBALL_BV_AFTERISPOTTED
 
 #region Using Statements
 using System;
@@ -12,6 +13,7 @@ using System.Diagnostics;
 using XNA_PoolGame.Helpers;
 using XNA_PoolGame.PoolTables;
 using XNA_PoolGame.Graphics.Models;
+using Microsoft.Xna.Framework.Graphics;
 #endregion
 
 namespace XNA_PoolGame
@@ -72,7 +74,7 @@ namespace XNA_PoolGame
         private float MIN_SPEED_SQUARED;
 
         /// <summary>
-        /// The Pooltable where this ball belongs to
+        /// The Pooltable where this ball belongs to.
         /// </summary>
         public PoolTable table = null;
         public Trajectory currentTrajectory = Trajectory.Motion;
@@ -165,7 +167,7 @@ namespace XNA_PoolGame
             volume = VolumeType.BoundingSpheres;
             rightVector = Vector3.Zero;
             ballRailHitsIndexes = new List<int>();
-#if DRAWBALL_BOUNDINGVOLUME
+#if DRAWBALL_BV
             drawboundingvolume = true;
 #endif
         }
@@ -182,6 +184,13 @@ namespace XNA_PoolGame
             this.UpdateOrder = 4; //this.DrawOrder = 4;
 
             MIN_SPEED_SQUARED = MIN_SPEED * MIN_SPEED;
+
+            if (this.ballNumber >= 1 && this.ballNumber <= 7)
+                this.bvColor = Color.Aqua;
+            else if (this.ballNumber >= 9 && this.ballNumber <= 15)
+                this.bvColor = Color.Plum;
+            else
+                this.bvColor = Color.Red;
 
             base.Initialize();
         }
@@ -253,24 +262,32 @@ namespace XNA_PoolGame
                 {
                     #region BFS
                     int collisionResult = 0;
-                    Dictionary<Ball, bool> pelotasVisitadas = new Dictionary<Ball, bool>();
+                    Dictionary<Ball, bool> mark = new Dictionary<Ball, bool>();
 
-                    for (int i = 0; i < table.TotalBalls; ++i) pelotasVisitadas[table.poolBalls[i]] = this == table.poolBalls[i];
+                    for (int i = 0; i < table.TotalBalls; ++i) mark[table.poolBalls[i]] = this == table.poolBalls[i];
 
-                    Queue<Ball> cola = new Queue<Ball>();
-                    cola.Enqueue(this);
+                    Queue<Ball> queue = new Queue<Ball>();
+                    queue.Enqueue(this);
 
-                    while (cola.Count > 0)
+                    while (queue.Count > 0)
                     {
-                        Ball elemento = cola.Dequeue();
+                        Ball T = queue.Dequeue();
 
                         for (int i = 0; i < table.TotalBalls; ++i)
                         {
-                            if (table.poolBalls[i].Visible && !pelotasVisitadas[table.poolBalls[i]] && Vector3.Distance(this.Position, table.poolBalls[i].Position) <= 2.0f * this.radius)
+                            if (table.poolBalls[i].Visible && !mark[table.poolBalls[i]] && Vector3.Distance(this.Position, table.poolBalls[i].Position) <= 2.0f * this.radius)
                             {
                                 collisionResult = CheckBallWithBallCollision(this, table.poolBalls[i], remainingTime, out remainingTime);
-                                cola.Enqueue(table.poolBalls[i]);
-                                pelotasVisitadas[table.poolBalls[i]] = true;
+                                if (collisionResult != 0)
+                                {
+                                    if (table.poolBalls[i] == table.cueBall && table.roundInfo.BallHitFirstThisRound == null)
+                                        table.roundInfo.BallHitFirstThisRound = this;
+
+                                    if (this == table.cueBall && table.roundInfo.BallHitFirstThisRound == null)
+                                        table.roundInfo.BallHitFirstThisRound = table.poolBalls[i];
+                                }
+                                queue.Enqueue(table.poolBalls[i]);
+                                mark[table.poolBalls[i]] = true;
 
                             }
                         }
@@ -326,9 +343,11 @@ namespace XNA_PoolGame
                 angleRotation += angleOnThisFrame;
                 this.Rotation = Matrix.CreateFromAxisAngle(rightVector, angleRotation);
 
-                if (this.pocketWhereAt == -1 && CheckBallIsPotted() && this == table.cueBall)
+                if (this.pocketWhereAt == -1 && CheckBallIsPotted())
                 {
-                    table.roundInfo.cueballPotted = true;
+                    table.roundInfo.BallsPottedThisRound.Add(this);
+                    if (this == table.cueBall)
+                        table.roundInfo.cueballPotted = true;
                 }
 
                 acceleration = Vector3.Zero;
@@ -716,6 +735,9 @@ namespace XNA_PoolGame
             Thread.MemoryBarrier();
             obb = null;
 
+#if DRAWBALL_BV_AFTERISPOTTED && DRAWBALL_BV
+            drawboundingvolume = this.pocketWhereAt >= 0;
+#endif
             if (!IsMoving() || table == null) { base.Update(gameTime); return; }
             lock (table.syncballsready)
                 ++table.ballsready;
@@ -987,6 +1009,7 @@ namespace XNA_PoolGame
                     //s2.Rotation = Matrix.Identity;
                     //Monitor.PulseAll(s2.syncObject);
                 }
+
                 //Monitor.PulseAll(s1.syncObject);
             }
 
@@ -999,7 +1022,7 @@ namespace XNA_PoolGame
 
         public bool CheckInsidePocketCollision()
         {
-            if (World.playerInTurn == -1) return false;
+            if (World.playerInTurnIndex == -1) return false;
 
             for (int i = 0; i < table.pockets.Length; i++)
             {
@@ -1260,7 +1283,7 @@ namespace XNA_PoolGame
             Vector3 frontVector = velocity;
             Vector3 upvector = Vector3.Up;
             rightVector = Vector3.Cross(frontVector, upvector);
-            if (rightVector.Length() > 0.0f)
+            if (rightVector.LengthSquared() > 0.0f)
             {
                 rightVector.Normalize();
 

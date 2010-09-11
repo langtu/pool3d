@@ -7,6 +7,9 @@ using Microsoft.Xna.Framework;
 
 namespace XNA_PoolGame.GameControllers
 {
+    /// <summary>
+    /// Game pad controller.
+    /// </summary>
     public class XboxPad : GameController
     {
         public XboxPad(PlayerIndex index)
@@ -31,6 +34,9 @@ namespace XNA_PoolGame.GameControllers
             return new XboxPad(this.playerIndex, this);
         }
 
+        /// <summary>
+        /// Update method.
+        /// </summary>
         public override void Update()
         {
             GamePadState gps = GamePad.GetState(playerIndex);

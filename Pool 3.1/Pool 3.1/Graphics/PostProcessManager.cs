@@ -117,7 +117,7 @@ namespace XNA_PoolGame.Graphics
         /// <summary>
         /// Returns if the current render mode is a final composited scene.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Returns true or false.</returns>
         public static bool isFinalSceneRenderMode()
         {
             return currentRenderMode == RenderMode.ScreenSpaceSoftShadowRender || 

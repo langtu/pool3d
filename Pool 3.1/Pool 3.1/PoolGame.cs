@@ -28,6 +28,7 @@ using XNA_PoolGame.Graphics.Particles;
 using XNA_PoolGame.Graphics.Models;
 using XNA_PoolGame.Threading;
 using XNA_PoolGame.Graphics.Shading;
+using XNA_PoolGame.PoolTables.Racks;
 #endregion
 
 namespace XNA_PoolGame
@@ -172,6 +173,9 @@ namespace XNA_PoolGame
             //bloom.Settings = BloomSettings.PresetSettings[0];
             PostProcessManager.gameplayBloomSettings = BloomSettings.PresetSettings[0];
             World.BloomPostProcessing = false;
+
+            World.racksfactory = new Dictionary<GameMode, RackFactory>();
+            World.racksfactory[GameMode.EightBalls] = new EightBallRackFactory();
 
             // Add FPS component to show frame per second rate.
             framesPerSecond = new FPSCounter(this);
@@ -343,7 +347,7 @@ namespace XNA_PoolGame
                 World.scenario.SetParticleEffectTechnique();
             }
 
-            if (kb.IsKeyDown(Keys.L) && lastkb.IsKeyUp(Keys.L) && World.playerInTurn != -1)
+            if (kb.IsKeyDown(Keys.L) && lastkb.IsKeyUp(Keys.L) && World.playerInTurnIndex != -1)
             {
                 if (World.motionblurType == MotionBlurType.None)
                 {

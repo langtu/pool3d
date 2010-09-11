@@ -28,6 +28,8 @@ namespace XNA_PoolGame
         public Stick stick = null;
         public GameController controller;
         public PoolTable table = null;
+        public Team team;
+        public TeamNumber teamNumber = TeamNumber.One;
 
         /// <summary>
         /// This is the world's player index.
@@ -41,7 +43,6 @@ namespace XNA_PoolGame
 
         private float repeater = 1.0f;
         public List<Ball> ballsPotted = new List<Ball>();
-        public TeamNumber teamNumber = TeamNumber.One;
 
         public bool waitingforOther;
         public bool aimLagShot;
@@ -63,13 +64,14 @@ namespace XNA_PoolGame
             this.teamNumber = team;
             this.table = poolTable;
         }
-        public Player(Game game, int playerIndex, GameController controller, TeamNumber team, PoolTable poolTable)
+        public Player(Game game, string playerName, int playerIndex, GameController controller, TeamNumber teamNumber, PoolTable poolTable)
             : base(game)
         {
             this.playerIndex = playerIndex;
             this.controller = controller;
             this.table = poolTable;
-            this.teamNumber = team;
+            this.teamNumber = teamNumber;
+            this.playerName = playerName;
         }
         #endregion
 
@@ -105,7 +107,7 @@ namespace XNA_PoolGame
         {
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (World.playerInTurn == -1 || (playerIndex != World.playerInTurn && table.phase == MatchPhase.Playing)) { base.Update(gameTime); return; }
+            if (World.playerInTurnIndex == -1 || (playerIndex != World.playerInTurnIndex && table.phase == MatchPhase.Playing)) { base.Update(gameTime); return; }
             
             GameController prevcontroller = (GameController)controller.Clone();
             controller.Update();
@@ -132,10 +134,7 @@ namespace XNA_PoolGame
                         if (stick.Power >= stick.MAX_POWER || prevcontroller.isAPressed && !controller.isAPressed)
                         {
                             if (stick.Power > 0)
-                            {
-                                //    stick.Visible = false;
-                                //    TakeShot();
-                                
+                            {                                
                                 aimLagShot = false;
                                 waitingforOther = true;
                             }
@@ -223,9 +222,6 @@ namespace XNA_PoolGame
                 break;
 
             }
-           
-            
-
             base.Update(gameTime);
         }
         #endregion
@@ -281,6 +277,7 @@ namespace XNA_PoolGame
                 stick = null;
                 table = null;
                 controller = null;
+                team = null;
                 World.players[this.playerIndex] = null;
                 //GC.SuppressFinalize(this);
             }

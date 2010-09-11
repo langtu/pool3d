@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using XNA_PoolGame.Screens.Entries;
 
 namespace XNA_PoolGame.Screens
 {
@@ -9,6 +10,7 @@ namespace XNA_PoolGame.Screens
     {
         MenuEntry volumenMenuEntry;
         MenuEntry backMenuEntry;
+
         public OptionsMenuScreen() 
             : base("Options")
         {

@@ -7,6 +7,9 @@ using Microsoft.Xna.Framework.Input;
 
 namespace XNA_PoolGame.GameControllers
 {
+    /// <summary>
+    /// Keyboard controller.
+    /// </summary>
     public class KeyBoard : GameController
     {
         public KeyBoard(PlayerIndex index)
@@ -31,6 +34,9 @@ namespace XNA_PoolGame.GameControllers
             return new KeyBoard(this.playerIndex, this);
         }
 
+        /// <summary>
+        /// Update method.
+        /// </summary>
         public override void Update()
         {
             KeyboardState kbs = Keyboard.GetState();

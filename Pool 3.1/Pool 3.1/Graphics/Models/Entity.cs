@@ -33,6 +33,7 @@ namespace XNA_PoolGame.Graphics.Models
         protected string modelNameL1 = null;
         protected string textureAsset = null;
         protected bool drawboundingvolume = false;
+        protected Color bvColor = Color.Red;
 
         public bool isScatterObject = false;
         /// <summary>
@@ -828,7 +829,7 @@ namespace XNA_PoolGame.Graphics.Models
                             vectorRenderer.SetViewProjMatrix(World.camera.ViewProjection);
                             vectorRenderer.SetWorldMatrix(Matrix.Identity);
                             {
-                                vectorRenderer.SetColor(Color.Red);
+                                vectorRenderer.SetColor(bvColor);
                                 vectorRenderer.DrawBoundingBox(boxes[i]);
 
                             }
@@ -840,7 +841,7 @@ namespace XNA_PoolGame.Graphics.Models
                             vectorRenderer.SetViewProjMatrix(World.camera.ViewProjection);
                             vectorRenderer.SetWorldMatrix(localWorld);
                             {
-                                vectorRenderer.SetColor(Color.Aqua);
+                                vectorRenderer.SetColor(bvColor);
                                 vectorRenderer.DrawBoundingSphere(modelPart.Sphere);
                             }
 
@@ -909,7 +910,6 @@ namespace XNA_PoolGame.Graphics.Models
                 switch (volume)
                 {
                     case VolumeType.BoundingBoxes:
-
                         if (frustum.Contains(boxes[i]) == ContainmentType.Disjoint)
                             return false;
                         
@@ -1187,6 +1187,7 @@ namespace XNA_PoolGame.Graphics.Models
             if (disposing)
             {
                 //ModelManager.AbortAllThreads();
+                
                 PoolGame.game.Components.Remove(this);
                 modelL1 = null; modelL2 = null;
 

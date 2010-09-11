@@ -43,6 +43,7 @@ namespace XNA_PoolGame.PoolTables
 
         public void Dispose()
         {
+            
             firstballsstuck.Clear();
             firstballsstuck = null;
             balls.Clear();

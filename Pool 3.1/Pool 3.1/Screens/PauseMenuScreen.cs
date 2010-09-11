@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using XNA_PoolGame.Graphics.Bloom;
 using Microsoft.Xna.Framework.Graphics;
 using XNA_PoolGame.Graphics;
+using XNA_PoolGame.Screens.Entries;
 
 namespace XNA_PoolGame.Screens
 {

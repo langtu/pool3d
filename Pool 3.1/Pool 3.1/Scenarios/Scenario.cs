@@ -202,32 +202,6 @@ namespace XNA_PoolGame.Scenarios
 
         public abstract void UpdateParticles(GameTime gameTime);
 
-        protected override void Dispose(bool disposing)
-        {
-            World.scenario = null;
-
-            if (refCubeMap != null) refCubeMap.Dispose();
-            refCubeMap = null;
-
-            if (objects != null) objects.Clear();
-            objects = null;
-
-            if (particles != null) particles.Clear();
-            particles = null;
-
-            if (distortionparticles != null) distortionparticles.Clear();
-            distortionparticles = null;
-            syncobject = null;
-
-            if (dems_basicrender != null) dems_basicrender.Clear();
-            dems_basicrender = null;
-
-            if (volumetriclights != null) volumetriclights.Clear();
-            volumetriclights = null;
-
-            PoolGame.game.Components.Remove(this);
-            base.Dispose(disposing);
-        }
 
         public void DrawEnvironmetMappingScene(GameTime gameTime)
         {
@@ -296,6 +270,33 @@ namespace XNA_PoolGame.Scenarios
             for (int i = 1; i < World.poolTable.TotalBalls; ++i) World.poolTable.poolBalls[i].environmentMap = this.environmentMap;
         }
 
+        #region Dispose
+        protected override void Dispose(bool disposing)
+        {
+            World.scenario = null;
 
+            if (refCubeMap != null) refCubeMap.Dispose();
+            refCubeMap = null;
+
+            if (objects != null) objects.Clear();
+            objects = null;
+
+            if (particles != null) particles.Clear();
+            particles = null;
+
+            if (distortionparticles != null) distortionparticles.Clear();
+            distortionparticles = null;
+            syncobject = null;
+
+            if (dems_basicrender != null) dems_basicrender.Clear();
+            dems_basicrender = null;
+
+            if (volumetriclights != null) volumetriclights.Clear();
+            volumetriclights = null;
+
+            PoolGame.game.Components.Remove(this);
+            base.Dispose(disposing);
+        }
+        #endregion
     }
 }
