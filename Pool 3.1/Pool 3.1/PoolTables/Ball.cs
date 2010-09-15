@@ -55,7 +55,7 @@ namespace XNA_PoolGame
         public float totaltime = 0.0f;
 
         /// <summary>
-        /// Index of the pocket where the ball is
+        /// Index of the pocket where the ball is.
         /// </summary>
         public volatile int pocketWhereAt = -1;
 
@@ -1053,6 +1053,8 @@ namespace XNA_PoolGame
                             this.SetVelocity(Vector3.Reflect(this.velocity, normal) * 0.9f);
                             this.initialvelocity = this.velocity;
                             totaltime = 0.0f;
+
+                            table.roundInfo.ballsRailsHit[this] = true;
                         }
                         return true;
                     }
@@ -1103,6 +1105,7 @@ namespace XNA_PoolGame
                                 this.initialvelocity = this.velocity;
                                 totaltime = 0.0f;
 
+                                table.roundInfo.ballsRailsHit[this] = true;
                             }
                             return i;
                         }

@@ -16,8 +16,11 @@ namespace XNA_PoolGame.PoolTables.Racks
     /// of the triangle. The other balls are placed in 
     /// the triangle without purposeful or intentional pattern.
     /// </summary>
-    public class EightBallsRack : Rack
+    public class EightBallRack : Rack
     {
+		/// <summary>
+        /// 8 ball index.
+        /// </summary>
         const int eightballnumber = 7;
         /// <summary>
         /// Numbers of rows in the triangle.
@@ -37,8 +40,8 @@ namespace XNA_PoolGame.PoolTables.Racks
         /// <summary>
         /// Creates a new instance of EightBallsRack class.
         /// </summary>
-        /// <param name="table">The table that this rack belongs to.</param>
-        public EightBallsRack(PoolTable table)
+        /// <param name="table">The table that the rack belongs to.</param>
+        public EightBallRack(PoolTable table)
         {
             this.table = table;
             BuildPoolBalls();
@@ -59,7 +62,9 @@ namespace XNA_PoolGame.PoolTables.Racks
 
         public override void BuildsBallsRack()
         {
-            for (int k = 0; k < 15; k++) ballsReady[k] = false;
+            for (int k = 0; k < 15; k++)
+                ballsReady[k] = false;
+            
             int ballnumber = 0, solidballnumber, stripeballnumber;
 
             solidballnumber = Maths.random.Next(0, 7);
@@ -76,23 +81,19 @@ namespace XNA_PoolGame.PoolTables.Racks
                 for (int col = 1; col <= row; ++col)
                 {
                     if (row == EIGHTBALL_ROW && col == EIGHTBALL_COL)
-                    {
                         ballnumber = eightballnumber;
-                    }
                     else if (row == 5 && (col == 1 || col == 5))
                     {
-                        if (col == 1)
-                            ballnumber = solidballnumber;
+                        if (col == 1) ballnumber = solidballnumber;
                         else ballnumber = stripeballnumber;
-                    } 
-                    else
-                    {
-                        ballnumber = findRandomBall();
                     }
+                    else
+                        ballnumber = findRandomBall();
+                    
                     table.poolBalls[ballnumber + 1].SetCenter(position);
                     table.poolBalls[ballnumber + 1].pocketWhereAt = -1;
                     table.poolBalls[ballnumber + 1].currentTrajectory = Trajectory.Motion;
-
+					
                     ballsReady[ballnumber] = true;
                     position.Z += diameter;
                 }
@@ -109,7 +110,7 @@ namespace XNA_PoolGame.PoolTables.Racks
     {
         public override Rack CreateRack(PoolTable table)
         {
-            return new EightBallsRack(table);
+            return new EightBallRack(table);
         }
     }
 }
