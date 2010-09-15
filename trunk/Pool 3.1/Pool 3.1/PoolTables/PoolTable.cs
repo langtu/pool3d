@@ -208,7 +208,7 @@ namespace XNA_PoolGame.PoolTables
             else
                 cueBall.SetCenter(new Vector3(MIN_X + World.ballRadius * 3.5f, SURFACE_POSITION_Y + World.ballRadius, MIN_Z / 2 - World.ballRadius));
 
-            rack = World.racksfactory[World.gameMode].CreateRack(this);
+            rack = World.rackfactories[World.gameMode].CreateRack(this);
             rack.BuildsBallsRack();
 
             //TotalBalls = 1;
@@ -544,7 +544,7 @@ namespace XNA_PoolGame.PoolTables
         /// </summary>
         /// <param name="ball">Position of the ball.</param>
         /// <returns>Return true or false.</returns>
-        public bool BallAboveHeadString(Vector3 position)
+        public bool BallBehindHeadString(Vector3 position)
         {
             if (position.X >= MIN_HEAD_STRING_X && position.X <= MAX_HEAD_STRING_X &&
                 position.Z >= MIN_HEAD_STRING_Z && position.Z <= MAX_HEAD_STRING_Z)
