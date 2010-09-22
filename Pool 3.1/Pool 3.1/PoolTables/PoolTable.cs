@@ -496,6 +496,7 @@ namespace XNA_PoolGame.PoolTables
             // Check.
             cueBall.SetCenter(cueBallStartPosition);
         }
+
         /// <summary>
         /// Restores cue ball behind the head string.
         /// </summary>

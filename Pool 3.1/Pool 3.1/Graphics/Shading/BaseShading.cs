@@ -37,10 +37,16 @@ namespace XNA_PoolGame.Graphics.Shading
 
         public abstract void DrawTextured(GameTime gameTime);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public abstract string GetBasicRenderTechnique();
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         public abstract void FreeStuff();
     }
 }

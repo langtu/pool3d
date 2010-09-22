@@ -42,10 +42,10 @@ namespace XNA_PoolGame.Graphics
 
             TextureInUse downscale1 = PostProcessManager.GetIntermediateTexture(source.Width / 4, source.Height / 4, source.Format, pp.MultiSampleType, pp.MultiSampleQuality);
             PostProcessManager.scalingEffect.CurrentTechnique = PostProcessManager.scalingEffect.Techniques[techniqueName];
-            PostProcess(source, downscale1.renderTarget, PostProcessManager.scalingEffect);
+            PostProcess(source, downscale1.renderTarget, ref PostProcessManager.scalingEffect);
 
             PostProcessManager.scalingEffect.CurrentTechnique = PostProcessManager.scalingEffect.Techniques[techniqueName];
-            PostProcess(downscale1.renderTarget, result, PostProcessManager.scalingEffect);
+            PostProcess(downscale1.renderTarget, result, ref PostProcessManager.scalingEffect);
             downscale1.DontUse();
         }
 
@@ -53,28 +53,28 @@ namespace XNA_PoolGame.Graphics
         {
             TextureInUse downscale1 = PostProcessManager.GetIntermediateTexture(source.Width / 2, source.Height / 2, source.Format);
             PostProcessManager.scalingEffect.CurrentTechnique = PostProcessManager.scalingEffect.Techniques["ScaleHW"];
-            PostProcess(source, downscale1.renderTarget, PostProcessManager.scalingEffect);
+            PostProcess(source, downscale1.renderTarget, ref PostProcessManager.scalingEffect);
 
             TextureInUse downscale2 = PostProcessManager.GetIntermediateTexture(source.Width / 2, source.Height / 2, source.Format);
             PostProcessManager.scalingEffect.CurrentTechnique = PostProcessManager.scalingEffect.Techniques["ScaleHW"];
-            PostProcess(downscale1.renderTarget, downscale2.renderTarget, PostProcessManager.scalingEffect);
+            PostProcess(downscale1.renderTarget, downscale2.renderTarget, ref PostProcessManager.scalingEffect);
             downscale1.DontUse();
 
             TextureInUse downscale3 = PostProcessManager.GetIntermediateTexture(source.Width / 2, source.Height / 2, source.Format);
             PostProcessManager.scalingEffect.CurrentTechnique = PostProcessManager.scalingEffect.Techniques["ScaleHW"];
-            PostProcess(downscale2.renderTarget, downscale3.renderTarget, PostProcessManager.scalingEffect);
+            PostProcess(downscale2.renderTarget, downscale3.renderTarget, ref PostProcessManager.scalingEffect);
             downscale2.DontUse();
 
             PostProcessManager.scalingEffect.CurrentTechnique = PostProcessManager.scalingEffect.Techniques["ScaleHW"];
-            PostProcess(downscale3.renderTarget, result, PostProcessManager.scalingEffect);
+            PostProcess(downscale3.renderTarget, result, ref PostProcessManager.scalingEffect);
             downscale3.DontUse();
         }
 
-        protected void PostProcess(RenderTarget2D source, RenderTarget2D result, Effect effect)
+        protected void PostProcess(RenderTarget2D source, RenderTarget2D result, ref Effect effect)
         {
             RenderTarget2D[] sources = singleSourceArray;
             sources[0] = source;
-            PostProcess(sources, result, effect);
+            PostProcess(sources, result, ref effect);
         }
 
         public void Blur(RenderTarget2D source,
@@ -92,12 +92,12 @@ namespace XNA_PoolGame.Graphics
             PostProcessManager.blurEffect.CurrentTechnique = PostProcessManager.blurEffect.Techniques[baseTechniqueName + "H"];
             PostProcessManager.blurEffect.Parameters["g_fSigma"].SetValue(blurSigma);
 
-            PostProcess(source, blurH.renderTarget, PostProcessManager.blurEffect);
+            PostProcess(source, blurH.renderTarget, ref PostProcessManager.blurEffect);
 
             // Now the vertical pass 
             PostProcessManager.blurEffect.CurrentTechnique = PostProcessManager.blurEffect.Techniques[baseTechniqueName + "V"];
 
-            PostProcess(blurH.renderTarget, result, PostProcessManager.blurEffect);
+            PostProcess(blurH.renderTarget, result, ref PostProcessManager.blurEffect);
 
             blurH.DontUse();
         }
@@ -129,14 +129,14 @@ namespace XNA_PoolGame.Graphics
             RenderTarget2D[] sources = doubleSourceArray;
             sources[0] = source;
             sources[1] = depthTexture;
-            PostProcess(sources, blurH.renderTarget, PostProcessManager.blurEffect);
+            PostProcess(sources, blurH.renderTarget, ref PostProcessManager.blurEffect);
 
             // Now the vertical pass 
             PostProcessManager.blurEffect.CurrentTechnique = PostProcessManager.blurEffect.Techniques[baseTechniqueName + "V"];
 
             sources[0] = blurH.renderTarget;
             sources[1] = depthTexture;
-            PostProcess(blurH.renderTarget, result, PostProcessManager.blurEffect);
+            PostProcess(blurH.renderTarget, result, ref PostProcessManager.blurEffect);
 
             blurH.DontUse();
         }
@@ -149,9 +149,8 @@ namespace XNA_PoolGame.Graphics
 		{
             PostProcessManager.DOFEffect.Parameters["bDeferred"].SetValue(World.shadingTech == ShadingTechnnique.Deferred);
             if (World.shadingTech == ShadingTechnnique.Deferred)
-            {
                 PostProcessManager.DOFEffect.Parameters["InvertProjection"].SetValue(World.camera.InvProjection);
-            }
+            
             if (dofType == DOFType.DiscBlur)
             {
                 // Scale tap offsets based on render target size
@@ -187,10 +186,16 @@ namespace XNA_PoolGame.Graphics
                 sources[0] = source;
                 sources[1] = depthTexture;
 
-                PostProcess(sources, result, PostProcessManager.DOFEffect);
+                PostProcess(sources, result, ref PostProcessManager.DOFEffect);
             }
             else
             {
+                PostProcessManager.blurEffect.Parameters["g_fFarClip"].SetValue(World.camera.FarPlane);
+                PostProcessManager.blurEffect.Parameters["bDeferred"].SetValue(World.shadingTech == ShadingTechnnique.Deferred);
+                if (World.shadingTech == ShadingTechnnique.Deferred)
+                    PostProcessManager.blurEffect.Parameters["InvertProjection"].SetValue(World.camera.InvProjection);
+            
+
                 PresentationParameters pp = PoolGame.device.PresentationParameters;
                 // Downscale to 1/16th size and blur
                 TextureInUse downscaleTexture = PostProcessManager.GetIntermediateTexture(source.Width / 4, source.Height / 4, SurfaceFormat.Color, pp.MultiSampleType, pp.MultiSampleQuality);
@@ -216,14 +221,14 @@ namespace XNA_PoolGame.Graphics
                 sources[1] = downscaleTexture.renderTarget;
                 sources[2] = depthTexture;
 
-                PostProcess(sources, result, PostProcessManager.DOFEffect);
+                PostProcess(sources, result, ref PostProcessManager.DOFEffect);
 
                 downscaleTexture.DontUse();
             }
 
         }
 
-        protected void PostProcess(RenderTarget2D[] sources, RenderTarget2D result, Effect effect)
+        protected void PostProcess(RenderTarget2D[] sources, RenderTarget2D result, ref Effect effect)
         {
             PoolGame.device.SetRenderTarget(0, result);
             PoolGame.device.Clear(Color.Black);

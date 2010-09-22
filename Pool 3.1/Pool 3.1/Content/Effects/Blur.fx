@@ -17,6 +17,9 @@
 //======================================================================
 
 #include "DOF_Common.fxh"
+bool bDeferred = false;
+float4x4 InvertProjection;
+float g_fFarClip;
 
 float g_fSigma = 0.5f;
 
@@ -66,12 +69,45 @@ float4 GaussianDepthBlurH (	in float2 in_vTexCoord			: TEXCOORD0,
     float4 vColor = 0;
 	float2 vTexCoord = in_vTexCoord;
 	float4 vCenterColor = tex2D(PointSampler0, in_vTexCoord);
-	float fCenterDepth = tex2D(PointSampler1, in_vTexCoord).x; 
+	float fCenterDepth;
 
+	if (bDeferred)
+	{
+		//compute screen-space position
+		float4 position;
+		position.x = in_vTexCoord.x * 2.0f - 1.0f;
+		position.y = -(in_vTexCoord.y * 2.0f - 1.0f);
+		position.z = tex2D(PointSampler1, in_vTexCoord).x;
+		position.w = 1.0f;
+		
+		//transform to world space
+		position = mul(position, InvertProjection);
+		position /= position.w;
+		fCenterDepth = -position.z / g_fFarClip;
+	} else
+		fCenterDepth = tex2D(PointSampler1, in_vTexCoord).x;
+		
     for (int i = -iRadius; i < 0; i++)
     {   
 		vTexCoord.x = in_vTexCoord.x + (i / g_vSourceDimensions.x);
-		float fDepth = tex2D(PointSampler1, vTexCoord).x;
+		float fDepth;// = tex2D(PointSampler1, vTexCoord).x;
+		
+		if (bDeferred)
+		{
+			//compute screen-space position
+			float4 position;
+			position.x = vTexCoord.x * 2.0f - 1.0f;
+			position.y = -(vTexCoord.y * 2.0f - 1.0f);
+			position.z = tex2D(PointSampler1, vTexCoord).x;
+			position.w = 1.0f;
+			
+			//transform to world space
+			position = mul(position, InvertProjection);
+			position /= position.w;
+			fDepth = -position.z / g_fFarClip;
+		} else
+			fDepth = tex2D(PointSampler1, vTexCoord).x;
+			
 		float fWeight = CalcGaussianWeight(i);
     
 		if (fDepth >= fCenterDepth)
@@ -80,13 +116,30 @@ float4 GaussianDepthBlurH (	in float2 in_vTexCoord			: TEXCOORD0,
 			vColor += vSample * fWeight;
 		}
 		else
-			vColor +=  vCenterColor * fWeight;
+			vColor += vCenterColor * fWeight;
     }
     
     for (int i = 1; i < iRadius; i++)
     {   
 		vTexCoord.x = in_vTexCoord.x + (i / g_vSourceDimensions.x);
-		float fDepth = tex2D(PointSampler1, vTexCoord).x;
+		float fDepth;// = tex2D(PointSampler1, vTexCoord).x;
+		
+		if (bDeferred)
+		{
+			//compute screen-space position
+			float4 position;
+			position.x = vTexCoord.x * 2.0f - 1.0f;
+			position.y = -(vTexCoord.y * 2.0f - 1.0f);
+			position.z = tex2D(PointSampler1, vTexCoord).x;
+			position.w = 1.0f;
+			
+			//transform to world space
+			position = mul(position, InvertProjection);
+			position /= position.w;
+			fDepth = -position.z / g_fFarClip;
+		} else
+			fDepth = tex2D(PointSampler1, vTexCoord).x;
+			
 		float fWeight = CalcGaussianWeight(i);
     
 		if (fDepth >= fCenterDepth)
@@ -109,12 +162,44 @@ float4 GaussianDepthBlurV(	in float2 in_vTexCoord			: TEXCOORD0,
     float4 vColor = 0;
 	float2 vTexCoord = in_vTexCoord;
 	float4 vCenterColor = tex2D(PointSampler0, in_vTexCoord);
-	float fCenterDepth = tex2D(PointSampler1, in_vTexCoord).x; 
-
+	float fCenterDepth;// = tex2D(PointSampler1, in_vTexCoord).x; 
+	
+	if (bDeferred)
+	{
+		//compute screen-space position
+		float4 position;
+		position.x = in_vTexCoord.x * 2.0f - 1.0f;
+		position.y = -(in_vTexCoord.y * 2.0f - 1.0f);
+		position.z = tex2D(PointSampler1, in_vTexCoord).x;
+		position.w = 1.0f;
+		
+		//transform to world space
+		position = mul(position, InvertProjection);
+		position /= position.w;
+		fCenterDepth = -position.z / g_fFarClip;
+	} else
+		fCenterDepth = tex2D(PointSampler1, in_vTexCoord).x;
+		
     for (int i = -iRadius; i < 0; i++)
     {   
 		vTexCoord.y = in_vTexCoord.y + (i / g_vSourceDimensions.y);
-		float fDepth = tex2D(PointSampler1, vTexCoord).x;
+		float fDepth;// = tex2D(PointSampler1, vTexCoord).x;
+		
+		if (bDeferred)
+		{
+			//compute screen-space position
+			float4 position;
+			position.x = vTexCoord.x * 2.0f - 1.0f;
+			position.y = -(vTexCoord.y * 2.0f - 1.0f);
+			position.z = tex2D(PointSampler1, vTexCoord).x;
+			position.w = 1.0f;
+			
+			//transform to world space
+			position = mul(position, InvertProjection);
+			position /= position.w;
+			fDepth = -position.z / g_fFarClip;
+		} else
+			fDepth = tex2D(PointSampler1, vTexCoord).x;
 		float fWeight = CalcGaussianWeight(i);
 		
 		if (fDepth >= fCenterDepth)
@@ -129,7 +214,24 @@ float4 GaussianDepthBlurV(	in float2 in_vTexCoord			: TEXCOORD0,
     for (int i = 1; i < iRadius; i++)
     {   
 		vTexCoord.y = in_vTexCoord.y + (i / g_vSourceDimensions.y);
-		float fDepth = tex2D(PointSampler1, vTexCoord).x;
+		float fDepth;// = tex2D(PointSampler1, vTexCoord).x;
+		
+		if (bDeferred)
+		{
+			//compute screen-space position
+			float4 position;
+			position.x = vTexCoord.x * 2.0f - 1.0f;
+			position.y = -(vTexCoord.y * 2.0f - 1.0f);
+			position.z = tex2D(PointSampler1, vTexCoord).x;
+			position.w = 1.0f;
+			
+			//transform to world space
+			position = mul(position, InvertProjection);
+			position /= position.w;
+			fDepth = -position.z / g_fFarClip;
+		} else
+			fDepth = tex2D(PointSampler1, vTexCoord).x;
+			
 		float fWeight = CalcGaussianWeight(i);
     
 		if (fDepth >= fCenterDepth)

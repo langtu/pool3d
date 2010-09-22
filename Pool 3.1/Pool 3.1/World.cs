@@ -54,7 +54,7 @@ namespace XNA_PoolGame
         public static Referee referee;
         public static ScenarioType scenarioType = ScenarioType.Cribs;
         public static GameMode gameMode = GameMode.EightBalls;
-        public static Dictionary<GameMode, RackFactory> racksfactory;
+        public static Dictionary<GameMode, RackFactory> rackfactories;
 
         /// <summary>
         /// Match teams.

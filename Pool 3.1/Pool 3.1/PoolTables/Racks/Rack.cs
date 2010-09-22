@@ -22,7 +22,7 @@ namespace XNA_PoolGame.PoolTables.Racks
 
         /// <summary>
         /// Abstract method. This should be called after
-        /// the concrete rack is created. (constructor)
+        /// the concrete rack is created.
         /// </summary>
         protected abstract void BuildPoolBalls();
 
