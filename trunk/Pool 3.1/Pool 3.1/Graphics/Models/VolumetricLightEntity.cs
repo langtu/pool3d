@@ -1,10 +1,12 @@
-﻿using System;
+﻿#region Using Statements
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using XNA_PoolGame.Helpers;
+#endregion
 
 namespace XNA_PoolGame.Graphics.Models
 {
@@ -13,6 +15,7 @@ namespace XNA_PoolGame.Graphics.Models
     /// </summary>
     public class VolumetricLightEntity : DrawableComponent
     {
+        #region Variables
         private string modelName;
         private CustomModel model;
         private string alphachannelAsset = null;
@@ -21,21 +24,16 @@ namespace XNA_PoolGame.Graphics.Models
         protected string textureAsset = null;
         protected Texture2D useTexture;
         protected Texture2D alphaChannelTexture;
+
         /// <summary>
         /// List of textures
         /// </summary>
         protected List<Texture2D> textures;
         public TextureAddressMode TEXTURE_ADDRESS_MODE = TextureAddressMode.Clamp;
 
-        protected Vector3 lightPosition;
-
-        protected Matrix lightview;
-        protected Texture2D noiseMap;
-        protected Texture2D noiseMap2;
-
         // Alpha blending settings.
         public Blend SourceBlend = Blend.SourceAlpha; // color de la textura del modelo
-        public Blend DestinationBlend = Blend.DestinationColor;
+        public Blend DestinationBlend = Blend.One;
 
 
         private Matrix prelocalWorld;
@@ -45,7 +43,7 @@ namespace XNA_PoolGame.Graphics.Models
         private Vector3 position;
         private Vector3 scale;
         private bool worldDirty;
-
+        private CullMode cullmode;
 
         protected VolumeType volume;
         private bool useModelPartBB = true;
@@ -58,6 +56,8 @@ namespace XNA_PoolGame.Graphics.Models
         /// Render parameters delegate
         /// </summary>
         public delegate void RenderHandler();
+
+        #endregion
 
         #region Properties
         public Vector3 Position
@@ -90,21 +90,16 @@ namespace XNA_PoolGame.Graphics.Models
             set { useModelPartBB = value; }
         }
 
-        public Vector3 LightPosition
+        public CullMode Cull
         {
-            get { return lightPosition; }
-            set { lightPosition = value; }
+            get { return cullmode; }
+            set { cullmode = value; }
         }
 
-        public Matrix LightView
-        {
-            get { return lightview; }
-            set { lightview = value; }
-        }
 
         #endregion
 
-        #region Constructor
+        #region Constructors
         public VolumetricLightEntity(Game _game, string _modelName)
             : base(_game)
         {
@@ -118,6 +113,7 @@ namespace XNA_PoolGame.Graphics.Models
             volume = VolumeType.BoundingBoxes;
             prelocalWorld = Matrix.Identity;
 
+            cullmode = CullMode.CullClockwiseFace;
             worldDirty = true;
         }
         public VolumetricLightEntity(Game _game, string _modelName, string _alphachannelAsset)
@@ -134,6 +130,7 @@ namespace XNA_PoolGame.Graphics.Models
             volume = VolumeType.BoundingBoxes;
             prelocalWorld = Matrix.Identity;
 
+            cullmode = CullMode.CullClockwiseFace;
             worldDirty = true;
         }
 
@@ -145,9 +142,6 @@ namespace XNA_PoolGame.Graphics.Models
             GC.Collect();
             model = PoolGame.content.Load<CustomModel>(modelName);
             if (alphachannelAsset != null) alphaChannelTexture = PoolGame.content.Load<Texture2D>(alphachannelAsset);
-
-            noiseMap = PoolGame.content.Load<Texture2D>("Textures\\noise1");
-            noiseMap2 = PoolGame.content.Load<Texture2D>("Textures\\noise2");
 
             // Setup model.
             textures = model.GetDiffuseTextures();
@@ -211,24 +205,18 @@ namespace XNA_PoolGame.Graphics.Models
                         // Set the alpha blend mode.
                         PoolGame.device.RenderState.AlphaBlendEnable = true;
                         PoolGame.device.RenderState.AlphaBlendOperation = BlendFunction.Add;
+                        
                         PoolGame.device.RenderState.SourceBlend = SourceBlend; // color de la textura del modelo
                         PoolGame.device.RenderState.DestinationBlend = DestinationBlend; // color del framebuffer
-                        //PoolGame.device.RenderState.BlendFactor = new Color(64, 64, 64);
-
-                        ////PoolGame.device.RenderState.SourceBlend = Blend.SourceAlpha; // source rgb * source alpha
-                        //PoolGame.device.RenderState.AlphaSourceBlend = Blend.One; // don't modify source alpha
-                        ////PoolGame.device.RenderState.DestinationBlend = Blend.InverseSourceAlpha; // dest rgb * (255 - source alpha)
-                        //PoolGame.device.RenderState.AlphaDestinationBlend = Blend.InverseSourceAlpha; // dest alpha * (255 - source alpha)
-                        //PoolGame.device.RenderState.BlendFunction = BlendFunction.Add;
-
+                        PoolGame.device.RenderState.BlendFunction = BlendFunction.Add;
 
                         // Set the alpha test mode.
-                        PoolGame.device.RenderState.AlphaTestEnable = true;
-                        PoolGame.device.RenderState.AlphaFunction = CompareFunction.Greater;
-                        PoolGame.device.RenderState.ReferenceAlpha = 0;
+                        //PoolGame.device.RenderState.AlphaTestEnable = true;
+                        //PoolGame.device.RenderState.AlphaFunction = CompareFunction.Greater;
+                        //PoolGame.device.RenderState.ReferenceAlpha = 0;
 
                         CullMode oldCullMode = PoolGame.device.RenderState.CullMode;
-                        PoolGame.device.RenderState.CullMode = CullMode.CullClockwiseFace;
+                        PoolGame.device.RenderState.CullMode = cullmode;
 
                         bool depthbufferWrite_old = PoolGame.device.RenderState.DepthBufferWriteEnable;
                         PoolGame.device.RenderState.DepthBufferEnable = true;
@@ -465,14 +453,13 @@ namespace XNA_PoolGame.Graphics.Models
         public void SetParametersVolumetricLightModel()
         {
             PostProcessManager.shaftsEffect.Parameters["World"].SetValue(localWorld);
+            PostProcessManager.shaftsEffect.Parameters["View"].SetValue(World.camera.View);
             PostProcessManager.shaftsEffect.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
-            PostProcessManager.shaftsEffect.Parameters["LightPosition"].SetValue(LightPosition);
-            PostProcessManager.shaftsEffect.Parameters["LightView"].SetValue(LightView);
+            
             PostProcessManager.shaftsEffect.Parameters["CameraPosition"].SetValue(World.camera.CameraPosition);
 
             PostProcessManager.shaftsEffect.Parameters["LightColor"].SetValue(new Color(240, 220, 0, 255).ToVector3());
-            PostProcessManager.shaftsEffect.Parameters["NoiseMap"].SetValue(noiseMap);
-            PostProcessManager.shaftsEffect.Parameters["NoiseMap2"].SetValue(noiseMap2);
+            
             if (alphaChannelTexture != null) 
                 PostProcessManager.shaftsEffect.Parameters["AlphaMap"].SetValue(alphaChannelTexture);
 

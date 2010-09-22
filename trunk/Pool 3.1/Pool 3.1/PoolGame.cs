@@ -174,8 +174,8 @@ namespace XNA_PoolGame
             PostProcessManager.gameplayBloomSettings = BloomSettings.PresetSettings[0];
             World.BloomPostProcessing = false;
 
-            World.racksfactory = new Dictionary<GameMode, RackFactory>();
-            World.racksfactory[GameMode.EightBalls] = new EightBallRackFactory();
+            World.rackfactories = new Dictionary<GameMode, RackFactory>();
+            World.rackfactories[GameMode.EightBalls] = new EightBallRackFactory();
 
             // Add FPS component to show frame per second rate.
             framesPerSecond = new FPSCounter(this);
@@ -474,7 +474,8 @@ namespace XNA_PoolGame
         #endregion
 
         /// <summary>
-        /// Reset the basic states of the Graphics Device needed to draw the scene
+        /// Reset the basic states of the Graphics Device
+        /// needed to draw the scene.
         /// </summary>
         public void PrepareRenderStates()
         {
@@ -521,7 +522,7 @@ namespace XNA_PoolGame
             ResetParticlesRenderStates();
 
             base.Draw(gameTime);
-
+            DrawHUD(gameTime);
             if (saturation != 1.0f) PostProcessManager.DrawSaturation(saturation);
 
             // Show Shadow Map Texture (depth) 
@@ -572,6 +573,24 @@ namespace XNA_PoolGame
             DrawText(gameTime);
 #endif
             //GraphicsDevice.Present();
+        }
+
+        private void DrawHUD(GameTime gameTime)
+        {
+            if (World.playerInTurnIndex < 0) return;
+            if (World.players[World.playerInTurnIndex] == null) return;
+
+            SpriteBatch batch = PostProcessManager.spriteBatch;
+            batch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Deferred,
+                SaveStateMode.SaveState);
+            string text = "";
+            text += World.players[World.playerInTurnIndex].playerName + " " + World.players[World.playerInTurnIndex].team.BallType.ToString();
+            text += "\nTotal balls pocketed: " + World.players[World.playerInTurnIndex].team.TotalBallsPocketed;
+
+            batch.DrawString(spriteFont, text, new Vector2(18, height - 316), Color.Black);
+            batch.DrawString(spriteFont, text, new Vector2(17, height - 317), Color.Tomato);
+
+            batch.End();
         }
 
         #region Draw Text for Debugging

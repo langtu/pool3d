@@ -422,13 +422,12 @@ namespace XNA_PoolGame.Scenarios
             vase.Position = bar.Position + new Vector3(0, 283, -200);
             PoolGame.game.Components.Add(vase);
 
-            lightScatter = new VolumetricLightEntity(PoolGame.game, "Models\\cone", "Models\\god rays alpha");
+            lightScatter = new VolumetricLightEntity(PoolGame.game, "Models\\coneAR", "Models\\god rays alpha");
             lightScatter.Position = new Vector3(180.0f, 375, 0.0f);
-            lightScatter.TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;
-            lightScatter.LightPosition = new Vector3(0, -45, 0) + lightScatter.Position;
-            lightScatter.LightView = Matrix.CreateLookAt(lightScatter.LightPosition, lightScatter.LightPosition + Vector3.Down, Vector3.Right);
+            lightScatter.TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;            
+            lightScatter.Scale = Vector3.One * 4.0f;
             ////lightScatter.Scale = new Vector3(5.0f);
-            //PoolGame.game.Components.Add(lightScatter);
+            PoolGame.game.Components.Add(lightScatter);
 
             ////////////////////////////////////////////////
             //World.scenario.Objects.Add(ballsinstanced);
@@ -478,7 +477,7 @@ namespace XNA_PoolGame.Scenarios
             foreach (Entity vent in vents)
                 World.scenario.Objects.Add(vent);
 
-            //World.scenario.objects.Add(lightScatter);
+            World.scenario.objects.Add(lightScatter);
             //volumetriclights.Add(lightScatter);
 
             base.Initialize();

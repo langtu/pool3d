@@ -653,6 +653,11 @@
     <None Include="Effects\pp_Common.fxh">
       <Name>pp_Common</Name>
     </None>
+    <Compile Include="Models\coneAR.X">
+      <Name>coneAR</Name>
+      <Importer>XImporter</Importer>
+      <Processor>CustomModelProcessor</Processor>
+    </Compile>
     <Compile Include="Fonts\HUD.spritefont">
       <Name>HUD</Name>
       <Importer>FontDescriptionImporter</Importer>
@@ -1721,6 +1726,13 @@
   <ItemGroup>
     <Compile Include="Textures\Balls\white.jpg">
       <Name>white</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Textures\radial2.jpg">
+      <Name>radial2</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

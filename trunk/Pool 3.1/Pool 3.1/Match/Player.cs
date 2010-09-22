@@ -42,7 +42,7 @@ namespace XNA_PoolGame
         public int faults = 0;
 
         private float repeater = 1.0f;
-        public List<Ball> ballsPotted = new List<Ball>();
+        public List<Ball> ballsPotted;
 
         public bool waitingforOther;
         public bool aimLagShot;
@@ -54,6 +54,7 @@ namespace XNA_PoolGame
             this.controller = controller;
             this.table = World.poolTable;
             this.playerIndex = playerIndex;
+            ballsPotted = new List<Ball>();
         }
         public Player(Game game, int playerIndex, GameController controller, TeamNumber team, Stick stick, PoolTable poolTable)
             : base(game)
@@ -63,6 +64,7 @@ namespace XNA_PoolGame
             this.stick = stick;
             this.teamNumber = team;
             this.table = poolTable;
+            ballsPotted = new List<Ball>();
         }
         public Player(Game game, string playerName, int playerIndex, GameController controller, TeamNumber teamNumber, PoolTable poolTable)
             : base(game)
@@ -72,6 +74,7 @@ namespace XNA_PoolGame
             this.table = poolTable;
             this.teamNumber = teamNumber;
             this.playerName = playerName;
+            ballsPotted = new List<Ball>();
         }
         #endregion
 
@@ -238,7 +241,7 @@ namespace XNA_PoolGame
             if (stick.Power >= stick.MIN_POWER)
             {
                 stick.Visible = false;
-                table.roundInfo.ballsState = new List<PoolBallState>();
+                table.roundInfo.ballsState.Clear();
 
                 for (int i = 0; i < table.TotalBalls; i++)
                 {

@@ -106,7 +106,7 @@ namespace XNA_PoolGame.Screens
             ////////////// PLAYERS //////////////
             World.playerCount = 2;
             World.playerInTurnIndex = 0;
-            World.players[0] = new Player(PoolGame.game, "Edgar", (int)PlayerIndex.One, new XboxPad(PlayerIndex.One), TeamNumber.One, World.poolTable);
+            World.players[0] = new Player(PoolGame.game, "Edgar", (int)PlayerIndex.One, new KeyBoard(PlayerIndex.One), TeamNumber.One, World.poolTable);
             World.players[1] = new Player(PoolGame.game, "Adry", (int)PlayerIndex.Two, new KeyBoard(PlayerIndex.Two), TeamNumber.Two, World.poolTable);
 
             ////////////// REFEREE //////////////

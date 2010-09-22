@@ -86,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cameras\EmptyCamera.cs" />
+    <Compile Include="GameEvents\GameEvent.cs" />
     <Compile Include="Graphics\DepthOfField.cs" />
     <Compile Include="Graphics\FullQuad.cs" />
     <Compile Include="Graphics\LensFlare.cs" />
@@ -112,7 +113,7 @@
     <Compile Include="Match\Team.cs" />
     <Compile Include="PoolTables\BallCollider.cs" />
     <Compile Include="Graphics\Particles\ParticlesCore.cs" />
-    <Compile Include="PoolTables\Racks\EightBallsRack.cs" />
+    <Compile Include="PoolTables\Racks\EightBallRack.cs" />
     <Compile Include="PoolTables\Racks\Rack.cs" />
     <Compile Include="Threading\ThreadComponent.cs" />
     <Compile Include="Helpers\Maths.cs" />
@@ -120,7 +121,7 @@
     <Compile Include="Cameras\Camera.cs" />
     <Compile Include="Cameras\ChaseCamera.cs" />
     <Compile Include="Cameras\FreeCamera.cs" />
-    <Compile Include="GameControllers\Controller.cs" />
+    <Compile Include="GameControllers\GameController.cs" />
     <Compile Include="GameControllers\XboxPad.cs" />
     <Compile Include="GameControllers\KeyBoard.cs" />
     <Compile Include="Enums.cs" />

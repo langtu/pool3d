@@ -86,10 +86,11 @@ namespace XNA_PoolGame.Match
         }
 
         /// <summary>
-        /// Increases the counter of balls that has been
-        /// legally pocketed.
+        /// Increases the balls counter that has been
+        /// legally pocketed or increases the balls counter 
+        /// of the opposite team.
         /// </summary>
-        public void IncreseBallsPocketedCounter()
+        public void IncresePocketedBallsCounter()
         {
             ++totalBallsPocketed;
         }
