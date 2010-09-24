@@ -291,10 +291,10 @@ namespace XNA_PoolGame.PoolTables
             {
                 if (World.players[i] != null)
                     World.players[i].stick.ballTarget = cueBall;
-                
             }
 
             this.phase = MatchPhase.Playing;
+            this.openTable = true;
             roundInfo.StartSet();
         }
 
@@ -307,6 +307,7 @@ namespace XNA_PoolGame.PoolTables
             rack.BuildsBallsRack();
 
             roundInfo.StartSet();
+            rack.StartGame();
         }
 
         public void Reset()

@@ -27,6 +27,12 @@ namespace XNA_PoolGame.Match
 
         int totalBallsPocketed;
 
+        /// <summary>
+        /// Last index of the selected pocket.
+        /// </summary>
+        int lastPocketIndex;
+
+
         #region Properties
         public BallGroupType BallType
         {
@@ -45,6 +51,12 @@ namespace XNA_PoolGame.Match
         public int TotalBallsPocketed
         {
             get { return totalBallsPocketed; }
+        }
+
+        public int LastPocketIndex
+        {
+            get { return lastPocketIndex; }
+            set { lastPocketIndex = value; }
         }
 
         #endregion
@@ -71,13 +83,8 @@ namespace XNA_PoolGame.Match
         {
             nextPlayerInTurn = 0;
             totalBallsPocketed = 0;
+            lastPocketIndex = -1;
             oppositeTeam = World.teams[((int)this.teamNumber + 1) % 2];
-        }
-
-        public void Dispose()
-        {
-            oppositeTeam = null;
-            players = null;
         }
 
         public int NextPlayerInTurn()
@@ -87,6 +94,7 @@ namespace XNA_PoolGame.Match
 
         public void ResetForGameSet()
         {
+            lastPocketIndex = -1;
             totalBallsPocketed = 0;
             ballType = BallGroupType.None;
         }
@@ -100,5 +108,12 @@ namespace XNA_PoolGame.Match
         {
             ++totalBallsPocketed;
         }
+
+        public void Dispose()
+        {
+            oppositeTeam = null;
+            players = null;
+        }
+
     }
 }

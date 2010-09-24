@@ -53,6 +53,15 @@ namespace XNA_PoolGame
         public static int playerInTurnIndex = -1;
         public static int playerCount = 0;
 
+        public static Player CurrentPlayer
+        {
+            get
+            {
+                if (playerInTurnIndex == -1) return null;
+                return players[playerInTurnIndex];
+            }
+        }
+
         /// <summary>
         /// Match referee.
         /// </summary>
@@ -75,7 +84,7 @@ namespace XNA_PoolGame
         // SHADOWS SETTINGS
         public static bool displayShadows = true;
         public static bool displayShadowsTextures = false;
-        public static int shadowMapSize = 1024 / 2;
+        public static int shadowMapSize = 1024 * 1;
         public static ShadowTechnnique shadowTechnique = ShadowTechnnique.VarianceShadowMapping;
         //
         public static ShadingTechnnique shadingTech = ShadingTechnnique.Foward;

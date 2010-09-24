@@ -9,6 +9,7 @@ using XNA_PoolGame.PoolTables;
 using XNA_PoolGame.GameControllers;
 using XNA_PoolGame.Match;
 using XNA_PoolGame.Screens;
+using XNA_PoolGame.PoolTables.Racks;
 #endregion
 
 namespace XNA_PoolGame
@@ -224,13 +225,15 @@ namespace XNA_PoolGame
                             if (controller.isAPressed && !prevcontroller.isAPressed)
                             {
                                 Ball ball = table.IntersectsABall();
-                                if (ball != null)
+                                if (ball != null && table.roundInfo.enabledCalledBall)
                                     table.roundInfo.calledBall = ball;
-                                else
+                                else if (table.roundInfo.enabledCalledPocket)
                                 {
                                     Pocket pocket = table.IntersectsAPocket();
                                     if (!(table.roundInfo.calledPocket != null && pocket == null))
+                                    {
                                         table.roundInfo.calledPocket = pocket;
+                                    }
                                 }
                             }
                         }

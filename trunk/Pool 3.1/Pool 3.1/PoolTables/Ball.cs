@@ -19,7 +19,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace XNA_PoolGame
 {
     /// <summary>
-    /// The Ball.
+    /// Define a ball.
     /// </summary>
     public class Ball : Entity
     {

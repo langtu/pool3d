@@ -71,6 +71,8 @@ namespace XNA_PoolGame.Match
         public bool firstShotOfSet;
         public float stickRotation;
 
+        public bool enabledCalledBall;
+        public bool enabledCalledPocket;
         public Ball calledBall;
         public Pocket calledPocket;
 
@@ -100,6 +102,8 @@ namespace XNA_PoolGame.Match
             table = null;
             calledBall = null;
             calledPocket = null;
+            enabledCalledBall = false;
+            enabledCalledPocket = false;
         }
 
         /// <summary>
@@ -126,7 +130,6 @@ namespace XNA_PoolGame.Match
             }
 
             this.cueballState = this.ballsState[0];
-            table.openTable = true;
         }
 
         public void EndSet()

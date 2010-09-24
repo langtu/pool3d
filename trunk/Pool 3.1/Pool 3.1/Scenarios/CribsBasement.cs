@@ -422,7 +422,7 @@ namespace XNA_PoolGame.Scenarios
             vase.Position = bar.Position + new Vector3(0, 283, -200);
             PoolGame.game.Components.Add(vase);
 
-            lightScatter = new VolumetricLightEntity(PoolGame.game, "Models\\coneAR", "Models\\god rays alpha");
+            lightScatter = new VolumetricLightEntity(PoolGame.game, "Models\\cone", "Models\\god rays alpha");
             lightScatter.Position = new Vector3(180.0f, 375, 0.0f);
             lightScatter.TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;            
             lightScatter.Scale = Vector3.One * 4.0f;
