@@ -51,6 +51,7 @@ namespace XNA_PoolGame
         public int currentlight = 0;
 
         public static Rectangle fullscreen;
+        public static Vector2 screenSize;
 
         #region Constants
 
@@ -165,6 +166,7 @@ namespace XNA_PoolGame
             height = graphics.GraphicsDevice.Viewport.Height;
 
             fullscreen = new Rectangle(0, 0, width, height);
+            screenSize = new Vector2(PoolGame.Width, PoolGame.height);
             PostProcessManager.Load();
             ModelManager.Load();
 
@@ -176,6 +178,7 @@ namespace XNA_PoolGame
 
             World.rackfactories = new Dictionary<GameMode, RackFactory>();
             World.rackfactories[GameMode.EightBalls] = new EightBallRackFactory();
+            World.rackfactories[GameMode.NineBalls] = new NineBallRackFactory();
 
             // Add FPS component to show frame per second rate.
             framesPerSecond = new FPSCounter(this);
@@ -586,7 +589,14 @@ namespace XNA_PoolGame
             string text = "";
             text += World.players[World.playerInTurnIndex].playerName + " " + World.players[World.playerInTurnIndex].team.BallType.ToString();
             text += "\nTotal balls pocketed: " + World.players[World.playerInTurnIndex].team.TotalBallsPocketed;
-
+            if (World.poolTable != null && World.poolTable.roundInfo.calledBall != null)
+            {
+                text += "\nCalled Ball: " + World.poolTable.roundInfo.calledBall.ballNumber;
+            }
+            if (World.poolTable != null && World.poolTable.roundInfo.calledPocket != null)
+            {
+                text += "\nCalled Pocket: " + World.poolTable.roundInfo.calledPocket.pocketIndex;
+            }
             batch.DrawString(spriteFont, text, new Vector2(18, height - 316), Color.Black);
             batch.DrawString(spriteFont, text, new Vector2(17, height - 317), Color.Tomato);
 

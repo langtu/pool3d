@@ -59,8 +59,11 @@ namespace XNA_PoolGame.PoolTables
             headDelimiters = new Vector3[2];
             headDelimiters[0] = new Vector3(MIN_HEAD_STRING_X, SURFACE_POSITION_Y + World.ballRadius, MIN_HEAD_STRING_Z);
             headDelimiters[1] = new Vector3(MAX_HEAD_STRING_X, SURFACE_POSITION_Y + World.ballRadius, MAX_HEAD_STRING_Z);
-            //headDelimiters[0] = new Vector3(MIN_X + World.ballRadius + float.Epsilon, SURFACE_POSITION_Y + World.ballRadius, MIN_Z + World.ballRadius + float.Epsilon);
-            //headDelimiters[1] = new Vector3(MAX_X - World.ballRadius - float.Epsilon, SURFACE_POSITION_Y + World.ballRadius, MAX_Z - World.ballRadius - float.Epsilon);
+            
+
+            surfaceDelimiters = new Vector3[2];
+            surfaceDelimiters[0] = new Vector3(MIN_X + World.ballRadius, SURFACE_POSITION_Y + World.ballRadius, MIN_Z + World.ballRadius);
+            surfaceDelimiters[1] = new Vector3(MAX_X - World.ballRadius, SURFACE_POSITION_Y + World.ballRadius, MAX_Z - World.ballRadius);
 
             footSpotPosition = new Vector3(-38.0f - 82.0f, SURFACE_POSITION_Y + World.ballRadius, 0.0f);
 
@@ -78,20 +81,20 @@ namespace XNA_PoolGame.PoolTables
             const float a = 1.4f;
 
 
-            pockets[0] = new Pocket(new BoundingSphere(new Vector3(MIN_X - 6.5f, SURFACE_POSITION_Y + World.ballRadius, MIN_Z - 6.5f), World.ballRadius * a));
+            pockets[0] = new Pocket(new BoundingSphere(new Vector3(MIN_X - 6.5f, SURFACE_POSITION_Y + World.ballRadius, MIN_Z - 6.5f), World.ballRadius * a), 0);
             pockets[0].headpoint = new Vector3(MIN_X, SURFACE_POSITION_Y, MIN_Z);
 
-            pockets[1] = new Pocket(new BoundingSphere(new Vector3(0.0f, SURFACE_POSITION_Y + World.ballRadius, MIN_Z - 15.3f), World.ballRadius * a));
+            pockets[1] = new Pocket(new BoundingSphere(new Vector3(0.0f, SURFACE_POSITION_Y + World.ballRadius, MIN_Z - 15.3f), World.ballRadius * a), 1);
             pockets[1].headpoint = new Vector3(0.0f, SURFACE_POSITION_Y, MIN_Z);
 
-            pockets[2] = new Pocket(new BoundingSphere(new Vector3(MAX_X + 6.5f, SURFACE_POSITION_Y + World.ballRadius, MIN_Z - 6.5f), World.ballRadius * a));
+            pockets[2] = new Pocket(new BoundingSphere(new Vector3(MAX_X + 6.5f, SURFACE_POSITION_Y + World.ballRadius, MIN_Z - 6.5f), World.ballRadius * a), 2);
             pockets[2].headpoint = new Vector3();
 
-            pockets[3] = new Pocket(new BoundingSphere(new Vector3(MIN_X - 6.5f, SURFACE_POSITION_Y + World.ballRadius, MAX_Z + 6.5f), World.ballRadius * a));
+            pockets[3] = new Pocket(new BoundingSphere(new Vector3(MIN_X - 6.5f, SURFACE_POSITION_Y + World.ballRadius, MAX_Z + 6.5f), World.ballRadius * a), 3);
 
-            pockets[4] = new Pocket(new BoundingSphere(new Vector3(0, SURFACE_POSITION_Y + World.ballRadius, MAX_Z + 15.3f), World.ballRadius * a));
+            pockets[4] = new Pocket(new BoundingSphere(new Vector3(0, SURFACE_POSITION_Y + World.ballRadius, MAX_Z + 15.3f), World.ballRadius * a), 4);
 
-            pockets[5] = new Pocket(new BoundingSphere(new Vector3(MAX_X + 6.5f, SURFACE_POSITION_Y + World.ballRadius, MAX_Z + 6.5f), World.ballRadius * a));
+            pockets[5] = new Pocket(new BoundingSphere(new Vector3(MAX_X + 6.5f, SURFACE_POSITION_Y + World.ballRadius, MAX_Z + 6.5f), World.ballRadius * a), 5);
 
 
             #region POCKET #0

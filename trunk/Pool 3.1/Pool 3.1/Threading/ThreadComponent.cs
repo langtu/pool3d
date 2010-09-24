@@ -1,16 +1,18 @@
-﻿using System;
+﻿#region Using Statements
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using System.Threading;
 using XNA_PoolGame.Graphics;
+#endregion
 
 namespace XNA_PoolGame.Threading
 {
     public class ThreadComponent : GameComponent, IThreadable
     {
-
+        #region Variables
         protected int cpu = 4;
         protected GameTime gameTime;
         protected Thread thread;
@@ -23,10 +25,11 @@ namespace XNA_PoolGame.Threading
         protected ManualResetEvent stopped;
 
         /// <summary>
-        /// Use thread for this component
+        /// Use thread for this component.
         /// </summary>
         protected bool useThread;
         protected bool running = false;
+        #endregion
 
         public ThreadComponent(Game _game)
             : base(_game)
@@ -137,6 +140,9 @@ namespace XNA_PoolGame.Threading
                 mutex.Close();
                 stopped.Close();
                 thread.Abort();
+                //mutex = null;
+                //stopped = null;
+                //thread = null;
                 ModelManager.allthreads.Remove(this);
             }
             base.Dispose(disposing);

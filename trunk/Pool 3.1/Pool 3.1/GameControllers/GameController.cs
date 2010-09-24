@@ -10,7 +10,7 @@ namespace XNA_PoolGame.GameControllers
 {
     /// <summary>
     /// Game controller. Used to retrieval players interaction in
-    /// a game match. Abstract class of all types of controllers.
+    /// a game match. Abstract class of all types of game controllers.
     /// </summary>
     public abstract class GameController : ICloneable, IEquatable<GameController>
     {
@@ -29,6 +29,7 @@ namespace XNA_PoolGame.GameControllers
         protected bool YPressed;
         protected bool BPressed;
         protected bool leftShoulderPressed;
+        protected bool rightShoulderPressed;
         #endregion
 
         #region Properties
@@ -82,6 +83,11 @@ namespace XNA_PoolGame.GameControllers
         {
             get { return leftShoulderPressed; }
         }
+
+        public bool isRightShoulderPressed
+        {
+            get { return rightShoulderPressed; }
+        }
         
 
         #endregion
@@ -107,12 +113,14 @@ namespace XNA_PoolGame.GameControllers
             YPressed = false;
             BPressed = false;
             leftShoulderPressed = false;
+            rightShoulderPressed = false;
         }
 
         public bool isIdle()
         {
             return (leftStick == Vector2.Zero && rightStick == Vector2.Zero && !APressed
-                && leftTrigger == 0.0f && rightTrigger == 0.0f && !leftShoulderPressed && !XPressed && !YPressed);
+                && leftTrigger == 0.0f && rightTrigger == 0.0f 
+                && !leftShoulderPressed && !rightShoulderPressed && !XPressed && !YPressed);
         }
 
 

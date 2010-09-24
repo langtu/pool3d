@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region Using Statements
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
 using XNA_PoolGame.Graphics;
+#endregion
 
 namespace XNA_PoolGame.Screens.Screen_Manager
 {
@@ -28,8 +30,6 @@ namespace XNA_PoolGame.Screens.Screen_Manager
         SpriteBatch spriteBatch;
         SpriteFont font;
         Texture2D blankTexture;
-
-        private Screen currentScreen;
 
         bool isInitialized;
 
@@ -71,10 +71,6 @@ namespace XNA_PoolGame.Screens.Screen_Manager
             set { traceEnabled = value; }
         }
 
-        public Screen CurrentScreen
-        {
-            get { return currentScreen; }
-        }
 
         #endregion
 
@@ -89,7 +85,7 @@ namespace XNA_PoolGame.Screens.Screen_Manager
         {
             this.UpdateOrder = 1; this.DrawOrder = 5;
             TraceEnabled = true;
-            currentScreen = null;
+
         }
 
 
@@ -99,7 +95,6 @@ namespace XNA_PoolGame.Screens.Screen_Manager
         public override void Initialize()
         {
             base.Initialize();
-
             isInitialized = true;
         }
 
@@ -134,7 +129,8 @@ namespace XNA_PoolGame.Screens.Screen_Manager
             {
                 screen.UnloadContent();
             }
-
+            if (World.cursor != null) World.cursor.Dispose();
+            World.cursor = null;
             //GC.Collect();
             //GC.GetTotalMemory(true);
             //GC.WaitForPendingFinalizers();
@@ -164,9 +160,9 @@ namespace XNA_PoolGame.Screens.Screen_Manager
             bool otherScreenHasFocus = !Game.IsActive;
             bool coveredByOtherScreen = false;
 
-            currentScreen = null;
-            if (screensToUpdate.Count > 0) currentScreen = screensToUpdate[screensToUpdate.Count - 1];
-
+            World.currentScreen = null;
+            if (screensToUpdate.Count > 0) World.currentScreen = screensToUpdate[screensToUpdate.Count - 1];
+            
             // Loop as long as there are screens waiting to be updated.
             while (screensToUpdate.Count > 0)
             {

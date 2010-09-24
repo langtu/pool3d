@@ -72,7 +72,7 @@ namespace XNA_PoolGame.Match
         public float stickRotation;
 
         public Ball calledBall;
-        public int calledPocket;
+        public Pocket calledPocket;
 
         public Dictionary<Ball, bool> ballsRailsHit;
 
@@ -99,7 +99,7 @@ namespace XNA_PoolGame.Match
             ballsRailsHit = new Dictionary<Ball, bool>();
             table = null;
             calledBall = null;
-            calledPocket = -1;
+            calledPocket = null;
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace XNA_PoolGame.Match
             cueballRailHitIndex = -1;
             ballsPottedThisRound.Clear();
             calledBall = null;
-            calledPocket = -1;
+            calledPocket = null;
         }
 
 
@@ -172,7 +172,7 @@ namespace XNA_PoolGame.Match
             ballsState.Clear();
             ballsState = null; 
             calledBall = null;
-            calledPocket = -1;
+            calledPocket = null;
         }
     }
 }

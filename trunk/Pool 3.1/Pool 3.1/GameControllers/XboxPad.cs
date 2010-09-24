@@ -27,6 +27,9 @@ namespace XNA_PoolGame.GameControllers
             this.BPressed = other.BPressed;
             this.XPressed = other.XPressed;
             this.YPressed = other.YPressed;
+            this.rightShoulderPressed = other.rightShoulderPressed;
+            this.leftShoulderPressed = other.leftShoulderPressed;
+            this.startPressed = other.startPressed;
         }
 
         public override object Clone()
@@ -57,6 +60,9 @@ namespace XNA_PoolGame.GameControllers
 
             if (gps.Buttons.LeftShoulder == ButtonState.Pressed) this.leftShoulderPressed = true;
             else this.leftShoulderPressed = false;
+
+            if (gps.Buttons.RightShoulder == ButtonState.Pressed) this.rightShoulderPressed = true;
+            else this.rightShoulderPressed = false;
 
             rightTrigger = gps.Triggers.Right;
             leftTrigger = gps.Triggers.Left;

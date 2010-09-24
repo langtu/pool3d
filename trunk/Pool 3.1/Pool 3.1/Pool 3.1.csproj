@@ -114,7 +114,9 @@
     <Compile Include="PoolTables\BallCollider.cs" />
     <Compile Include="Graphics\Particles\ParticlesCore.cs" />
     <Compile Include="PoolTables\Racks\EightBallRack.cs" />
+    <Compile Include="PoolTables\Racks\NineBallRack.cs" />
     <Compile Include="PoolTables\Racks\Rack.cs" />
+    <Compile Include="Screens\Cursor.cs" />
     <Compile Include="Threading\ThreadComponent.cs" />
     <Compile Include="Helpers\Maths.cs" />
     <Compile Include="PoolTables\Ball.cs" />

@@ -85,6 +85,12 @@ namespace XNA_PoolGame.Match
             return players[this.nextPlayerInTurn].playerIndex;
         }
 
+        public void ResetForGameSet()
+        {
+            totalBallsPocketed = 0;
+            ballType = BallGroupType.None;
+        }
+
         /// <summary>
         /// Increases the balls counter that has been
         /// legally pocketed or increases the balls counter 

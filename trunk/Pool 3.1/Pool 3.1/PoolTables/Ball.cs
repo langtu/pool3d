@@ -165,6 +165,7 @@ namespace XNA_PoolGame
             previousHitRail = -1; previousInsideHitRail = -1;
             pocketWhereAt = -1;
             volume = VolumeType.BoundingSpheres;
+            useModelPartBB = false;
             rightVector = Vector3.Zero;
             ballRailHitsIndexes = new List<int>();
 #if DRAWBALL_BV

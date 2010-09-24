@@ -18,14 +18,16 @@ namespace XNA_PoolGame.PoolTables
         public Vector3 headpoint;
         public Vector3[] insideNormal;
         public OrientedBoundingBox[] insideBands;
+        public int pocketIndex;
 
         /// <summary>
         /// Creates a new instance of a Pocket.
         /// </summary>
         /// <param name="bounds"></param>
-        public Pocket(BoundingSphere bounds)
+        public Pocket(BoundingSphere bounds, int pocketIndex)
         {
             this.bounds = bounds;
+            this.pocketIndex = pocketIndex;
             balls = new List<Ball>();
             firstballsstuck = new List<Ball>();
             insideNormal = new Vector3[2];
