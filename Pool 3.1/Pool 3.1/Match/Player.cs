@@ -135,7 +135,7 @@ namespace XNA_PoolGame
                         if (prevcontroller.LeftStick.X != 0.0f && controller.LeftStick.X == 0.0f) repeater = 1.0f;
 
 
-                        stick.AngleY -= controller.LeftStick.X * repeater * dt * 10.0f;
+                        stick.AngleY += controller.LeftStick.X * repeater * dt * 10.0f;
 
                         if (!prevcontroller.isAPressed && controller.isAPressed) stick.charging = true;
                     }
@@ -206,7 +206,7 @@ namespace XNA_PoolGame
                                     if (prevcontroller.LeftStick.X != 0.0f && controller.LeftStick.X == 0.0f) repeater = 1.0f;
 
 
-                                    stick.AngleY -= controller.LeftStick.X * repeater * dt * 10.0f;
+                                    stick.AngleY += controller.LeftStick.X * repeater * dt * 10.0f;
                                 }
                             }
 
