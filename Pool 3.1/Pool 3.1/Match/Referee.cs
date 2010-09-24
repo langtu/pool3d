@@ -57,7 +57,7 @@ namespace XNA_PoolGame.Match
                 if (player != null && player.playerIndex != World.playerInTurnIndex) 
                     player.stick.Visible = false;
 
-            World.cursor.Controller = World.players[World.playerInTurnIndex].controller;
+            World.cursor.Controller = World.CurrentPlayer.controller;
             table.InitializeMatch();
         }
 
@@ -153,12 +153,19 @@ namespace XNA_PoolGame.Match
                                                 // or
                                                 // (2) re-breaking.
                                                 breakShotFouled = true;
+
+
                                             }
 
                                         }
                                         else
                                         {
                                             breakShotFouled = cueBallScratch;
+                                            if (cueBallScratch)
+                                            {
+                                                table.InitializeGameSet();
+                                                inningOver = true;
+                                            }
                                         }
                                     }
                                 }
@@ -169,16 +176,8 @@ namespace XNA_PoolGame.Match
                             {
                                 if (table.roundInfo.BallsPottedThisRound.Count == 0)
                                 {
-                                    if (table.roundInfo.BallHitFirstThisRound == null)
-                                        fouled = true;
-                                    else if (World.players[World.playerInTurnIndex].team.BallType == BallGroupType.Solid &&
-                                        table.roundInfo.BallHitFirstThisRound.ballNumber >= 9)
-                                        fouled = true;
-                                    else if (World.players[World.playerInTurnIndex].team.BallType == BallGroupType.Stripe &&
-                                        table.roundInfo.BallHitFirstThisRound.ballNumber <= 7)
-                                        fouled = true;
-
-                                    if (!fouled) inningOver = true;
+                                    if (!IsALegalShot())
+                                        inningOver = true;
                                 }
                                 else
                                 {
@@ -213,13 +212,13 @@ namespace XNA_PoolGame.Match
                                                 if (!found)
                                                 {
                                                     if (ball.ballNumber >= 1 && ball.ballNumber <= 7 &&
-                                                        World.players[World.playerInTurnIndex].team.BallType == BallGroupType.Solid)
-                                                        World.players[World.playerInTurnIndex].team.IncresePocketedBallsCounter();
+                                                        World.CurrentPlayer.team.BallType == BallGroupType.Solid)
+                                                        World.CurrentPlayer.team.IncresePocketedBallsCounter();
                                                     else if (ball.ballNumber >= 9 && ball.ballNumber <= 15 &&
-                                                        World.players[World.playerInTurnIndex].team.BallType == BallGroupType.Stripe)
-                                                        World.players[World.playerInTurnIndex].team.IncresePocketedBallsCounter();
+                                                        World.CurrentPlayer.team.BallType == BallGroupType.Stripe)
+                                                        World.CurrentPlayer.team.IncresePocketedBallsCounter();
                                                     else
-                                                        World.players[World.playerInTurnIndex].team.OppositeTeam.IncresePocketedBallsCounter();
+                                                        World.CurrentPlayer.team.OppositeTeam.IncresePocketedBallsCounter();
                                                 }
                                             }
                                             table.openTable = false;
@@ -230,14 +229,16 @@ namespace XNA_PoolGame.Match
                                         if (AreBallsIllegallyPocketed())
                                             inningOver = true;
                                         else if (!IsALegalShot())
-                                            inningOver = true;
+                                            inningOver = fouled = true;
                                         
                                         if (EightBallPocketed())
                                         {
-                                            if (World.players[World.playerInTurnIndex].team.TotalBallsPocketed == 7)
+                                            if (World.CurrentPlayer.team.TotalBallsPocketed == 7)
                                             {
-                                                if (table.poolBalls[EightBallRack.EIGHTBALLNUMBER + 1].pocketWhereAt == table.roundInfo.calledPocket.pocketIndex)
+                                                if (table.poolBalls[EightBallRack.EIGHTBALLNUMBER + 1].pocketWhereAt == table.roundInfo.calledPocket.pocketIndex &&
+                                                    table.roundInfo.calledPocket.pocketIndex != World.CurrentPlayer.team.LastPocketIndex)
                                                 {
+                                                    // the team has won.
                                                     inningOver = false;
                                                     setState = 1;
                                                 }
@@ -253,10 +254,10 @@ namespace XNA_PoolGame.Match
                                                 setState = 2;
                                             }
                                         }
-                                            
-                                        
-
                                     }
+
+                                    if (table.roundInfo.calledPocket != null && !fouled) 
+                                        World.CurrentPlayer.team.LastPocketIndex = table.roundInfo.calledPocket.pocketIndex;
                                 }
                             }
                             if (cueBallScratch)
@@ -284,27 +285,38 @@ namespace XNA_PoolGame.Match
                             table.roundInfo.EndRound();
                             if (setState == 2) // The team has lost.
                             {
-                                World.players[World.playerInTurnIndex].stick.Visible = false;
-                                World.players[World.playerInTurnIndex].team.RotatePlayer();
-                                World.playerInTurnIndex = World.players[World.playerInTurnIndex].team.OppositeTeam.NextPlayerInTurn();
-                                World.cursor.Controller = World.players[World.playerInTurnIndex].controller;
+                                World.CurrentPlayer.stick.Visible = false;
+                                World.CurrentPlayer.team.RotatePlayer();
+                                World.playerInTurnIndex = World.CurrentPlayer.team.OppositeTeam.NextPlayerInTurn();
+                                World.cursor.Controller = World.CurrentPlayer.controller;
 
-                                World.players[World.playerInTurnIndex].team.ResetForGameSet();
-                                World.players[World.playerInTurnIndex].team.OppositeTeam.ResetForGameSet();
+                                World.CurrentPlayer.team.ResetForGameSet();
+                                World.CurrentPlayer.team.OppositeTeam.ResetForGameSet();
                                 table.InitializeGameSet();
                             }
                             else if (setState == 1) // the team has won.
                             {
-                                World.players[World.playerInTurnIndex].team.ResetForGameSet();
-                                World.players[World.playerInTurnIndex].team.OppositeTeam.ResetForGameSet();
+                                World.CurrentPlayer.team.ResetForGameSet();
+                                World.CurrentPlayer.team.OppositeTeam.ResetForGameSet();
                                 table.InitializeGameSet();
                             }
                             else if (inningOver && setState == 0)
                             {
-                                World.players[World.playerInTurnIndex].stick.Visible = false;
-                                World.players[World.playerInTurnIndex].team.RotatePlayer();
-                                World.playerInTurnIndex = World.players[World.playerInTurnIndex].team.OppositeTeam.NextPlayerInTurn();
-                                World.cursor.Controller = World.players[World.playerInTurnIndex].controller;
+                                World.CurrentPlayer.stick.Visible = false;
+                                World.CurrentPlayer.team.RotatePlayer();
+                                World.playerInTurnIndex = World.CurrentPlayer.team.OppositeTeam.NextPlayerInTurn();
+                                World.cursor.Controller = World.CurrentPlayer.controller;
+                            }
+
+                            if (World.CurrentPlayer.team.TotalBallsPocketed == 7)
+                            {
+                                table.roundInfo.calledBall = table.poolBalls[EightBallRack.EIGHTBALLNUMBER + 1];
+                                table.roundInfo.enabledCalledBall = false;
+                            }
+                            else if (!table.roundInfo.cueBallBehindHeadString || !table.roundInfo.firstShotOfSet)
+                            {
+                                table.roundInfo.enabledCalledBall = true;
+                                table.roundInfo.enabledCalledPocket = true;
                             }
                             break;
                         #endregion
@@ -314,6 +326,7 @@ namespace XNA_PoolGame.Match
             base.Update(gameTime);
         }
 
+
         public bool IsTableRemainsOpen()
         {
             if (table.roundInfo.calledBall == null || table.roundInfo.calledPocket == null) return true;
@@ -322,13 +335,13 @@ namespace XNA_PoolGame.Match
             {
                 if (table.roundInfo.calledBall.ballNumber >= 1 && table.roundInfo.calledBall.ballNumber <= 7)
                 {
-                    World.players[World.playerInTurnIndex].team.BallType = BallGroupType.Solid;
-                    World.players[World.playerInTurnIndex].team.OppositeTeam.BallType = BallGroupType.Stripe;
+                    World.CurrentPlayer.team.BallType = BallGroupType.Solid;
+                    World.CurrentPlayer.team.OppositeTeam.BallType = BallGroupType.Stripe;
                 }
-                else
+                else if (table.roundInfo.calledBall.ballNumber >= 9 && table.roundInfo.calledBall.ballNumber <= 15)
                 {
-                    World.players[World.playerInTurnIndex].team.BallType = BallGroupType.Stripe;
-                    World.players[World.playerInTurnIndex].team.OppositeTeam.BallType = BallGroupType.Solid;
+                    World.CurrentPlayer.team.BallType = BallGroupType.Stripe;
+                    World.CurrentPlayer.team.OppositeTeam.BallType = BallGroupType.Solid;
                 }
                 return false;
 
@@ -352,11 +365,11 @@ namespace XNA_PoolGame.Match
                     if (table.roundInfo.cueBallBehindHeadString && table.BallBehindHeadString(table.roundInfo.positionHitFirstThisRound))
                         return true;
                     
-                    if (World.players[World.playerInTurnIndex].team.BallType == BallGroupType.Solid &&
+                    if (World.CurrentPlayer.team.BallType == BallGroupType.Solid &&
                         table.roundInfo.BallHitFirstThisRound.ballNumber >= 9)
                         return true;
 
-                    if (World.players[World.playerInTurnIndex].team.BallType == BallGroupType.Stripe &&
+                    if (World.CurrentPlayer.team.BallType == BallGroupType.Stripe &&
                         table.roundInfo.BallHitFirstThisRound.ballNumber <= 7)
                         return true;
 
@@ -500,21 +513,21 @@ namespace XNA_PoolGame.Match
             {
                 if (ball.ballNumber >= 1 && ball.ballNumber <= 7)
                 {
-                    if (World.players[World.playerInTurnIndex].team.BallType == BallGroupType.Solid)
-                        World.players[World.playerInTurnIndex].team.IncresePocketedBallsCounter();
-                    else if (World.players[World.playerInTurnIndex].team.BallType == BallGroupType.Stripe)
+                    if (World.CurrentPlayer.team.BallType == BallGroupType.Solid)
+                        World.CurrentPlayer.team.IncresePocketedBallsCounter();
+                    else if (World.CurrentPlayer.team.BallType == BallGroupType.Stripe)
                     {
-                        World.players[World.playerInTurnIndex].team.OppositeTeam.IncresePocketedBallsCounter();
+                        World.CurrentPlayer.team.OppositeTeam.IncresePocketedBallsCounter();
                         r = true;
                     }
                 }
                 else if (ball.ballNumber >= 9 && ball.ballNumber <= 15)
                 {
-                    if (World.players[World.playerInTurnIndex].team.BallType == BallGroupType.Stripe)
-                        World.players[World.playerInTurnIndex].team.IncresePocketedBallsCounter();
-                    else if (World.players[World.playerInTurnIndex].team.BallType == BallGroupType.Solid)
+                    if (World.CurrentPlayer.team.BallType == BallGroupType.Stripe)
+                        World.CurrentPlayer.team.IncresePocketedBallsCounter();
+                    else if (World.CurrentPlayer.team.BallType == BallGroupType.Solid)
                     {
-                        World.players[World.playerInTurnIndex].team.OppositeTeam.IncresePocketedBallsCounter();
+                        World.CurrentPlayer.team.OppositeTeam.IncresePocketedBallsCounter();
                         r = true;
                     }
                 }

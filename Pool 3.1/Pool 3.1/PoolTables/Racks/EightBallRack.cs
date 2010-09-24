@@ -101,6 +101,14 @@ namespace XNA_PoolGame.PoolTables.Racks
                 position.Z -= ((diameter * (float)(row)) + World.ballRadius);
             }
         }
+
+        public override void StartGame()
+        {
+            table.openTable = true;
+
+            table.roundInfo.enabledCalledBall = false;
+            table.roundInfo.enabledCalledPocket = false;
+        }
     }
 
     /// <summary>

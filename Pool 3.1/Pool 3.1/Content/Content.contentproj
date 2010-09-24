@@ -653,11 +653,6 @@
     <None Include="Effects\pp_Common.fxh">
       <Name>pp_Common</Name>
     </None>
-    <Compile Include="Models\coneAR.X">
-      <Name>coneAR</Name>
-      <Importer>XImporter</Importer>
-      <Processor>CustomModelProcessor</Processor>
-    </Compile>
     <Compile Include="Fonts\HUD.spritefont">
       <Name>HUD</Name>
       <Importer>FontDescriptionImporter</Importer>
@@ -1289,13 +1284,6 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
       <ProcessorParameters_GenerateMipmaps>True</ProcessorParameters_GenerateMipmaps>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Particles\heat.png">
-      <Name>heat</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>

@@ -28,8 +28,6 @@ namespace XNA_PoolGame.Screens
     /// </summary>
     public class GameplayScreen : Screen
     {
-        
-
         #region Initialization
         /// <summary>
         /// Constructor.
@@ -87,7 +85,7 @@ namespace XNA_PoolGame.Screens
                 case ScenarioType.Garage:
                     break;
             }
-            World.gameMode = GameMode.NineBalls;
+            World.gameMode = GameMode.EightBalls;
 
             ////////////// FACTORY //////////////
 

@@ -97,6 +97,11 @@ namespace XNA_PoolGame.PoolTables.Racks
 
         }
 
+
+        public override void StartGame()
+        {
+
+        }
     }
 
     /// <summary>
