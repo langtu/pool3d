@@ -142,6 +142,11 @@ namespace XNA_PoolGame.Graphics.Models
         #endregion
 
         #region Properties
+
+        public BoundingSphere BoundingSphere
+        {
+            get { return boundingSphere; }
+        }
         public bool UseModelPartBB
         {
             get { return useModelPartBB; }
@@ -484,6 +489,9 @@ namespace XNA_PoolGame.Graphics.Models
                 }
                 boundingBox.Min = min;
                 boundingBox.Max = max;
+                Vector3 diff = max - min;
+                boundingSphere.Center = (max + min) / 2.0f;
+                boundingSphere.Radius = Math.Max(diff.X, Math.Max(diff.Y, diff.Z));
             }
             base.LoadContent();
         }
@@ -492,7 +500,7 @@ namespace XNA_PoolGame.Graphics.Models
 
         #region Update
 
-        protected virtual void updateLocalWorld()
+        protected virtual void UpdateLocalWorld()
         {
             if (worldDirty)
             {
@@ -542,6 +550,9 @@ namespace XNA_PoolGame.Graphics.Models
 
                     boundingBox.Min = points[0];
                     boundingBox.Max = points[1];
+                } else if (!useModelPartBB && volume == VolumeType.BoundingSpheres)
+                {
+                    boundingSphere.Center = position;
                 }
                 worldDirty = false;
             }
@@ -562,7 +573,7 @@ namespace XNA_PoolGame.Graphics.Models
             if (World.camera == null) return;
             RenderMode renderMode = PostProcessManager.currentRenderMode;
 
-            updateLocalWorld();
+            UpdateLocalWorld();
 
             switch (renderMode)
             {
@@ -934,7 +945,7 @@ namespace XNA_PoolGame.Graphics.Models
                             return false;
                         break;
                     case VolumeType.BoundingSpheres:
-                        if (frustum.Contains(new BoundingSphere(Vector3.Transform(boundingSphere.Center, localWorld), boundingSphere.Radius * Math.Max(scale.X, Math.Max(scale.Y, scale.Z)))) == ContainmentType.Disjoint)
+                        if (frustum.Contains(boundingSphere) == ContainmentType.Disjoint)
                             return false;
                         break;
                 }

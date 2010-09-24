@@ -19,9 +19,9 @@ namespace XNA_PoolGame.PoolTables.Racks
     public class EightBallRack : Rack
     {
 		/// <summary>
-        /// 8 ball index.
+        /// Index of eight ball.
         /// </summary>
-        const int eightballnumber = 7;
+        public static int EIGHTBALLNUMBER = 7;
         /// <summary>
         /// Numbers of rows in the triangle.
         /// </summary>
@@ -49,7 +49,7 @@ namespace XNA_PoolGame.PoolTables.Racks
 
         protected override void BuildPoolBalls()
         {
-            table.TotalBalls = 16;
+            table.TotalBalls = 15 + 1;
             table.poolBalls = new Ball[15 + 1];
             ballsReady = new bool[15];
 
@@ -71,7 +71,7 @@ namespace XNA_PoolGame.PoolTables.Racks
             stripeballnumber = Maths.random.Next(8, 15);
 
             ballsReady[solidballnumber] = true; ballsReady[stripeballnumber] = true;
-            ballsReady[eightballnumber] = true;
+            ballsReady[EIGHTBALLNUMBER] = true;
 
             float diameter = World.ballRadius * 2.0f;
             Vector3 position = table.footSpotPosition;
@@ -81,7 +81,7 @@ namespace XNA_PoolGame.PoolTables.Racks
                 for (int col = 1; col <= row; ++col)
                 {
                     if (row == EIGHTBALL_ROW && col == EIGHTBALL_COL)
-                        ballnumber = eightballnumber;
+                        ballnumber = EIGHTBALLNUMBER;
                     else if (row == 5 && (col == 1 || col == 5))
                     {
                         if (col == 1) ballnumber = solidballnumber;

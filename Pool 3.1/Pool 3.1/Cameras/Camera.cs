@@ -13,7 +13,7 @@ using XNA_PoolGame.Graphics;
 namespace XNA_PoolGame.Cameras
 {
 	/// <summary>
-    /// Main camera.
+    /// Base camera.
     /// </summary>
     public abstract class Camera : GameComponent
     {

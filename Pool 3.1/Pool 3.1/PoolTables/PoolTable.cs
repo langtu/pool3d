@@ -97,6 +97,8 @@ namespace XNA_PoolGame.PoolTables
         public float MAX_HEAD_STRING_X = 0.0f;
         public float MAX_HEAD_STRING_Z = 0.0f;
 
+        public Vector3[] surfaceDelimiters;
+
         public float SURFACE_POSITION_Y = 192.6f;
         public float MAXSURFACEPOS_Y = 204.0f;
 
@@ -376,6 +378,40 @@ namespace XNA_PoolGame.PoolTables
             
         }
         #endregion
+
+        public Ball IntersectsABall()
+        {
+            Ray cursorRay = World.cursor.CalculateCursorRay();
+            Ball ball = null;
+            float distance = float.MaxValue;
+            for (int i = 1; i < TotalBalls; ++i)
+            {
+                if (poolBalls[i].pocketWhereAt != -1) continue;
+                float? t = poolBalls[i].BoundingSphere.Intersects(cursorRay);
+                if (t != null)
+                {
+                    if (distance > t)
+                    {
+                        ball = poolBalls[i];
+                        t = distance;
+                    }
+                }
+            }
+            return ball;
+        }
+
+        public Pocket IntersectsAPocket()
+        {
+            Ray cursorRay = World.cursor.CalculateCursorRay();
+            foreach (Pocket pocket in pockets)
+            {
+                if (pocket.bounds.Intersects(cursorRay) != null)
+                {
+                    return pocket;
+                }
+            }
+            return null;
+        }
 
         #region Check for side collisions
 

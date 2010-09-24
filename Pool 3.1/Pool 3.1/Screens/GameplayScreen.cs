@@ -28,6 +28,7 @@ namespace XNA_PoolGame.Screens
     /// </summary>
     public class GameplayScreen : Screen
     {
+        
 
         #region Initialization
         /// <summary>
@@ -41,6 +42,7 @@ namespace XNA_PoolGame.Screens
         
         public override void LoadContent()
         {
+
             // CAMERA
             //World.camera = new ChaseCamera(PoolGame.game);
             World.camera = new FreeCamera(PoolGame.game);
@@ -85,7 +87,7 @@ namespace XNA_PoolGame.Screens
                 case ScenarioType.Garage:
                     break;
             }
-            World.gameMode = GameMode.EightBalls;
+            World.gameMode = GameMode.NineBalls;
 
             ////////////// FACTORY //////////////
 
@@ -150,6 +152,10 @@ namespace XNA_PoolGame.Screens
             PoolGame.game.Components.Add(World.referee);
 
 
+            World.cursor = new Cursor(PoolGame.game);
+            PoolGame.game.Components.Add(World.cursor);
+
+
             // A real game would probably have more content than this sample, so
             // it would take longer to load. We simulate that by delaying for a
             // while, giving you a chance to admire the beautiful loading screen.
@@ -167,6 +173,9 @@ namespace XNA_PoolGame.Screens
         public override void UnloadContent()
         {
             ModelManager.AbortAllThreads();
+            World.cursor.Dispose();
+            World.cursor = null;
+
             World.playerInTurnIndex = -1;
             World.playerCount = 0;
 
@@ -422,6 +431,14 @@ namespace XNA_PoolGame.Screens
             }
 
             #endregion
+
+            if (World.cursor.Visible)
+            {
+                SpriteBatch batch = PostProcessManager.spriteBatch;
+                batch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.SaveState);
+                batch.Draw(World.cursor.CursorTexture, World.cursor.CursorPosition * PoolGame.screenSize, Color.White);
+                batch.End();
+            }
 
             for (int k = 0; k < useless.Count; ++k) useless[k].DontUse();
             useless.Clear(); useless = null;

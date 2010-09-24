@@ -8,6 +8,7 @@ using XNA_PoolGame.Sticks;
 using XNA_PoolGame.PoolTables;
 using XNA_PoolGame.GameControllers;
 using XNA_PoolGame.Match;
+using XNA_PoolGame.Screens;
 #endregion
 
 namespace XNA_PoolGame
@@ -116,9 +117,14 @@ namespace XNA_PoolGame
             controller.Update();
 
             if (controller.isYPressed && !prevcontroller.isYPressed) table.Reset();
+            if (!controller.isRightShoulderPressed && prevcontroller.isRightShoulderPressed)
+                World.cursor.Visible = false;
+            else if (controller.isRightShoulderPressed && !prevcontroller.isRightShoulderPressed)
+                World.cursor.Visible = true;
 
             switch (table.phase)
             {
+                #region Lagging Shot
                 case MatchPhase.LaggingShot:
                     if (!stick.charging && aimLagShot)
                     {
@@ -148,7 +154,8 @@ namespace XNA_PoolGame
 
                     }
                     break;
-
+                #endregion
+                #region Playing
                 case MatchPhase.Playing:
 
                 if (!table.ballsMoving)
@@ -160,47 +167,74 @@ namespace XNA_PoolGame
                     {
                         if (!stick.Visible) stick.Visible = true;
 
-                        if (controller.isXPressed && table.roundInfo.cueBallInHand)
+                        if (!controller.isRightShoulderPressed)
                         {
-                            
-                            if (controller.LeftStick.Y != 0.0f)
+                            if (controller.isXPressed && table.roundInfo.cueBallInHand)
                             {
-                                Vector3 newPosition = stick.ballTarget.Position + controller.LeftStick.Y * stick.Direction;
-                                //newPosition = Vector3.Max(table.headDelimiters[0], Vector3.Min(newPosition, table.headDelimiters[1]));
-                                
-                                stick.ballTarget.Position = newPosition;
-                            }
-                            if (controller.LeftStick.X != 0.0f)
-                            {
+                                if (controller.LeftStick.Y != 0.0f)
+                                {
+                                    Vector3 newPosition = stick.ballTarget.Position + controller.LeftStick.Y * stick.Direction;
+                                    if (table.roundInfo.cueBallBehindHeadString) newPosition = Vector3.Max(table.headDelimiters[0], Vector3.Min(newPosition, table.headDelimiters[1]));
+                                    else newPosition = Vector3.Max(table.surfaceDelimiters[0], Vector3.Min(newPosition, table.surfaceDelimiters[1]));
 
-                                Vector3 newPosition = stick.ballTarget.Position - controller.LeftStick.X * stick.AxisOfRotation;
-                                //newPosition = Vector3.Max(table.headDelimiters[0], Vector3.Min(newPosition, table.headDelimiters[1]));
+                                    stick.ballTarget.Position = newPosition;
+                                }
+                                if (controller.LeftStick.X != 0.0f)
+                                {
+                                    Vector3 newPosition = stick.ballTarget.Position - controller.LeftStick.X * stick.AxisOfRotation;
+                                    if (table.roundInfo.cueBallBehindHeadString) newPosition = Vector3.Max(table.headDelimiters[0], Vector3.Min(newPosition, table.headDelimiters[1]));
+                                    else newPosition = Vector3.Max(table.surfaceDelimiters[0], Vector3.Min(newPosition, table.surfaceDelimiters[1]));
 
-                                stick.ballTarget.Position = newPosition;
-                            }
-                        }
-                        else
-                        {
-                            if (controller.isLeftShoulderPressed)
-                            {
-                                if (controller.LeftStick.X > 0.2f) stick.AngleY = 90.0f;
-                                else if (controller.LeftStick.X < -0.2f) stick.AngleY = 270.0f;
-                                if (controller.LeftStick.Y > 0.2f) stick.AngleY = 0.0f;
-                                else if (controller.LeftStick.Y < -0.2f) stick.AngleY = 180.0f;
+                                    stick.ballTarget.Position = newPosition;
+                                }
                             }
                             else
                             {
-                                if (prevcontroller.LeftStick.X > 0.0f && controller.LeftStick.X > 0.0f) repeater = MathHelper.Clamp(repeater + 0.04f, 1.0f, 6.0f);
-                                else if (prevcontroller.LeftStick.X < 0.0f && controller.LeftStick.X < 0.0f) repeater = MathHelper.Clamp(repeater + 0.04f, 1.0f, 6.0f);
+                                if (controller.isLeftShoulderPressed)
+                                {
+                                    if (controller.LeftStick.X > 0.2f) stick.AngleY = 90.0f;
+                                    else if (controller.LeftStick.X < -0.2f) stick.AngleY = 270.0f;
+                                    if (controller.LeftStick.Y > 0.2f) stick.AngleY = 0.0f;
+                                    else if (controller.LeftStick.Y < -0.2f) stick.AngleY = 180.0f;
+                                }
+                                else
+                                {
+                                    if (prevcontroller.LeftStick.X > 0.0f && controller.LeftStick.X > 0.0f) repeater = MathHelper.Clamp(repeater + 0.04f, 1.0f, 6.0f);
+                                    else if (prevcontroller.LeftStick.X < 0.0f && controller.LeftStick.X < 0.0f) repeater = MathHelper.Clamp(repeater + 0.04f, 1.0f, 6.0f);
 
-                                if (prevcontroller.LeftStick.X != 0.0f && controller.LeftStick.X == 0.0f) repeater = 1.0f;
+                                    if (prevcontroller.LeftStick.X != 0.0f && controller.LeftStick.X == 0.0f) repeater = 1.0f;
 
 
-                                stick.AngleY -= controller.LeftStick.X * repeater * dt * 10.0f;
+                                    stick.AngleY -= controller.LeftStick.X * repeater * dt * 10.0f;
+                                }
+                            }
+
+                            if (!prevcontroller.isAPressed && controller.isAPressed) stick.charging = true;
+                        }
+                        else
+                        {
+                            //Vector2 newPosition = World.gameplayscreen.CursorPosition;
+                            //newPosition.Y -= (controller.LeftStick.Y) * dt * 1.0f;
+                            //newPosition.X += (controller.LeftStick.X) * dt * 1.0f;
+
+                            //newPosition = Vector2.Max(Vector2.Zero, Vector2.Min(Vector2.One, newPosition));
+                            
+                            //World.gameplayscreen.CursorPosition = newPosition;
+
+                            if (controller.isAPressed && !prevcontroller.isAPressed)
+                            {
+                                Ball ball = table.IntersectsABall();
+                                if (ball != null)
+                                    table.roundInfo.calledBall = ball;
+                                else
+                                {
+                                    Pocket pocket = table.IntersectsAPocket();
+                                    if (!(table.roundInfo.calledPocket != null && pocket == null))
+                                        table.roundInfo.calledPocket = pocket;
+                                }
                             }
                         }
 
-                        if (!prevcontroller.isAPressed && controller.isAPressed) stick.charging = true;
                     }
                     else
                     {
@@ -223,7 +257,7 @@ namespace XNA_PoolGame
                     }
                 }
                 break;
-
+                #endregion
             }
             base.Update(gameTime);
         }

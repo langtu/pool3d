@@ -27,6 +27,9 @@ namespace XNA_PoolGame.GameControllers
             this.BPressed = other.BPressed;
             this.XPressed = other.XPressed;
             this.YPressed = other.YPressed;
+            this.rightShoulderPressed = other.rightShoulderPressed;
+            this.leftShoulderPressed = other.leftShoulderPressed;
+            this.startPressed = other.startPressed;
         }
 
         public override object Clone()
@@ -58,7 +61,9 @@ namespace XNA_PoolGame.GameControllers
 
             if (kbs.IsKeyDown(Keys.LeftControl)) this.leftShoulderPressed = true;
             else this.leftShoulderPressed = false;
-            
+
+            if (kbs.IsKeyDown(Keys.LeftShift)) this.rightShoulderPressed = true;
+            else this.rightShoulderPressed = false;
 
             if (kbs.IsKeyDown(Keys.Back)) this.startPressed = true;
             if (kbs.IsKeyUp(Keys.Back)) this.startPressed = false;

@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using XNA_PoolGame.Graphics;
 using XNA_PoolGame.Match;
 using XNA_PoolGame.PoolTables.Racks;
+using XNA_PoolGame.Screens;
 
 namespace XNA_PoolGame
 {
@@ -38,6 +39,10 @@ namespace XNA_PoolGame
         public static PoolTable poolTable = null;
         public static float ballRadius = 11.275f; //8.75f;
 
+        public static Screen currentScreen = null;
+        public static Cursor cursor = null;
+
+
         /// <summary>
         /// Collection of players.
         /// </summary>
@@ -53,7 +58,7 @@ namespace XNA_PoolGame
         /// </summary>
         public static Referee referee;
         public static ScenarioType scenarioType = ScenarioType.Cribs;
-        public static GameMode gameMode = GameMode.EightBalls;
+        public static GameMode gameMode = GameMode.NineBalls;
         public static Dictionary<GameMode, RackFactory> rackfactories;
 
         /// <summary>
