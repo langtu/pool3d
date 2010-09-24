@@ -12,10 +12,13 @@ namespace XNA_PoolGame.GameControllers
     /// </summary>
     public class KeyBoard : GameController
     {
+        MouseState mouseState;
+        Vector2 lastPosition;
+        Vector2 currentPosition;
         public KeyBoard(PlayerIndex index)
             : base(index)
         {
-
+            mouseState = Mouse.GetState();
         }
 
         private KeyBoard(PlayerIndex index, KeyBoard other)
@@ -30,6 +33,7 @@ namespace XNA_PoolGame.GameControllers
             this.rightShoulderPressed = other.rightShoulderPressed;
             this.leftShoulderPressed = other.leftShoulderPressed;
             this.startPressed = other.startPressed;
+            mouseState = Mouse.GetState();
         }
 
         public override object Clone()
@@ -44,14 +48,17 @@ namespace XNA_PoolGame.GameControllers
         {
             KeyboardState kbs = Keyboard.GetState();
             this.leftStick = Vector2.Zero;
+            mouseState = Mouse.GetState();
 
-            if (kbs.IsKeyDown(Keys.Up)) this.leftStick.Y = 1.0f;
-            else if (kbs.IsKeyDown(Keys.Down)) this.leftStick.Y = -1.0f;
-            else this.leftStick.Y = 0.0f;
+
+
+            //if (kbs.IsKeyDown(Keys.Up)) this.leftStick.Y = 1.0f;
+            //else if (kbs.IsKeyDown(Keys.Down)) this.leftStick.Y = -1.0f;
+            //else this.leftStick.Y = 0.0f;
             
-            if (kbs.IsKeyDown(Keys.Left)) this.leftStick.X = -1.0f;
-            else if (kbs.IsKeyDown(Keys.Right)) this.leftStick.X = 1.0f;
-            else this.leftStick.X = 0.0f;
+            //if (kbs.IsKeyDown(Keys.Left)) this.leftStick.X = -1.0f;
+            //else if (kbs.IsKeyDown(Keys.Right)) this.leftStick.X = 1.0f;
+            //else this.leftStick.X = 0.0f;
 
             if (kbs.IsKeyDown(Keys.Space)) this.rightTrigger = 1.0f;
             if (kbs.IsKeyUp(Keys.Space)) this.rightTrigger = 0.0f;

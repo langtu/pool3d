@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using XNA_PoolGame.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using XNA_PoolGame.GameControllers;
+using Microsoft.Xna.Framework.Input;
 
 namespace XNA_PoolGame.Screens
 {
@@ -13,6 +14,7 @@ namespace XNA_PoolGame.Screens
     {
         Texture2D cursorTexture;
         Vector2 cursorPosition;
+        Vector2 lastcursorPosition;
         GameController controller;
 
         #region Properties
@@ -40,6 +42,7 @@ namespace XNA_PoolGame.Screens
 
             Visible = false;
             cursorPosition = Vector2.One * 0.5f;
+            lastcursorPosition = cursorPosition;
         }
 
         public override void LoadContent()
@@ -84,6 +87,7 @@ namespace XNA_PoolGame.Screens
             if (World.currentScreen is GameplayScreen)
             {
                 Player player = World.players[World.playerInTurnIndex];
+                
                 if (!player.table.ballsMoving && !player.stick.charging && controller.isRightShoulderPressed)
                 {
                     Vector2 newPosition = this.cursorPosition;
@@ -97,6 +101,8 @@ namespace XNA_PoolGame.Screens
             {
 
             }
+
+            lastcursorPosition = cursorPosition;
             base.Update(gameTime);
         }
 
