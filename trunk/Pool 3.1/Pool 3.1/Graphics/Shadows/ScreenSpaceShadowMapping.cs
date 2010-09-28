@@ -89,6 +89,8 @@ namespace XNA_PoolGame.Graphics.Shadows
             PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
 
             PoolGame.device.SetRenderTarget(0, null);
+            PoolGame.device.SetRenderTarget(1, null);
+            PoolGame.device.SetRenderTarget(2, null);
         }
 
         public void RenderShadowMap(int lightindex)
@@ -192,9 +194,16 @@ namespace XNA_PoolGame.Graphics.Shadows
         public override void Pass3(GameTime gameTime)
         {
             ///////////////// PASS 3 - DEM //////////////
-            if (World.dem == EnvironmentType.Dynamic)
+            if (World.EM == EnvironmentType.Dynamic)
             {
                 PostProcessManager.ChangeRenderMode(RenderMode.DEMPass);
+                RenderDEM();
+
+                World.scenario.DrawDEMObjects(gameTime);
+            }
+            else if (World.EM == EnvironmentType.DualParaboloid)
+            {
+                PostProcessManager.ChangeRenderMode(RenderMode.DualParaboloidRenderMaps);
                 RenderDEM();
 
                 World.scenario.DrawDEMObjects(gameTime);
@@ -239,5 +248,6 @@ namespace XNA_PoolGame.Graphics.Shadows
             PostProcessManager.DepthEffect.Parameters["ViewProj"].SetValue(light.LightViewProjection);
             PostProcessManager.DepthEffect.Parameters["MaxDepth"].SetValue(light.LightFarPlane);
         }
+
     }
 }

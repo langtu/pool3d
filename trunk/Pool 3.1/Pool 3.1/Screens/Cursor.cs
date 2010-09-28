@@ -16,6 +16,7 @@ namespace XNA_PoolGame.Screens
         Vector2 cursorPosition;
         Vector2 lastcursorPosition;
         GameController controller;
+        float moveSpeed;
 
         #region Properties
 
@@ -43,11 +44,12 @@ namespace XNA_PoolGame.Screens
             Visible = false;
             cursorPosition = Vector2.One * 0.5f;
             lastcursorPosition = cursorPosition;
+            moveSpeed = 1.0f;// 0.9f;
         }
 
         public override void LoadContent()
         {
-             cursorTexture = PoolGame.content.Load<Texture2D>("Textures\\Cursors\\Cursor 32");
+            cursorTexture = PoolGame.content.Load<Texture2D>("Textures\\Cursors\\Cursor 32");
             base.LoadContent();
         }
 
@@ -91,9 +93,25 @@ namespace XNA_PoolGame.Screens
                 if (!player.table.ballsMoving && !player.stick.charging && controller.isRightShoulderPressed)
                 {
                     Vector2 newPosition = this.cursorPosition;
-                    newPosition.Y -= (controller.LeftStick.Y) * dt * 0.35f;
-                    newPosition.X += (controller.LeftStick.X) * dt * 0.35f;
 
+                    if (controller is KeyBoard)
+                    {
+                        int centerX = PoolGame.game.Window.ClientBounds.Width / 2;
+                        int centerY = PoolGame.game.Window.ClientBounds.Height / 2;
+
+                        Vector2 center = new Vector2((float)centerX, (float)centerY);
+
+                        Vector2 mousedt = new Vector2((float)((KeyBoard)controller).MouseState().X - center.X,
+                            (float)((KeyBoard)controller).MouseState().Y - center.Y);
+
+                        newPosition.Y += (mousedt.Y / PoolGame.screenSize.Y * 0.5f) * moveSpeed;
+                        newPosition.X += (mousedt.X / PoolGame.screenSize.X * 0.5f) * moveSpeed;
+                    }
+                    else
+                    {
+                        newPosition.Y -= (controller.LeftStick.Y) * dt * 0.65f;
+                        newPosition.X += (controller.LeftStick.X) * dt * 0.65f;
+                    }
                     this.cursorPosition = Vector2.Max(Vector2.Zero, Vector2.Min(Vector2.One, newPosition));
                 }
             }

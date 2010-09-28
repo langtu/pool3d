@@ -18,6 +18,8 @@ namespace XNA_PoolGame.Scenarios
     /// </summary>
     public class CribsBasement : Scenario
     {
+        #region Variables
+
         public Entity floor = null;
         public Entity[] walls;
         public Entity couch = null;
@@ -53,7 +55,7 @@ namespace XNA_PoolGame.Scenarios
 
         public Vector3[] smokeWoodPositions;
 
-        public VolumetricLightEntity lightScatter;
+        public VolumetricLightEntity fakeLightShafts;
 
         // Distortion
         public ParticleSystem heatParticles = null;
@@ -63,6 +65,8 @@ namespace XNA_PoolGame.Scenarios
 
         //
         public InstancedEntity ballsinstanced;
+
+        #endregion
 
         public CribsBasement(Game game)
             : base(game)
@@ -75,7 +79,7 @@ namespace XNA_PoolGame.Scenarios
             ///////// INSTANCED MODEL ///////
             ballsinstanced = new InstancedEntity(PoolGame.game, "Models\\Balls\\instanced_newball");
             ballsinstanced.DrawOrder = 5;
-            ballsinstanced.delegateupdate = delegate { UpdateInstancedWorldMatrix(); };
+            ballsinstanced.DelegateUpdate = delegate { UpdateInstancedWorldMatrix(); };
             PoolGame.game.Components.Add(ballsinstanced);
 
             /////////// PARTICLES /////////// 
@@ -422,12 +426,13 @@ namespace XNA_PoolGame.Scenarios
             vase.Position = bar.Position + new Vector3(0, 283, -200);
             PoolGame.game.Components.Add(vase);
 
-            lightScatter = new VolumetricLightEntity(PoolGame.game, "Models\\cone", "Models\\god rays alpha");
-            lightScatter.Position = new Vector3(180.0f, 375, 0.0f);
-            lightScatter.TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;            
-            lightScatter.Scale = Vector3.One * 4.0f;
+            fakeLightShafts = new VolumetricLightEntity(PoolGame.game, "Models\\coneAR");
+            fakeLightShafts.Position = new Vector3(180.0f, 375.0f - 150.0f, 0.0f);
+            fakeLightShafts.TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;
+            fakeLightShafts.Scale = Vector3.One * 3.0f;
+            fakeLightShafts.Cull = CullMode.None;
             ////lightScatter.Scale = new Vector3(5.0f);
-            PoolGame.game.Components.Add(lightScatter);
+            PoolGame.game.Components.Add(fakeLightShafts);
 
             ////////////////////////////////////////////////
             //World.scenario.Objects.Add(ballsinstanced);
@@ -477,7 +482,7 @@ namespace XNA_PoolGame.Scenarios
             foreach (Entity vent in vents)
                 World.scenario.Objects.Add(vent);
 
-            World.scenario.objects.Add(lightScatter);
+            World.scenario.objects.Add(fakeLightShafts);
             //volumetriclights.Add(lightScatter);
 
             base.Initialize();

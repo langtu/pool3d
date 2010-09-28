@@ -92,6 +92,7 @@ namespace XNA_PoolGame.Graphics.Models
         public RenderTargetCube refCubeMap = null;
         public TextureCube environmentMap;
         public static DepthStencilBuffer DEMdepthstencil;
+        public RenderTarget2D mDPMapFront, mDPMapBack;
         #endregion
 
         #region //// FRUSTUM CULLING ////
@@ -342,20 +343,27 @@ namespace XNA_PoolGame.Graphics.Models
             GC.Collect();
             modelL1 = PoolGame.content.Load<CustomModel>(modelNameL1);
 
-            if (modelNameL2 != null)
+            //if (modelNameL2 != null)
             {
-                if (EMType == EnvironmentType.Dynamic)
+                if (EMType == EnvironmentType.Dynamic || EMType == EnvironmentType.DualParaboloid)
                 {
                     World.scenario.dems_basicrender.Add(this);
                     World.scenario.dems.Add(this);
                 }
-                modelL2 = PoolGame.content.Load<CustomModel>(modelNameL2);
+                if (modelNameL2 != null)
+                    modelL2 = PoolGame.content.Load<CustomModel>(modelNameL2);
+                
             }
 
-            if (EMType == EnvironmentType.Dynamic && refCubeMap == null && World.dem == EnvironmentType.Dynamic)
+            if (EMType == EnvironmentType.Dynamic && refCubeMap == null && World.EM == EnvironmentType.Dynamic)
             {
                 DEMdepthstencil = new DepthStencilBuffer(PoolGame.device, PoolGame.Width, PoolGame.Height, PoolGame.device.PresentationParameters.AutoDepthStencilFormat);
                 refCubeMap = new RenderTargetCube(PoolGame.device, World.EMSize, 1, PoolGame.device.PresentationParameters.BackBufferFormat);
+            }
+            else if (EMType == EnvironmentType.DualParaboloid && World.EM == EnvironmentType.DualParaboloid)
+            {
+                mDPMapFront = new RenderTarget2D(PoolGame.device, PoolGame.Width / World.DPDivisor, PoolGame.Height / World.DPDivisor, 1, SurfaceFormat.Color);
+                mDPMapBack = new RenderTarget2D(PoolGame.device, PoolGame.Width / World.DPDivisor, PoolGame.Height / World.DPDivisor, 1, SurfaceFormat.Color);
             }
 
             // Load custom texture
@@ -604,8 +612,9 @@ namespace XNA_PoolGame.Graphics.Models
 
                         if (World.displacementType != DisplacementType.None && (this.customnormalMapAsset != null || useNormalMapTextures))
                             basicTechnique = World.displacementType.ToString() + basicTechnique;
-                        
-                        if (EMType != EnvironmentType.None && World.dem != EnvironmentType.None) basicTechnique = "EM" + basicTechnique;
+
+                        bool DEM = this.EMType != EnvironmentType.None && this.EMType != EnvironmentType.DualParaboloid && World.EM != EnvironmentType.None && World.EM != EnvironmentType.DualParaboloid;
+                        if (DEM) basicTechnique = "EM" + basicTechnique;
                         if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) basicTechnique = "NoMRT" + basicTechnique;
                         
                         DrawModel(true, PostProcessManager.SSSoftShadow_MRT, basicTechnique, delegate { SetParametersSoftShadowMRT(ref LightManager.lights); });
@@ -621,7 +630,8 @@ namespace XNA_PoolGame.Graphics.Models
                     {
                         frustum = World.camera.FrustumCulling;
                         string basicTechnique = "ModelTechnique";
-                        if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) basicTechnique = "NoMRT" + basicTechnique;
+                        //if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) 
+                            basicTechnique = "NoMRT" + basicTechnique;
                         CustomModel tmpmodel = modelL1;
                         if (modelL2 != null) modelL1 = modelL2;
                         DrawModel(true, PostProcessManager.modelEffect, basicTechnique, delegate { SetParametersModelEffectMRT(ref LightManager.lights); });
@@ -649,9 +659,78 @@ namespace XNA_PoolGame.Graphics.Models
                         DrawModel(true, PostProcessManager.renderGBuffer_DefEffect, basicTechnique, delegate { SetParameterRenderGBuffer(); });
                     }
                     break;
+                case RenderMode.DPBasicRender:
+                    {
+                        frustum = World.camera.FrustumCulling;
+                        string basicTechnique = "DPModelTechnique";
+                        //if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) 
+                            basicTechnique = "NoMRT" + basicTechnique;
+                        CustomModel tmpmodel = modelL1;
+                        if (modelL2 != null) modelL1 = modelL2;
+                        DrawModel(true, PostProcessManager.modelEffect, basicTechnique, delegate { SetParametersDPEffect(); });
+                        modelL1 = tmpmodel;
+                    }
+                    break;
+                case RenderMode.DualParaboloidRenderMaps:
+                    #region Dual Paraboloid Maps
+                    {
+                        Camera oldCamera = World.camera;
+                        World.camera = World.emptycamera;
 
-                #region Dynamic Environment Mapping
+                        World.camera.CameraPosition = this.position;
+                        World.camera.FieldOfView = MathHelper.ToRadians(90.0f);
+                        World.camera.FarPlane = oldCamera.FarPlane;
+                        World.camera.NearPlane = oldCamera.NearPlane;
+                        World.camera.Projection = Matrix.Identity;
+
+                        mRight = Vector3.Right;
+                        this.LookAt(this.position, this.Position + Vector3.UnitZ);
+                        this.BuildView();
+                        
+                        //Matrix view = Matrix.CreateLookAt(this.Position, this.Position + Vector3.UnitZ, Vector3.Up);
+
+                        //view = Matrix.Transpose(view);
+                        
+                        World.camera.EnableFrustumCulling = true;
+                        //World.camera.ViewProjection = World.camera.View * World.camera.Projection;
+
+                        //translate the paraboloid camera to the origin <0, 0, 0>
+                        Matrix translate = Matrix.CreateTranslation(-mView.Translation);
+                        //Matrix view = World.camera.View;
+                        //Matrix viewProj = World.camera.ViewProjection;
+
+                        //World.camera.View = translate * mView;
+                        World.camera.View = mView;
+                        World.camera.ViewProjection = World.camera.View * World.camera.Projection;
+
+                        this.Visible = false;
+
+                        PostProcessManager.ChangeRenderMode(RenderMode.BasicRender);
+                        PoolGame.device.SetRenderTarget(0, mDPMapFront);
+                        PoolGame.device.Clear(Color.Black);
+                        PostProcessManager.modelEffect.Parameters["Direction"].SetValue(1.0f);
+                        World.scenario.DrawDEMBasicRenderObjects(gameTime);
+
+                        PoolGame.device.SetRenderTarget(0, null);
+
+                        PoolGame.device.SetRenderTarget(0, mDPMapBack);
+                        PoolGame.device.Clear(Color.Black);
+                        PostProcessManager.modelEffect.Parameters["Direction"].SetValue(-1.0f);
+                        World.scenario.DrawDEMBasicRenderObjects(gameTime);
+
+                        PoolGame.device.SetRenderTarget(0, null);
+
+                        World.camera = oldCamera;
+                        PostProcessManager.ChangeRenderMode(RenderMode.DualParaboloidRenderMaps);
+                        this.Visible = true;
+
+                    }
+                    #endregion
+                    break;
+
+                
                 case RenderMode.DEMPass:
+                    #region Dynamic Environment Mapping
                     {
                         if (EMType == EnvironmentType.Dynamic)
                         {
@@ -669,7 +748,7 @@ namespace XNA_PoolGame.Graphics.Models
                             // Render our cube map, once for each cube face (6 times).
                             for (int i = 0; i < 6; i++)
                             {
-                                // render the scene to all cubemap faces
+                                // Render the scene to all cubemap faces.
                                 CubeMapFace cubeMapFace = (CubeMapFace)i;
 
                                 switch (cubeMapFace)
@@ -720,16 +799,74 @@ namespace XNA_PoolGame.Graphics.Models
                             this.Visible = true;
                         }
                     }
+                    #endregion
                     break;
-                #endregion
             }
 
             base.Draw(gameTime);
         }
+        Matrix mView;
+        Vector3 mLook, mRight = Vector3.Right, mUp = Vector3.Up;
+        Vector3 mPosition;
+        private void BuildView()
+        {
+            mLook.Normalize();
 
-        
+            mUp = Vector3.Cross(mLook, mRight);
+            mUp.Normalize();
 
+            mRight = Vector3.Cross(mUp, mLook);
+            mRight.Normalize();
 
+            // Build the view matrix:
+            float x = -Vector3.Dot(mRight, mPosition);
+            float y = -Vector3.Dot(mUp, mPosition);
+            float z = -Vector3.Dot(mLook, mPosition);
+
+            mView.M11 = mRight.X;
+            mView.M21 = mRight.Y;
+            mView.M31 = mRight.Z;
+            mView.M41 = x;
+
+            mView.M12 = mUp.X;
+            mView.M22 = mUp.Y;
+            mView.M32 = mUp.Z;
+            mView.M42 = y;
+
+            mView.M13 = mLook.X;
+            mView.M23 = mLook.Y;
+            mView.M33 = mLook.Z;
+            mView.M43 = z;
+
+            mView.M14 = 0.0f;
+            mView.M24 = 0.0f;
+            mView.M34 = 0.0f;
+            mView.M44 = 1.0f;
+        }
+
+        private void LookAt(Vector3 pos, Vector3 target)
+        {
+            Vector3 L = pos - target;
+            //Vector3 L = target - pos;
+            L = Vector3.Normalize(L);
+
+            Vector3 R, U;
+            if (Math.Abs(Vector3.Dot(mUp, L)) < .5f)
+            {
+                R = Vector3.Cross(mUp, L);
+                U = Vector3.Cross(L, R);
+            }
+            else
+            {
+                U = Vector3.Cross(L, mRight);
+                R = Vector3.Cross(U, L);
+            }
+
+            mPosition = pos;
+            mRight = R;
+            mUp = U;
+            mLook = L;
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -962,11 +1099,11 @@ namespace XNA_PoolGame.Graphics.Models
 
         private void SetParameterRenderGBuffer()
         {
-            PostProcessManager.renderGBuffer_DefEffect.Parameters["bDEM"].SetValue(EMType != EnvironmentType.None && World.dem != EnvironmentType.None);
-            if (EMType != EnvironmentType.None && World.dem != EnvironmentType.None)
+            bool DEM = this.EMType != EnvironmentType.None && this.EMType != EnvironmentType.DualParaboloid && World.EM != EnvironmentType.None && World.EM != EnvironmentType.DualParaboloid;
+            PostProcessManager.renderGBuffer_DefEffect.Parameters["bDEM"].SetValue(DEM);
+            if (DEM)
                 PostProcessManager.renderGBuffer_DefEffect.Parameters["EnvironmentMap"].SetValue(environmentMap);
             
-
             PostProcessManager.renderGBuffer_DefEffect.Parameters["isScatterObject"].SetValue(isScatterObject);
 
             if ((this.customnormalMapAsset != null || useNormalMapTextures) && World.displacementType != DisplacementType.None)
@@ -995,6 +1132,18 @@ namespace XNA_PoolGame.Graphics.Models
         #endregion
 
         #region Set Parameters for Basic Render
+
+        public void SetParametersDPEffect()
+        {
+            Matrix worldIT = Matrix.Invert(localWorld);
+            worldIT = Matrix.Transpose(worldIT);
+            PostProcessManager.modelEffect.Parameters["WorldInvTrans"].SetValue(worldIT);
+            //PostProcessManager.modelEffect.Parameters["NearPlane"].SetValue(World.camera.NearPlane);
+            //PostProcessManager.modelEffect.Parameters["FarPlane"].SetValue(World.camera.FarPlane);
+            PostProcessManager.modelEffect.Parameters["WorldViewProj"].SetValue(localWorld * World.camera.ViewProjection);
+            
+            SetParametersModelEffectMRT(ref LightManager.lights);
+        }
 
         public void SetParametersModelEffectMRT(ref List<Light> lights)
         {
@@ -1122,8 +1271,8 @@ namespace XNA_PoolGame.Graphics.Models
                 else
                     PostProcessManager.SSSoftShadow_MRT.Parameters["SSAOMap"].SetValue(PostProcessManager.whiteTexture);
             }
-
-            if (EMType != EnvironmentType.None && World.dem != EnvironmentType.None)
+            bool DEM = this.EMType != EnvironmentType.None && this.EMType != EnvironmentType.DualParaboloid && World.EM != EnvironmentType.None && World.EM != EnvironmentType.DualParaboloid;
+            if (DEM)
             {
                 PostProcessManager.SSSoftShadow_MRT.Parameters["EnvironmentMap"].SetValue(environmentMap);
             }
@@ -1219,6 +1368,10 @@ namespace XNA_PoolGame.Graphics.Models
                 if (refCubeMap != null) refCubeMap.Dispose();
                 refCubeMap = null;
 
+                if (mDPMapFront != null) mDPMapFront.Dispose();
+                if (mDPMapBack != null) mDPMapFront.Dispose();
+
+                mDPMapFront = mDPMapBack = null;
                 lightsradius = null;
                 lightscolors = null;
                 lightspositions = null;

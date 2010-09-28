@@ -83,9 +83,9 @@ namespace XNA_PoolGame
 
         // SHADOWS SETTINGS
         public static bool displayShadows = true;
-        public static bool displayShadowsTextures = false;
-        public static int shadowMapSize = 1024 * 1;
-        public static ShadowTechnnique shadowTechnique = ShadowTechnnique.VarianceShadowMapping;
+        public static bool displayShadowsTextures = true;
+        public static int shadowMapSize = 1024 / 2;
+        public static ShadowTechnnique shadowTechnique = ShadowTechnnique.ScreenSpaceShadowMapping;
         //
         public static ShadingTechnnique shadingTech = ShadingTechnnique.Foward;
 
@@ -115,7 +115,8 @@ namespace XNA_PoolGame
         public static InstancingTechnique instancingTech = InstancingTechnique.HardwareInstancing;
 
         //
-        public static EnvironmentType dem = EnvironmentType.None;
+        public static EnvironmentType EM = EnvironmentType.DualParaboloid;
+        public static int DPDivisor = 2;
         public static int EMSize = 64;
 
         public static bool doLightshafts = false;
