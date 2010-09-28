@@ -20,6 +20,13 @@ float vaditionalLightRadius[2];
 int vaditionalLightType[2];
 int aditionalLights = 0;
 
+///
+float4x4 WorldInvTrans;
+float4x4 WorldViewProj;
+float Direction = 1.0f;
+float NearPlane = 0.1f;
+float FarPlane = 1000.0f;
+
 Texture TexColor;
 sampler ColorSampler = sampler_state
 {
@@ -201,6 +208,61 @@ float4 NoMRTPixelShaderFunction(VS_ModelOutput input) : COLOR0
     //return Color * vAmbient + (totalDiffuse * materialDiffuseColor + totalSpecular) + totalDiffuse2 * materialDiffuseColor;
     
 }
+struct OutputVS_DP
+{
+    float4 posH    : POSITION0;
+    float3 normalW : TEXCOORD0;
+    float2 tex0    : TEXCOORD1;
+    float z		   : TEXCOORD2;
+};
+
+OutputVS_DP Build_DP_VS(float4 posL : POSITION0, float3 normalL : NORMAL0, float2 tex0: TEXCOORD0)
+{
+    // Zero out our output.
+	OutputVS_DP outVS;
+	
+	// Transform normal to world space.
+	outVS.normalW = mul(float4(normalL, 0.0f), WorldInvTrans).xyz;	
+	
+	// Pass on texture coordinates to be interpolated in rasterization.
+	outVS.tex0 = tex0;
+	
+	//Render with the Dual-Paraboloid distortion
+	
+	// Transform to homogeneous clip space.
+	outVS.posH = mul(posL, WorldViewProj);
+	
+	outVS.posH.z = outVS.posH.z * Direction;
+	
+	float L = length( outVS.posH.xyz );							// determine the distance between (0,0,0) and the vertex
+	outVS.posH = outVS.posH / L;								// divide the vertex position by the distance 
+	
+	outVS.z = outVS.posH.z;										// remember which hemisphere the vertex is in
+	outVS.posH.z = outVS.posH.z + 1;							// add the reflected vector to find the normal vector
+
+	outVS.posH.x = outVS.posH.x / outVS.posH.z;					// divide x coord by the new z-value
+	outVS.posH.y = outVS.posH.y / outVS.posH.z;					// divide y coord by the new z-value
+
+	outVS.posH.z = (L - NearPlane) / (FarPlane - NearPlane);	// scale the depth to [0, 1]
+	outVS.posH.w = 1;											// set w to 1 so there is no w divide
+
+	// Done--return the output.
+    return outVS;
+}
+float4 NoMRTDP_PS(float3 normalW : TEXCOORD0, float2 tex0 : TEXCOORD1, float z : TEXCOORD2) : COLOR0
+{
+	//clip(z);
+	
+	// Interpolated normals can become unnormal--so normalize.
+	normalW = normalize(normalW);
+	
+	
+	// Get the texture color.
+	float4 texColor = tex2D(ColorSampler, tex0);
+	
+    return float4(1,1,1,1);//texColor;//float4(color, texColor.a);
+}
+
 technique ModelTechnique
 {
     pass Pass1
@@ -217,5 +279,16 @@ technique NoMRTModelTechnique
 
         VertexShader = compile vs_3_0 VertexShaderFunction();
         PixelShader = compile ps_3_0 NoMRTPixelShaderFunction();
+    }
+}
+
+technique NoMRTDPModelTechnique
+{
+    pass Pass1
+    {
+
+        VertexShader = compile vs_2_0 Build_DP_VS();
+        PixelShader = compile ps_2_0 NoMRTDP_PS();
+        CullMode = NONE;
     }
 }

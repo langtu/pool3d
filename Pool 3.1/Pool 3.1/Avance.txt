@@ -37,4 +37,6 @@
 - Colocar los parametros de los efectos en las clases (effect.Parameters[""]) a variables para ser mas eficiente
 - Realizar Antialiasing a pata (Edge detection and blur)
 - Incluir buen chequeo de frustrum culling a las sombras
-- 
+- Dual-Paraboloid Reflection
+- Dual-Paraboloid Shadow Maps
+- Tamaño del Shadow Map no cuadrado

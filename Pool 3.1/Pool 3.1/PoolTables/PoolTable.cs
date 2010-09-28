@@ -200,11 +200,7 @@ namespace XNA_PoolGame.PoolTables
 
         public void CreatePoolBalls()
         {
-            cueBall = new Ball(PoolGame.game, 0, "Models\\Balls\\newball", "Textures\\Balls\\white", this, World.ballRadius);
-            cueBall.EMType = EnvironmentType.Static;
-            cueBall.DrawOrder = 2;
-            cueBall.Scale = new Vector3(poolballscaleFactor);
-
+            cueBall = new Ball(PoolGame.game, 0, "Models\\Balls\\newball", "Textures\\Balls\\white", this, World.ballRadius);            
             if (!World.Debug)
                 cueBall.SetCenter(cueBallStartPosition);
             else
@@ -213,13 +209,13 @@ namespace XNA_PoolGame.PoolTables
             rack = World.rackfactories[World.gameMode].CreateRack(this);
             rack.BuildsBallsRack();
 
-            //TotalBalls = 1;
+            TotalBalls = 2;
             poolBalls[0] = cueBall;
             for (int i = 0; i < TotalBalls; i++)
             {
                 poolBalls[i].Scale = new Vector3(poolballscaleFactor);
                 poolBalls[i].DrawOrder = 2;
-                poolBalls[i].EMType = EnvironmentType.Static;
+                poolBalls[i].EMType = EnvironmentType.DualParaboloid;
                 poolBalls[i].UseThread = World.UseThreads;
 
                 PoolGame.game.Components.Add(poolBalls[i]);

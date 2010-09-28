@@ -187,13 +187,11 @@ namespace XNA_PoolGame.Match
                                         
                                         bool illegallypocketedballs = false;
                                         if (tableremainsopened)
-                                            illegallypocketedballs = true;
+                                            inningOver = true;
                                         else
                                         {
                                             illegallypocketedballs = AreBallsIllegallyPocketed();
                                         }
-                                        if (illegallypocketedballs)
-                                            inningOver = true;
 
                                         if (!tableremainsopened)
                                         {
@@ -380,6 +378,7 @@ namespace XNA_PoolGame.Match
             return false;
         }
 
+        #region Lagging shot checking
         /// <summary>
         /// Player fails his lag shot?
         /// </summary>
@@ -477,7 +476,9 @@ namespace XNA_PoolGame.Match
                 table.InitializeMatch();
             }
         }
+        #endregion
 
+        #region Is a Legal Shot?
         public bool IsALegalShot()
         {
             switch (World.gameMode)
@@ -486,7 +487,19 @@ namespace XNA_PoolGame.Match
                     if (table.roundInfo.calledBall == null || table.roundInfo.calledPocket == null)
                         return false;
 
-                    //if (table.roundInfo.BallHitFirstThisRound.
+                    if (table.roundInfo.BallHitFirstThisRound == null)
+                        return false;
+
+                    if (table.roundInfo.BallHitFirstThisRound.ballNumber == 8)
+                        return false;
+
+                    if (World.CurrentPlayer.team.BallType == BallGroupType.Stripe &&
+                        table.roundInfo.BallHitFirstThisRound.ballNumber <= 7)
+                        return false;
+
+                    if (World.CurrentPlayer.team.BallType == BallGroupType.Solid &&
+                        table.roundInfo.BallHitFirstThisRound.ballNumber >= 9)
+                        return false;
 
                     if (table.roundInfo.calledBall.pocketWhereAt != table.roundInfo.calledPocket.pocketIndex)
                         return false;
@@ -504,7 +517,9 @@ namespace XNA_PoolGame.Match
             }
             return true;
         }
+        #endregion
 
+        #region Are balls illegally pockected this round?
         public bool AreBallsIllegallyPocketed()
         {
             bool r = false;            
@@ -534,6 +549,7 @@ namespace XNA_PoolGame.Match
             }
             return r;
         }
+        #endregion
 
         private bool EightBallPocketed()
         {

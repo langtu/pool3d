@@ -31,7 +31,7 @@ namespace XNA_PoolGame.Graphics.Models
         /// Delegate
         /// </summary>
         public delegate void GatherWorldMatrices();
-        public GatherWorldMatrices delegateupdate;
+        public GatherWorldMatrices DelegateUpdate;
 
         /// <summary>
         /// Render parameters delegate
@@ -142,7 +142,7 @@ namespace XNA_PoolGame.Graphics.Models
 
             effect.CurrentTechnique = effect.Techniques[newTechnique];
             // Gather instance transform matrices into a single array.
-            delegateupdate.Invoke();
+            DelegateUpdate.Invoke();
 
             // Draw all the instances in a single call.
             model.DrawInstances(transforms, effect);

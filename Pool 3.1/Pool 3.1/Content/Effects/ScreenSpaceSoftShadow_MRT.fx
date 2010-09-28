@@ -180,7 +180,7 @@ PS_ScreenSpaceShadow_Output PS_ScreenSpaceShadow(VS_ScreenSpaceShadow_Output inp
 	///////////////////////////////////////////////////////////////////////
 	float2 texCoord;
 	float3 ViewDir = normalize(CameraPosition.xyz - input.WorldPosition.xyz);
-	if (bparallax == true)
+	if (bparallax)
     {
 		float3 ViewDirTBN = mul(ViewDir, input.TBN);
 		
@@ -284,7 +284,7 @@ float4 PS_ScreenSpaceShadowNoMRT(VS_ScreenSpaceShadow_Output input, uniform bool
 	///////////////////////////////////////////////////////////////////////
 	float2 texCoord;
 	float3 ViewDir = normalize(CameraPosition.xyz - input.WorldPosition.xyz);
-	if (bparallax == true)
+	if (bparallax)
     {
 		float3 ViewDirTBN = mul(ViewDir, input.TBN);
 		

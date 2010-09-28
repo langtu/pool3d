@@ -124,7 +124,6 @@ namespace XNA_PoolGame.Graphics.Models
 
         #endregion
 
-
         /// <summary>
         /// Draws a batch of instanced models.
         /// </summary>

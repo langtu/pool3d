@@ -216,7 +216,8 @@ namespace XNA_PoolGame.Graphics.Models
                         //PoolGame.device.RenderState.ReferenceAlpha = 0;
 
                         CullMode oldCullMode = PoolGame.device.RenderState.CullMode;
-                        PoolGame.device.RenderState.CullMode = cullmode;
+                        //PoolGame.device.RenderState.CullMode = cullmode;
+                        PoolGame.device.RenderState.CullMode = CullMode.CullClockwiseFace;
 
                         bool depthbufferWrite_old = PoolGame.device.RenderState.DepthBufferWriteEnable;
                         PoolGame.device.RenderState.DepthBufferEnable = true;
@@ -226,7 +227,7 @@ namespace XNA_PoolGame.Graphics.Models
 
 
                         PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
-                        //DrawModel(true, PostProcessManager.shaftsEffect, basicTechnique, delegate { SetParametersVolumetricLightModel(); });
+                        DrawModel(true, PostProcessManager.shaftsEffect, basicTechnique, delegate { SetParametersVolumetricLightModel(); });
 
                         PoolGame.device.RenderState.CullMode = oldCullMode;
 

@@ -92,9 +92,9 @@ namespace XNA_PoolGame.Screens
 
             ////////////// MAIN POOLTABLE //////////////
             World.poolTable = new Classic(PoolGame.game);
+            World.poolTable.CreatePoolBalls();
             World.poolTable.PreRotation = Matrix.CreateRotationY(MathHelper.Pi);
             World.poolTable.DrawOrder = 1;
-            World.poolTable.CreatePoolBalls();
             
             //World.poolTable.UseThread = true;
 
@@ -268,7 +268,7 @@ namespace XNA_PoolGame.Screens
             List<TextureInUse> useless = new List<TextureInUse>();
             TextureInUse distortionTIU = null;
 
-            if (!World.scenario.texcubeGenerated && World.dem != EnvironmentType.None)
+            if (!World.scenario.texcubeGenerated && (World.EM == EnvironmentType.Dynamic || World.EM == EnvironmentType.Static))
             {
                 PoolGame.device.SetRenderTarget(0, null);
 

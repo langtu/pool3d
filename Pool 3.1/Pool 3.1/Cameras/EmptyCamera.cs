@@ -14,12 +14,17 @@ namespace XNA_PoolGame.Cameras
 
         }
 
+        /// <summary>
+        /// Do nothing.
+        /// </summary>
         public override void SetMouseCentered()
         {
             
         }
 
-
+        /// <summary>
+        /// Do nothing.
+        /// </summary>
         public override void UpdateCameraMatrices()
         {
             
@@ -31,7 +36,8 @@ namespace XNA_PoolGame.Cameras
             set
             {
                 viewMatrix = value;
-                frustum.Matrix = viewMatrix * projectionMatrix;
+                viewProjectionMatrix = viewMatrix * projectionMatrix;
+                if (enableFrustum) frustum.Matrix = viewProjectionMatrix;
             }
         }
 
@@ -41,7 +47,8 @@ namespace XNA_PoolGame.Cameras
             set
             {
                 projectionMatrix = value;
-                frustum.Matrix = viewMatrix * projectionMatrix;
+                viewProjectionMatrix = viewMatrix * projectionMatrix;
+                if (enableFrustum) frustum.Matrix = viewProjectionMatrix;
             }
         }
 
@@ -51,7 +58,7 @@ namespace XNA_PoolGame.Cameras
             set
             {
                 viewProjectionMatrix = value;
-                frustum.Matrix = viewProjectionMatrix;
+                if (enableFrustum) frustum.Matrix = viewProjectionMatrix;
             }
         }
         public override BoundingFrustum FrustumCulling
@@ -64,7 +71,7 @@ namespace XNA_PoolGame.Cameras
 
         protected override void Dispose(bool disposing)
         {
-            World.emptycamera = null;
+            //World.emptycamera = null;
         }
     }
 }

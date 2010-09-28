@@ -1,6 +1,7 @@
 ﻿//#define DRAW_TEXT
 #define USE_DIRTY_STATES
 
+#region Using Statements
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using XNA_PoolGame.Graphics;
+#endregion
 
 namespace XNA_PoolGame.Cameras
 {

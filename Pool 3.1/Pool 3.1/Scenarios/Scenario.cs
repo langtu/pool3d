@@ -43,12 +43,12 @@ namespace XNA_PoolGame.Scenarios
         public MultiMap<int, ParticleSystem> distortionparticles;
 
         /// <summary>
-        /// DEM's scene
+        /// DEM's scene.
         /// </summary>
         public MultiMap<int, Entity> dems_basicrender;
 
         /// <summary>
-        /// DEM's Objects scene
+        /// DEM's Objects scene.
         /// </summary>
         public MultiMap<int, Entity> dems;
 
@@ -92,7 +92,8 @@ namespace XNA_PoolGame.Scenarios
 
             this.ambientColor = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
 
-            if (World.dem != EnvironmentType.None) refCubeMap = new RenderTargetCube(PoolGame.device, World.EMSize, 1, PoolGame.device.PresentationParameters.BackBufferFormat);
+            if (World.EM == EnvironmentType.Dynamic || World.EM == EnvironmentType.Static)
+                refCubeMap = new RenderTargetCube(PoolGame.device, World.EMSize, 1, PoolGame.device.PresentationParameters.BackBufferFormat);
             LoadLights();
         }
 
@@ -154,12 +155,12 @@ namespace XNA_PoolGame.Scenarios
         }
 
         /// <summary>
-        /// Initialize lights from the scene.
+        /// Initialize lights of the scene.
         /// </summary>
         public abstract void LoadLights();
 
         /// <summary>
-        /// Set particles settings before drawing them.
+        /// Sets particles settings before drawing them.
         /// </summary>
         public virtual void SetParticlesSettings()
         {
@@ -173,7 +174,7 @@ namespace XNA_PoolGame.Scenarios
         }
 
         /// <summary>
-        /// Set distortion particles settings before drawing them.
+        /// Sets distortion particles settings before drawing them.
         /// </summary>
         public virtual void SetDistortionParticleSettings()
         {
@@ -210,7 +211,7 @@ namespace XNA_PoolGame.Scenarios
 
             World.camera = World.emptycamera;
 
-            Vector3 position = new Vector3(0, World.poolTable.SURFACE_POSITION_Y + World.ballRadius, 0);
+            Vector3 position = new Vector3(0.0f, World.poolTable.SURFACE_POSITION_Y + World.ballRadius, 0.0f);
             World.emptycamera.CameraPosition = position;
             World.emptycamera.Projection = oldCamera.Projection;
 

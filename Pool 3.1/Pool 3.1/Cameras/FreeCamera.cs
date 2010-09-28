@@ -44,19 +44,19 @@ namespace XNA_PoolGame.Cameras
             MouseState mouse = Mouse.GetState();
 
             int centerX = Game.Window.ClientBounds.Width / 2;
-            int centerY = Game.Window.ClientBounds.Width / 2;
+            int centerY = Game.Window.ClientBounds.Height / 2;
 
-            if (PoolGame.game.IsActive) Mouse.SetPosition(centerX, centerY);
+            //if (PoolGame.game.IsActive) Mouse.SetPosition(centerX, centerY);
 
-            if (isMoveablePitchAndYaw && PoolGame.game.IsActive)
-            {
-                if (mouse.Y != centerY || mouse.X != centerX)
-                {
-                    angle.X += MathHelper.ToRadians((mouse.Y - centerY) * turnSpeed * 0.01f); // pitch
-                    angle.Y += MathHelper.ToRadians((mouse.X - centerX) * turnSpeed * 0.01f); // yaw
-                }
-                viewDirty = true;
-            }
+            //if (isMoveablePitchAndYaw && PoolGame.game.IsActive)
+            //{
+            //    if (mouse.Y != centerY || mouse.X != centerX)
+            //    {
+            //        angle.X += MathHelper.ToRadians((mouse.Y - centerY) * turnSpeed * 0.01f); // pitch
+            //        angle.Y += MathHelper.ToRadians((mouse.X - centerX) * turnSpeed * 0.01f); // yaw
+            //    }
+            //    viewDirty = true;
+            //}
 
             forward = Vector3.Normalize(new Vector3((float)Math.Sin(-angle.Y), (float)Math.Sin(angle.X), (float)Math.Cos(-angle.Y)));
             Vector3 left = Vector3.Normalize(new Vector3((float)Math.Cos(angle.Y), 0f, (float)Math.Sin(angle.Y)));

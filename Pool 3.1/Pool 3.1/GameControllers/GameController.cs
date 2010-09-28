@@ -118,9 +118,11 @@ namespace XNA_PoolGame.GameControllers
 
         public bool isIdle()
         {
-            return (leftStick == Vector2.Zero && rightStick == Vector2.Zero && !APressed
+            return (leftStick == Vector2.Zero && rightStick == Vector2.Zero
                 && leftTrigger == 0.0f && rightTrigger == 0.0f 
-                && !leftShoulderPressed && !rightShoulderPressed && !XPressed && !YPressed);
+                && !leftShoulderPressed && !rightShoulderPressed &&
+                !XPressed && !YPressed && !APressed && !BPressed &&
+                !startPressed);
         }
 
 

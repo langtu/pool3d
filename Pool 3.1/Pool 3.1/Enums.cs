@@ -25,7 +25,8 @@ namespace XNA_PoolGame
     {
         None,
         Dynamic,
-        Static
+        Static,
+        DualParaboloid
     }
     public enum LightType : int
     {
@@ -97,6 +98,7 @@ namespace XNA_PoolGame
         PauseMenuMode
 
     }
+
     public enum MatchPhase
     {
         None,
@@ -125,7 +127,9 @@ namespace XNA_PoolGame
         ParticleSystem,
         DistortionParticleSystem,
         RenderGBuffer,
-        SSAOPrePass
+        SSAOPrePass,
+        DualParaboloidRenderMaps,
+        DPBasicRender
     }
     /// <summary>
     /// Controls the DOF effect being applied
