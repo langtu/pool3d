@@ -101,6 +101,7 @@ namespace XNA_PoolGame.Graphics.Models
         /// What frustum volume use? Camera or Light source Frustum.
         /// </summary>
         protected BoundingFrustum frustum;
+        protected BoundingFrustum frustum2;
 
         /// <summary>
         /// Type of volume
@@ -109,6 +110,7 @@ namespace XNA_PoolGame.Graphics.Models
         BoundingBox boundingBox;
         BoundingSphere boundingSphere;
         protected BoundingBox[] boxes;
+        protected BoundingSphere[] spheres;
         protected bool useModelPartBB = true;
         public bool belongsToScenario = true;
 
@@ -464,7 +466,10 @@ namespace XNA_PoolGame.Graphics.Models
 
             boundingBox = modelL1.GetBoundingBox();
             boundingSphere = new BoundingSphere();
-            boxes = new BoundingBox[modelL1.modelParts.Count];
+            if (volume== VolumeType.BoundingBoxes)
+                boxes = new BoundingBox[modelL1.modelParts.Count];
+            else
+                spheres = new BoundingSphere[modelL1.modelParts.Count];
 
             localWorld = preRotation * rotation * Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
             this.prelocalWorld = localWorld;
@@ -472,9 +477,10 @@ namespace XNA_PoolGame.Graphics.Models
 
             if (belongsToScenario)
             {
-                int boxindex = 0;
+                int modelPartIndex = 0;
                 Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
                 Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+                Vector3 diff;
                 foreach (CustomModelPart modelPart in modelL1.modelParts)
                 {
                     Vector3[] corners = modelPart.AABox.GetCorners();
@@ -492,12 +498,20 @@ namespace XNA_PoolGame.Graphics.Models
 
                     min = Vector3.Min(min, points[0]);
                     max = Vector3.Max(max, points[1]);
-                    boxes[boxindex] = new BoundingBox(points[0], points[1]);
-                    ++boxindex;
+                    if (volume == VolumeType.BoundingBoxes)
+                        boxes[modelPartIndex] = new BoundingBox(points[0], points[1]);
+                    else
+                    {
+                        spheres[modelPartIndex] = new BoundingSphere();
+                        diff = max - min;
+                        spheres[modelPartIndex].Center = (max + min) / 2.0f;
+                        spheres[modelPartIndex].Radius = Math.Max(diff.X, Math.Max(diff.Y, diff.Z));
+                    }
+                    ++modelPartIndex;
                 }
                 boundingBox.Min = min;
                 boundingBox.Max = max;
-                Vector3 diff = max - min;
+                diff = max - min;
                 boundingSphere.Center = (max + min) / 2.0f;
                 boundingSphere.Radius = Math.Max(diff.X, Math.Max(diff.Y, diff.Z));
             }
@@ -540,7 +554,33 @@ namespace XNA_PoolGame.Graphics.Models
                         
                         ++i;
                     }
-                } else if (!useModelPartBB && volume == VolumeType.BoundingBoxes)
+                }
+                else if (useModelPartBB && volume == VolumeType.BoundingSpheres)
+                {
+                    int i = 0;
+                    foreach (CustomModelPart modelPart in modelL1.modelParts)
+                    {
+                        Vector3[] corners = modelPart.AABox.GetCorners();
+                        Vector3 pointrotated = Vector3.Transform(corners[0], localWorld);
+                        Vector3[] points = new Vector3[2];
+                        points[0] = pointrotated;
+                        points[1] = pointrotated;
+
+                        for (int k = 1; k < 8; ++k)
+                        {
+                            pointrotated = Vector3.Transform(corners[k], localWorld);
+
+                            points[0] = Vector3.Min(points[0], pointrotated);
+                            points[1] = Vector3.Max(points[1], pointrotated);
+                        }
+
+                        Vector3 diff = points[1] - points[0];
+                        spheres[i].Center = position;
+                        spheres[i].Radius = Math.Max(diff.X, Math.Max(diff.Y, diff.Z));
+                        ++i;
+                    }
+                }
+                else if (!useModelPartBB && volume == VolumeType.BoundingBoxes)
                 {
                     Vector3[] corners = modelL1.GetBoundingBox().GetCorners();
                     Vector3 pointrotated = Vector3.Transform(corners[0], localWorld);
@@ -558,7 +598,8 @@ namespace XNA_PoolGame.Graphics.Models
 
                     boundingBox.Min = points[0];
                     boundingBox.Max = points[1];
-                } else if (!useModelPartBB && volume == VolumeType.BoundingSpheres)
+                }
+                else if (!useModelPartBB && volume == VolumeType.BoundingSpheres)
                 {
                     boundingSphere.Center = position;
                 }
@@ -571,6 +612,7 @@ namespace XNA_PoolGame.Graphics.Models
             
             //Matrix proj = Maths.CalcLightProjection(LightManager.lights.Position, LightManager.bounds, PoolGame.device.Viewport);
 
+            UpdateLocalWorld();
             base.Update(gameTime);
         }
         #endregion
@@ -579,35 +621,48 @@ namespace XNA_PoolGame.Graphics.Models
         public override void Draw(GameTime gameTime)
         {
             if (World.camera == null) return;
-            RenderMode renderMode = PostProcessManager.currentRenderMode;
+            RenderPassMode renderMode = PostProcessManager.currentRenderMode;
 
-            UpdateLocalWorld();
-
+            frustum2 = null;
             switch (renderMode)
             {
-                case RenderMode.ShadowMapRender:
+                case RenderPassMode.ShadowMapRender:
                     {
                         if (!occluder) return;
 
-                        frustum = World.camera.FrustumCulling;
-                        //frustum = LightManager.lights[PostProcessManager.shading.shadows.lightpass].Frustum;
-                        DrawModel(false, PostProcessManager.DepthEffect, PostProcessManager.shading.shadows.GetDepthMapTechnique(), null);
+                        frustum = World.camera.Frustum;
+                        frustum2 = LightManager.lights[PostProcessManager.shading.Shadows.lightpass].Frustum;
+                        //frustum = LightManager.lights[PostProcessManager.shading.Shadows.lightpass].Frustum;
+                        DrawModel(false, PostProcessManager.DepthEffect, PostProcessManager.shading.Shadows.GetDepthMapTechnique(), null);
                     }
                     break;
-                case RenderMode.PCFShadowMapRender:
+                case RenderPassMode.CubeShadowMapPass:
+                    #region Cube Shadow Map
+                    {
+                        if (!occluder) return;
+
+                        //frustum = ((CubeShadowMapping)PostProcessManager.shading.Shadows).CurrentFrustum;
+                        frustum = null;
+                        DrawModel(false, PostProcessManager.DepthEffect, PostProcessManager.shading.Shadows.GetDepthMapTechnique(), null);
+                    }
+                    #endregion
+                    break;
+                case RenderPassMode.PCFShadowMapRender:
                     {
                         //if (!occluder) return;
 
-                        frustum = World.camera.FrustumCulling;
+                        frustum = World.camera.Frustum;
                         if (World.shadowTechnique == ShadowTechnnique.VarianceShadowMapping)
                             DrawModel(false, PostProcessManager.VSMEffect, "PCFSMTechnique", null);
+                        else if (World.shadowTechnique == ShadowTechnnique.CubeShadowMapping)
+                            DrawModel(false, PostProcessManager.PCFShadowMap, "cubicShadowMapping", null);
                         else
                             DrawModel(false, PostProcessManager.PCFShadowMap, "PCFSMTechnique", null);
                     }
                     break;
-                case RenderMode.ScreenSpaceSoftShadowRender:
+                case RenderPassMode.ScreenSpaceSoftShadowRender:
                     {
-                        frustum = World.camera.FrustumCulling;
+                        frustum = World.camera.Frustum;
                         string basicTechnique = "SSSTechnique";
 
                         if (World.displacementType != DisplacementType.None && (this.customnormalMapAsset != null || useNormalMapTextures))
@@ -620,15 +675,15 @@ namespace XNA_PoolGame.Graphics.Models
                         DrawModel(true, PostProcessManager.SSSoftShadow_MRT, basicTechnique, delegate { SetParametersSoftShadowMRT(ref LightManager.lights); });
                     }
                     break;
-                case RenderMode.SSAOPrePass:
+                case RenderPassMode.SSAOPrePass:
                     {
-                        frustum = World.camera.FrustumCulling;
+                        frustum = World.camera.Frustum;
                         DrawModel(false, PostProcessManager.SSAOPrePassEffect, "SSAO", delegate { SetParametersSSAO(); });
                     }
                     break;
-                case RenderMode.DEMBasicRender:
+                case RenderPassMode.DEMBasicRender:
                     {
-                        frustum = World.camera.FrustumCulling;
+                        frustum = World.camera.Frustum;
                         string basicTechnique = "ModelTechnique";
                         //if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) 
                             basicTechnique = "NoMRT" + basicTechnique;
@@ -638,18 +693,18 @@ namespace XNA_PoolGame.Graphics.Models
                         modelL1 = tmpmodel;
                     }
                     break;
-                case RenderMode.BasicRender:
+                case RenderPassMode.BasicRender:
                     {
-                        frustum = World.camera.FrustumCulling;
+                        frustum = World.camera.Frustum;
                         string basicTechnique = PostProcessManager.shading.GetBasicRenderTechnique();
                         //if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) basicTechnique = "NoMRT" + basicTechnique;
 
                         DrawModel(true, PostProcessManager.modelEffect, basicTechnique, delegate { SetParametersModelEffectMRT(ref LightManager.lights); });
                     }
                     break;
-                case RenderMode.RenderGBuffer:
+                case RenderPassMode.RenderGBufferPass:
                     {
-                        frustum = World.camera.FrustumCulling;
+                        frustum = World.camera.Frustum;
                         string basicTechnique = PostProcessManager.shading.GetBasicRenderTechnique();
 
                         if (World.displacementType == DisplacementType.ParallaxMapping && (this.customheightMapAsset != null || useHeightMapTextures))
@@ -659,9 +714,9 @@ namespace XNA_PoolGame.Graphics.Models
                         DrawModel(true, PostProcessManager.renderGBuffer_DefEffect, basicTechnique, delegate { SetParameterRenderGBuffer(); });
                     }
                     break;
-                case RenderMode.DPBasicRender:
+                case RenderPassMode.DPBasicRender:
                     {
-                        frustum = World.camera.FrustumCulling;
+                        frustum = World.camera.Frustum;
                         string basicTechnique = "DPModelTechnique";
                         //if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) 
                             basicTechnique = "NoMRT" + basicTechnique;
@@ -671,70 +726,20 @@ namespace XNA_PoolGame.Graphics.Models
                         modelL1 = tmpmodel;
                     }
                     break;
-                case RenderMode.DualParaboloidRenderMaps:
+                case RenderPassMode.DualParaboloidRenderMapsPass:
                     #region Dual Paraboloid Maps
                     {
-                        Camera oldCamera = World.camera;
-                        World.camera = World.emptycamera;
-
-                        World.camera.CameraPosition = this.position;
-                        World.camera.FieldOfView = MathHelper.ToRadians(90.0f);
-                        World.camera.FarPlane = oldCamera.FarPlane;
-                        World.camera.NearPlane = oldCamera.NearPlane;
-                        World.camera.Projection = Matrix.Identity;
-
-                        mRight = Vector3.Right;
-                        this.LookAt(this.position, this.Position + Vector3.UnitZ);
-                        this.BuildView();
                         
-                        //Matrix view = Matrix.CreateLookAt(this.Position, this.Position + Vector3.UnitZ, Vector3.Up);
-
-                        //view = Matrix.Transpose(view);
-                        
-                        World.camera.EnableFrustumCulling = true;
-                        //World.camera.ViewProjection = World.camera.View * World.camera.Projection;
-
-                        //translate the paraboloid camera to the origin <0, 0, 0>
-                        Matrix translate = Matrix.CreateTranslation(-mView.Translation);
-                        //Matrix view = World.camera.View;
-                        //Matrix viewProj = World.camera.ViewProjection;
-
-                        //World.camera.View = translate * mView;
-                        World.camera.View = mView;
-                        World.camera.ViewProjection = World.camera.View * World.camera.Projection;
-
-                        this.Visible = false;
-
-                        PostProcessManager.ChangeRenderMode(RenderMode.BasicRender);
-                        PoolGame.device.SetRenderTarget(0, mDPMapFront);
-                        PoolGame.device.Clear(Color.Black);
-                        PostProcessManager.modelEffect.Parameters["Direction"].SetValue(1.0f);
-                        World.scenario.DrawDEMBasicRenderObjects(gameTime);
-
-                        PoolGame.device.SetRenderTarget(0, null);
-
-                        PoolGame.device.SetRenderTarget(0, mDPMapBack);
-                        PoolGame.device.Clear(Color.Black);
-                        PostProcessManager.modelEffect.Parameters["Direction"].SetValue(-1.0f);
-                        World.scenario.DrawDEMBasicRenderObjects(gameTime);
-
-                        PoolGame.device.SetRenderTarget(0, null);
-
-                        World.camera = oldCamera;
-                        PostProcessManager.ChangeRenderMode(RenderMode.DualParaboloidRenderMaps);
-                        this.Visible = true;
-
                     }
                     #endregion
                     break;
 
-                
-                case RenderMode.DEMPass:
+                case RenderPassMode.DEMPass:
                     #region Dynamic Environment Mapping
                     {
                         if (EMType == EnvironmentType.Dynamic)
                         {
-                            PostProcessManager.ChangeRenderMode(RenderMode.DEMBasicRender);
+                            PostProcessManager.ChangeRenderMode(RenderPassMode.DEMBasicRender);
                             Camera oldCamera = World.camera;
 
                             World.camera = World.emptycamera;
@@ -751,6 +756,7 @@ namespace XNA_PoolGame.Graphics.Models
                                 // Render the scene to all cubemap faces.
                                 CubeMapFace cubeMapFace = (CubeMapFace)i;
 
+                                #region Cube Faces
                                 switch (cubeMapFace)
                                 {
                                     case CubeMapFace.NegativeX:
@@ -765,7 +771,7 @@ namespace XNA_PoolGame.Graphics.Models
                                         }
                                     case CubeMapFace.NegativeZ:
                                         {
-                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, this.position + Vector3.Backward, Vector3.Up);
+                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, this.position + Vector3.Forward, Vector3.Up);
                                             break;
                                         }
                                     case CubeMapFace.PositiveX:
@@ -780,10 +786,11 @@ namespace XNA_PoolGame.Graphics.Models
                                         }
                                     case CubeMapFace.PositiveZ:
                                         {
-                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, this.position + Vector3.Forward, Vector3.Up);
+                                            World.emptycamera.View = Matrix.CreateLookAt(this.position, this.position + Vector3.Backward, Vector3.Up);
                                             break;
                                         }
                                 }
+                                #endregion
 
                                 PoolGame.device.SetRenderTarget(0, refCubeMap, cubeMapFace);
                                 PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target, Color.White, 1.0f, 0);
@@ -795,7 +802,7 @@ namespace XNA_PoolGame.Graphics.Models
                             environmentMap = refCubeMap.GetTexture();
 
                             World.camera = oldCamera;
-                            PostProcessManager.ChangeRenderMode(RenderMode.DEMPass);
+                            PostProcessManager.ChangeRenderMode(RenderPassMode.DEMPass);
                             this.Visible = true;
                         }
                     }
@@ -805,68 +812,7 @@ namespace XNA_PoolGame.Graphics.Models
 
             base.Draw(gameTime);
         }
-        Matrix mView;
-        Vector3 mLook, mRight = Vector3.Right, mUp = Vector3.Up;
-        Vector3 mPosition;
-        private void BuildView()
-        {
-            mLook.Normalize();
-
-            mUp = Vector3.Cross(mLook, mRight);
-            mUp.Normalize();
-
-            mRight = Vector3.Cross(mUp, mLook);
-            mRight.Normalize();
-
-            // Build the view matrix:
-            float x = -Vector3.Dot(mRight, mPosition);
-            float y = -Vector3.Dot(mUp, mPosition);
-            float z = -Vector3.Dot(mLook, mPosition);
-
-            mView.M11 = mRight.X;
-            mView.M21 = mRight.Y;
-            mView.M31 = mRight.Z;
-            mView.M41 = x;
-
-            mView.M12 = mUp.X;
-            mView.M22 = mUp.Y;
-            mView.M32 = mUp.Z;
-            mView.M42 = y;
-
-            mView.M13 = mLook.X;
-            mView.M23 = mLook.Y;
-            mView.M33 = mLook.Z;
-            mView.M43 = z;
-
-            mView.M14 = 0.0f;
-            mView.M24 = 0.0f;
-            mView.M34 = 0.0f;
-            mView.M44 = 1.0f;
-        }
-
-        private void LookAt(Vector3 pos, Vector3 target)
-        {
-            Vector3 L = pos - target;
-            //Vector3 L = target - pos;
-            L = Vector3.Normalize(L);
-
-            Vector3 R, U;
-            if (Math.Abs(Vector3.Dot(mUp, L)) < .5f)
-            {
-                R = Vector3.Cross(mUp, L);
-                U = Vector3.Cross(L, R);
-            }
-            else
-            {
-                U = Vector3.Cross(L, mRight);
-                R = Vector3.Cross(U, L);
-            }
-
-            mPosition = pos;
-            mRight = R;
-            mUp = U;
-            mLook = L;
-        }
+        
         /// <summary>
         /// 
         /// </summary>
@@ -876,7 +822,7 @@ namespace XNA_PoolGame.Graphics.Models
         }
 
 
-        public virtual void DrawModel(bool enableTexture, Effect effect, string technique, RenderHandler setParameter)
+        protected virtual void DrawModel(bool enableTexture, Effect effect, string technique, RenderHandler setParameter)
         {
             if (setParameter != null) { setParameter.Invoke(); }
 
@@ -1055,18 +1001,40 @@ namespace XNA_PoolGame.Graphics.Models
         {
             if (World.camera.EnableFrustumCulling && frustum != null)
             {
-                switch (volume)
+                if (frustum2 != null)
                 {
-                    case VolumeType.BoundingBoxes:
-                        if (frustum.Contains(boxes[i]) == ContainmentType.Disjoint)
-                            return false;
-                        
-                        break;
-                    case VolumeType.BoundingSpheres:
-                        if (frustum.Contains(new BoundingSphere(Vector3.Transform(modelPart.Sphere.Center, localWorld), modelPart.Sphere.Radius * Math.Max(scale.X, Math.Max(scale.Y, scale.Z)))) == ContainmentType.Disjoint)
-                            return false;
-                        
-                        break;
+                    switch (volume)
+                    {
+                        case VolumeType.BoundingBoxes:
+                            if (frustum.Contains(boxes[i]) == ContainmentType.Disjoint &&
+                                frustum2.Contains(boxes[i]) == ContainmentType.Disjoint)
+                                return false;
+
+                            break;
+                        case VolumeType.BoundingSpheres:
+                            if (frustum.Contains(spheres[i]) == ContainmentType.Disjoint &&
+                                frustum2.Contains(spheres[i]) == ContainmentType.Disjoint)
+                                return false;
+
+                            break;
+                    }
+                }
+                else
+                {
+
+                    switch (volume)
+                    {
+                        case VolumeType.BoundingBoxes:
+                            if (frustum.Contains(boxes[i]) == ContainmentType.Disjoint)
+                                return false;
+
+                            break;
+                        case VolumeType.BoundingSpheres:
+                            if (frustum.Contains(spheres[i]) == ContainmentType.Disjoint)
+                                return false;
+
+                            break;
+                    }
                 }
             }
             return true;
@@ -1075,16 +1043,35 @@ namespace XNA_PoolGame.Graphics.Models
         {
             if (World.camera.EnableFrustumCulling && frustum != null)
             {
-                switch (volume)
+                if (frustum2 != null)
                 {
-                    case VolumeType.BoundingBoxes:
-                        if (frustum.Contains(boundingBox) == ContainmentType.Disjoint)
-                            return false;
-                        break;
-                    case VolumeType.BoundingSpheres:
-                        if (frustum.Contains(boundingSphere) == ContainmentType.Disjoint)
-                            return false;
-                        break;
+                    switch (volume)
+                    {
+                        case VolumeType.BoundingBoxes:
+                            if (frustum.Contains(boundingBox) == ContainmentType.Disjoint ||
+                                frustum2.Contains(boundingBox) == ContainmentType.Disjoint)
+                                return false;
+                            break;
+                        case VolumeType.BoundingSpheres:
+                            if (frustum.Contains(boundingSphere) == ContainmentType.Disjoint ||
+                                frustum2.Contains(boundingBox) == ContainmentType.Disjoint)
+                                return false;
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (volume)
+                    {
+                        case VolumeType.BoundingBoxes:
+                            if (frustum.Contains(boundingBox) == ContainmentType.Disjoint)
+                                return false;
+                            break;
+                        case VolumeType.BoundingSpheres:
+                            if (frustum.Contains(boundingSphere) == ContainmentType.Disjoint)
+                                return false;
+                            break;
+                    }
                 }
             }
             
@@ -1236,7 +1223,7 @@ namespace XNA_PoolGame.Graphics.Models
             else PostProcessManager.SSSoftShadow_MRT.Parameters["vSpecularColor"].SetValue(LightManager.specular);
 
             // Shadow Occlussion
-            PostProcessManager.SSSoftShadow_MRT.Parameters["TexBlurV"].SetValue(PostProcessManager.shading.shadows.shadowOcclussionTIU.renderTarget.GetTexture());
+            PostProcessManager.SSSoftShadow_MRT.Parameters["TexBlurV"].SetValue(PostProcessManager.shading.Shadows.shadowOcclussionTIU.renderTarget.GetTexture());
 
             PostProcessManager.SSSoftShadow_MRT.Parameters["Shineness"].SetValue(shineness);
 
@@ -1286,7 +1273,7 @@ namespace XNA_PoolGame.Graphics.Models
             if (PostProcessManager.shadowBlurTech == ShadowBlurTechnnique.SoftShadow)
                 PostProcessManager.SSSoftShadow.Parameters["TexBlurV"].SetValue(PostProcessManager.GBlurVRT.GetTexture());
             else
-                PostProcessManager.SSSoftShadow.Parameters["TexBlurV"].SetValue(PostProcessManager.shading.shadows.ShadowRT.GetTexture());
+                PostProcessManager.SSSoftShadow.Parameters["TexBlurV"].SetValue(PostProcessManager.shading.Shadows.ShadowRT.GetTexture());
 
 
             PostProcessManager.SSSoftShadow.Parameters["LightPosition"].SetValue(new Vector4(light.Position.X, light.Position.Y, light.Position.Z, 1.0f));
@@ -1308,10 +1295,10 @@ namespace XNA_PoolGame.Graphics.Models
             PostProcessManager.PCFShadowMap.Parameters["totalLights"].SetValue(LightManager.totalLights);
             for (int i = 0; i < LightManager.totalLights; ++i)
             {
-                PostProcessManager.PCFShadowMap.Parameters["ShadowMap" + i].SetValue(PostProcessManager.shading.shadows.ShadowMapRT[i].GetTexture());   
+                PostProcessManager.PCFShadowMap.Parameters["ShadowMap" + i].SetValue(PostProcessManager.shading.Shadows.ShadowMapRT[i].GetTexture());   
             }
 
-            PostProcessManager.PCFShadowMap.Parameters["PCFSamples"].SetValue(PostProcessManager.shading.shadows.pcfSamples);
+            PostProcessManager.PCFShadowMap.Parameters["PCFSamples"].SetValue(PostProcessManager.shading.Shadows.pcfSamples);
             PostProcessManager.PCFShadowMap.Parameters["depthBias"].SetValue(LightManager.depthbias);
         }
 

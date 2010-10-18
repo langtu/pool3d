@@ -17,6 +17,9 @@ float4x4 LightViewProjs[2];
 float MaxDepths[2];
 float depthBias[2];
 int totalLights;
+float3 eyePosition;
+float3 LightPosition;
+const float4 lightAttenuation = float4(0.0f, 0.05f, 0.0f, 1.0f);
 
 float2 PCFSamples[9];
 
@@ -42,6 +45,18 @@ sampler ShadowMapSampler1 = sampler_state
     MipFilter = ANISOTROPIC;
     AddressU = Clamp;
     AddressV = Clamp;
+};
+
+
+textureCUBE cubeShadowMap;
+samplerCUBE cubeShadowMapSampler = sampler_state
+{
+	Texture = <cubeShadowMap>;
+    MipFilter = NONE;
+    MinFilter = NONE;
+    MagFilter = NONE;
+    AddressU = WRAP;
+    AddressV = WRAP;
 };
 
 //------------------
@@ -92,7 +107,6 @@ float4 PCFSM_PS(VertexShaderOutput input) : COLOR
 			float shadowTerm = 0.0f;
 			for( int i = 0; i < 9; i++ )
 			{
-				
 				float StoredDepthInShadowMap;
 				if (j == 0) StoredDepthInShadowMap = tex2D(ShadowMapSampler0, ProjectedTexCoords + PCFSamples[i]).x;
 				else StoredDepthInShadowMap = tex2D(ShadowMapSampler1, ProjectedTexCoords + PCFSamples[i]).x;
@@ -148,6 +162,47 @@ VertexShaderOutput HardwareInstancingVertexShader(VertexShaderInput input,
 {
     return VertexShaderCommon(input, transpose(instanceTransform));
 }
+struct VS_CUBIC_OUTPUT
+{
+	float4 position  :  POSITION0;
+	float3 worldPos  :  TEXCOORD0;
+};
+VS_CUBIC_OUTPUT cubicShadowMapping_VS(float4 inPosition  : POSITION0)
+{
+    VS_CUBIC_OUTPUT output;
+	
+	//float4x4 wvp = World * ViewProj;
+	float4 positionW = mul(inPosition, World);
+
+    //output.position = mul(inPosition, wvp);
+    output.position = mul(positionW, ViewProj);
+    output.worldPos = positionW.xyz;
+    
+    return output;
+}
+
+float4 cubicShadowMapping_PS(VS_CUBIC_OUTPUT In) : COLOR0
+{
+    float4 color = float4(1, 1, 1, 1);    
+    float4 PLightDirection = 0.0f;
+	PLightDirection.xyz = LightPosition - In.worldPos;
+	float distance = length(PLightDirection.xyz);
+	PLightDirection.xyz = PLightDirection.xyz / distance;
+
+	//compute attenuation factor
+	PLightDirection.w = max(0.0f, 1.0f / (lightAttenuation.x + 
+                  			 lightAttenuation.y * distance + 
+                   			 lightAttenuation.z * distance * distance) );
+                               		 
+    
+	//sample depth from cubic shadow map                         		 
+	float shadowMapDepth = texCUBE(cubeShadowMapSampler, float3(-PLightDirection.xy, PLightDirection.z)).x;
+	//depth comparison
+	if(distance > shadowMapDepth)
+		color.xyz = 0.0f;
+	
+    return color;
+}
 
 // Windows instancing technique for shader 2.0 cards.
 technique ShaderInstancingPCFSMTechnique
@@ -182,3 +237,11 @@ technique PCFSMTechnique
     }
 }
 
+technique cubicShadowMapping
+{
+    pass P0
+    {          
+        VertexShader = compile vs_2_0 cubicShadowMapping_VS( );
+        PixelShader  = compile ps_2_0 cubicShadowMapping_PS( ); 
+    }
+}

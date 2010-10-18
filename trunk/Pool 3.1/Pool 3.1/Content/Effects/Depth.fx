@@ -135,6 +135,34 @@ VertexShaderOutput HardwareInstancingVertexShader(VertexShaderInput input,
 
 //#endif
 
+float3 LightPosition;
+struct VS_OUTPUT_CUBEDEPTH
+{
+    float4 oPositionLight : POSITION0;
+    float3 lightVec       : TEXCOORD0;
+};
+
+VS_OUTPUT_CUBEDEPTH CubeDepthMap_VS( float4 inPosition : POSITION0 )
+{
+    VS_OUTPUT_CUBEDEPTH output;
+    //float4x4 wvp = World * ViewProj;
+    float4 positionW = mul(inPosition, World);
+    
+    output.oPositionLight = mul(positionW, ViewProj);
+    //output.oPositionLight = mul(inPosition, wvp);
+    
+    output.lightVec = LightPosition - positionW.xyz; 
+
+    return output;
+}
+//-------------------------------------------------------------------------------------------------
+//Pixel Shader
+//-------------------------------------------------------------------------------------------------
+float4 CubeDepthMap_PS( VS_OUTPUT_CUBEDEPTH In ) : COLOR0
+{
+    return length(In.lightVec) + 0.5f;
+}
+
 //------------------
 //--- Techniques ---
 technique DepthMap
@@ -206,3 +234,14 @@ technique HardwareInstancingDepthMap
 
 
 //#endif
+
+
+
+technique CubeDepthMap
+{
+    pass P0
+    {          
+        VertexShader = compile vs_2_0 CubeDepthMap_VS();
+        PixelShader  = compile ps_2_0 CubeDepthMap_PS(); 
+    }
+}

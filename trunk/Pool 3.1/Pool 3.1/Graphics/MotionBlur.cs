@@ -35,7 +35,7 @@ namespace XNA_PoolGame.Graphics
         {
             // Get corners of the main camera's bounding frustum
             Matrix viewMatrix = World.camera.View;
-            camera.FrustumCulling.GetCorners(frustumCornersWS);
+            camera.Frustum.GetCorners(frustumCornersWS);
 
             Vector3.Transform(frustumCornersWS, ref viewMatrix, frustumCornersVS);
             for (int i = 0; i < 4; i++)

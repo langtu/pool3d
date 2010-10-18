@@ -13,7 +13,8 @@ using XNA_PoolGame.Scenarios;
 namespace XNA_PoolGame.Graphics.Shading
 {
     /// <summary>
-    /// Deferred shading for deferred lighting. Also can work with SSAO implementation.
+    /// Deferred shading for deferred lighting.
+    /// Also can work with SSAO implementation.
     /// </summary>
     public class DeferredShading : BaseShading
     {
@@ -47,7 +48,7 @@ namespace XNA_PoolGame.Graphics.Shading
             ClearGBuffer();
 
             World.camera.ItemsDrawn = 0;
-            PostProcessManager.ChangeRenderMode(RenderMode.RenderGBuffer);
+            PostProcessManager.ChangeRenderMode(RenderPassMode.RenderGBufferPass);
             SetParameters();
             World.scenario.DrawScene(gameTime);
             
@@ -355,7 +356,7 @@ namespace XNA_PoolGame.Graphics.Shading
             SetGBuffer();
             ClearGBuffer();
 
-            PostProcessManager.ChangeRenderMode(RenderMode.RenderGBuffer);
+            PostProcessManager.ChangeRenderMode(RenderPassMode.RenderGBufferPass);
             SetParameters();
             World.scenario.DrawScene(gameTime);
 

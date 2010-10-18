@@ -427,9 +427,9 @@ namespace XNA_PoolGame.Scenarios
             PoolGame.game.Components.Add(vase);
 
             fakeLightShafts = new VolumetricLightEntity(PoolGame.game, "Models\\coneAR");
-            fakeLightShafts.Position = new Vector3(180.0f, 375.0f - 150.0f, 0.0f);
+            fakeLightShafts.Position = new Vector3(180.0f, 375.0f - 100.0f, 0.0f);
             fakeLightShafts.TEXTURE_ADDRESS_MODE = TextureAddressMode.Mirror;
-            fakeLightShafts.Scale = Vector3.One * 3.0f;
+            fakeLightShafts.Scale = Vector3.One * 1.75f;
             fakeLightShafts.Cull = CullMode.None;
             ////lightScatter.Scale = new Vector3(5.0f);
             PoolGame.game.Components.Add(fakeLightShafts);
@@ -476,14 +476,14 @@ namespace XNA_PoolGame.Scenarios
 
             World.scenario.Objects.Add(stairs);
 
-            foreach (Entity lamp in rooflamps)
-                World.scenario.Objects.Add(lamp);
+            //foreach (Entity lamp in rooflamps)
+            //    World.scenario.Objects.Add(lamp);
 
             foreach (Entity vent in vents)
                 World.scenario.Objects.Add(vent);
 
-            World.scenario.objects.Add(fakeLightShafts);
-            //volumetriclights.Add(lightScatter);
+            //World.scenario.objects.Add(fakeLightShafts);
+            //volumetriclights.Add(fakeLightShafts);
 
             base.Initialize();
             LoadContent();
@@ -500,8 +500,9 @@ namespace XNA_PoolGame.Scenarios
             Light light1 = new Light(new Vector3(-178, 383, 0));
 
             light1.DiffuseColor = new Vector4(0.9f, 0.85f, 0.9f, 1.0f);
-            //light1.DepthBias = 0.01193f;
-            light1.DepthBias = 0.008193f;
+            //light1.DepthBias = 0.01193f; // 2048
+            light1.DepthBias = 0.012937f; // 1024
+            //light1.DepthBias = 0.008193f;
             light1.LightFarPlane = 1100.0f;
             light1.LightFOV = 2.604f;
 

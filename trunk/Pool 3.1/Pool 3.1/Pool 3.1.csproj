@@ -91,6 +91,7 @@
     <Compile Include="Graphics\FullQuad.cs" />
     <Compile Include="Graphics\LensFlare.cs" />
     <Compile Include="Graphics\Models\AlphaEntity.cs" />
+    <Compile Include="Graphics\Models\BoundingVolumeEntity.cs" />
     <Compile Include="Graphics\Models\InstancedEntity.cs" />
     <Compile Include="Graphics\Models\CustomModelPart.cs" />
     <Compile Include="Graphics\Models\InstancedModel.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="Graphics\Shading\BaseShading.cs" />
     <Compile Include="Graphics\Shading\DeferredShading.cs" />
     <Compile Include="Graphics\Shading\FowardShading.cs" />
+    <Compile Include="Graphics\Shadows\CubeShadowMapping.cs" />
     <Compile Include="Graphics\Shadows\ScreenSpaceShadowMapping.cs" />
     <Compile Include="Graphics\Shadows\Shadow.cs" />
     <Compile Include="Graphics\Shadows\PSMShadowMapping.cs" />

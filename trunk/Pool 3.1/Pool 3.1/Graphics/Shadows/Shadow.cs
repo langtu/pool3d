@@ -91,7 +91,7 @@ namespace XNA_PoolGame.Graphics.Shadows
         public virtual void DrawTextured(GameTime gameTime)
         {
             World.camera.ItemsDrawn = 0;
-            PostProcessManager.ChangeRenderMode(RenderMode.BasicRender);
+            PostProcessManager.ChangeRenderMode(RenderPassMode.BasicRender);
 
             PostProcessManager.mainTIU.Use();
             PoolGame.device.SetRenderTarget(0, PostProcessManager.mainRT);

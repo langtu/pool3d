@@ -92,8 +92,8 @@ namespace XNA_PoolGame.Scenarios
 
             this.ambientColor = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
 
-            if (World.EM == EnvironmentType.Dynamic || World.EM == EnvironmentType.Static)
-                refCubeMap = new RenderTargetCube(PoolGame.device, World.EMSize, 1, PoolGame.device.PresentationParameters.BackBufferFormat);
+            //if (World.EM == EnvironmentType.Dynamic || World.EM == EnvironmentType.Static)
+            //    refCubeMap = new RenderTargetCube(PoolGame.device, World.EMSize, 1, PoolGame.device.PresentationParameters.BackBufferFormat);
             LoadLights();
         }
 
@@ -114,12 +114,12 @@ namespace XNA_PoolGame.Scenarios
         public virtual void Draw(GameTime gameTime) 
         {
 
-            if (PostProcessManager.currentRenderMode == RenderMode.ParticleSystem && World.drawParticles)
+            if (PostProcessManager.currentRenderMode == RenderPassMode.ParticleSystemPass && World.drawParticles)
             {
                 foreach (ParticleSystem pa in particles)
                     pa.Draw(gameTime);
             }
-            else if (PostProcessManager.currentRenderMode == RenderMode.DistortionParticleSystem && World.doDistortion)
+            else if (PostProcessManager.currentRenderMode == RenderPassMode.DistortionParticleSystemPass && World.doDistortion)
             {
                 foreach (ParticleSystem pa in distortionparticles)
                     pa.Draw(gameTime);
@@ -206,7 +206,7 @@ namespace XNA_PoolGame.Scenarios
 
         public void DrawEnvironmetMappingScene(GameTime gameTime)
         {
-            PostProcessManager.ChangeRenderMode(RenderMode.DEMBasicRender);
+            PostProcessManager.ChangeRenderMode(RenderPassMode.DEMBasicRender);
             Camera oldCamera = World.camera;
 
             World.camera = World.emptycamera;

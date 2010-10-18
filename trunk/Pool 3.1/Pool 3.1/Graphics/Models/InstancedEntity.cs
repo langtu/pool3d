@@ -72,28 +72,28 @@ namespace XNA_PoolGame.Graphics.Models
         public override void Draw(GameTime gameTime)
         {
             if (World.camera == null) return;
-            RenderMode renderMode = PostProcessManager.currentRenderMode;
+            RenderPassMode renderMode = PostProcessManager.currentRenderMode;
 
             switch (renderMode)
             {
-                case RenderMode.ShadowMapRender:
+                case RenderPassMode.ShadowMapRender:
                     //if (!occluder) return;
 
-                    frustum = LightManager.lights[PostProcessManager.shading.shadows.lightpass].Frustum;
-                    DrawModel(false, PostProcessManager.DepthEffect, "DepthMap", delegate { SetParametersShadowMap(LightManager.lights[PostProcessManager.shading.shadows.lightpass]); });
+                    frustum = LightManager.lights[PostProcessManager.shading.Shadows.lightpass].Frustum;
+                    DrawModel(false, PostProcessManager.DepthEffect, "DepthMap", delegate { SetParametersShadowMap(LightManager.lights[PostProcessManager.shading.Shadows.lightpass]); });
 
                     break;
 
-                case RenderMode.PCFShadowMapRender:
+                case RenderPassMode.PCFShadowMapRender:
                     //if (!occluder) return;
 
-                    frustum = World.camera.FrustumCulling;
+                    frustum = World.camera.Frustum;
                     DrawModel(false, PostProcessManager.PCFShadowMap, "PCFSMTechnique", delegate { SetParametersPCFShadowMap(LightManager.lights); });
                     break;
 
-                case RenderMode.ScreenSpaceSoftShadowRender:
+                case RenderPassMode.ScreenSpaceSoftShadowRender:
                     {
-                        frustum = World.camera.FrustumCulling;
+                        frustum = World.camera.Frustum;
                         string basicTechnique = "SSSTechnique";
 
                         /*if (World.displacementType != DisplacementType.None && this.normalMapAsset != null)
@@ -109,9 +109,9 @@ namespace XNA_PoolGame.Graphics.Models
                         //DrawModel(true, LightManager.lights, PostProcessManager.SSSoftShadow, "SSSTechnique", delegate { SetParametersSoftShadow(LightManager.lights); });
                     }
                     break;
-                case RenderMode.BasicRender:
+                case RenderPassMode.BasicRender:
                     {
-                        frustum = World.camera.FrustumCulling;
+                        frustum = World.camera.Frustum;
                         string basicTechnique = "ModelTechnique";
                         if (World.motionblurType == MotionBlurType.None && World.dofType == DOFType.None) basicTechnique = "NoMRT" + basicTechnique;
                         DrawModel(true, PostProcessManager.modelEffect, basicTechnique, delegate { SetParametersModelEffectMRT(LightManager.lights); });
@@ -264,10 +264,10 @@ namespace XNA_PoolGame.Graphics.Models
             PostProcessManager.PCFShadowMap.Parameters["totalLights"].SetValue(LightManager.totalLights);
             for (int i = 0; i < LightManager.totalLights; ++i)
             {
-                PostProcessManager.PCFShadowMap.Parameters["ShadowMap" + i].SetValue(PostProcessManager.shading.shadows.ShadowMapRT[i].GetTexture());
+                PostProcessManager.PCFShadowMap.Parameters["ShadowMap" + i].SetValue(PostProcessManager.shading.Shadows.ShadowMapRT[i].GetTexture());
             }
 
-            PostProcessManager.PCFShadowMap.Parameters["PCFSamples"].SetValue(PostProcessManager.shading.shadows.pcfSamples);
+            PostProcessManager.PCFShadowMap.Parameters["PCFSamples"].SetValue(PostProcessManager.shading.Shadows.pcfSamples);
             PostProcessManager.PCFShadowMap.Parameters["depthBias"].SetValue(LightManager.depthbias);
             
         }

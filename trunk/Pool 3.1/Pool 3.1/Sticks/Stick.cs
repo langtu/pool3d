@@ -54,7 +54,6 @@ namespace XNA_PoolGame.Sticks
 
                 if (this.angleY == 0) angleY = 360;
                 else if (this.angleY == 360) angleY = 0;
-                
             }
         }
 
@@ -92,7 +91,6 @@ namespace XNA_PoolGame.Sticks
 
             if (!World.poolTable.ballsMoving)
             {
-
                 //Direction = new Vector3((float)-Math.Cos(MathHelper.ToRadians(angleY)), (float)-Math.Sin(MathHelper.ToRadians(angle)), (float)Math.Sin(MathHelper.ToRadians(angleY)));
                 Direction = new Vector3((float)-Math.Cos(MathHelper.ToRadians(angleY)), 0.0f, (float)Math.Sin(MathHelper.ToRadians(angleY)));
                 Direction.Normalize();

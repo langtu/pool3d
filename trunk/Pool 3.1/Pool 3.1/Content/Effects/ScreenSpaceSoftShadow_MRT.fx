@@ -323,7 +323,7 @@ float4 PS_ScreenSpaceShadowNoMRT(VS_ScreenSpaceShadow_Output input, uniform bool
 		float3 envmap = texCUBE(EnvironmentMapSampler, Reflection);
 		float3 ccolor = tex2D(ColorSampler, texCoord);
 		Color = float4(lerp(ccolor, envmap, Fresnel), 1.0f);
-		//Color = float4(envmap, 1.0f);
+		Color = float4(envmap, 1.0f);
     }
     
 	for (int k = 0; k < totalLights; k++)

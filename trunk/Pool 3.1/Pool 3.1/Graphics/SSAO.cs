@@ -1,10 +1,12 @@
-﻿using System;
+﻿#region Using Statement
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using TextureInUse = XNA_PoolGame.Graphics.PostProcessManager.TextureInUse;
 using Microsoft.Xna.Framework;
+#endregion
 
 namespace XNA_PoolGame.Graphics
 {

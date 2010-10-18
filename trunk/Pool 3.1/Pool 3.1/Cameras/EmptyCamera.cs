@@ -61,7 +61,7 @@ namespace XNA_PoolGame.Cameras
                 if (enableFrustum) frustum.Matrix = viewProjectionMatrix;
             }
         }
-        public override BoundingFrustum FrustumCulling
+        public override BoundingFrustum Frustum
         {
             get
             {

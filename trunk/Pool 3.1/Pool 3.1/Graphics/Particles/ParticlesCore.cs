@@ -13,7 +13,7 @@ using XNA_PoolGame.Scenarios;
 namespace XNA_PoolGame.Graphics.Particles
 {
     /// <summary>
-    /// 
+    /// Particles System Core.
     /// </summary>
     public class ParticlesCore : ThreadComponent
     {
@@ -24,6 +24,7 @@ namespace XNA_PoolGame.Graphics.Particles
         {
             set { scenario = value; }
         }
+
         public ParticlesCore(Game _game)
             : base(_game)
         {
@@ -33,7 +34,6 @@ namespace XNA_PoolGame.Graphics.Particles
 
         public void AddParticlesFromMultiMap(MultiMap<int, ParticleSystem> map)
         {
-            
             foreach (ParticleSystem particle in map)
             {
                 particle.Enabled = false;

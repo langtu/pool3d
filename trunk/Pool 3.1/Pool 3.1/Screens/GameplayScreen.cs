@@ -64,13 +64,16 @@ namespace XNA_PoolGame.Screens
             switch (World.shadowTechnique)
             {
                 case ShadowTechnnique.PSMShadowMapping:
-                    PostProcessManager.shading.shadows = new PSMShadowMapping();
+                    PostProcessManager.shading.Shadows = new PSMShadowMapping();
                     break;
                 case ShadowTechnnique.ScreenSpaceShadowMapping:
-                    PostProcessManager.shading.shadows = new ScreenSpaceShadowMapping();
+                    PostProcessManager.shading.Shadows = new ScreenSpaceShadowMapping();
                     break;
                 case ShadowTechnnique.VarianceShadowMapping:
-                    PostProcessManager.shading.shadows = new VarianceShadowMapping();
+                    PostProcessManager.shading.Shadows = new VarianceShadowMapping();
+                    break;
+                case ShadowTechnnique.CubeShadowMapping:
+                    PostProcessManager.shading.Shadows = new CubeShadowMapping();
                     break;
 
             }
@@ -106,8 +109,16 @@ namespace XNA_PoolGame.Screens
             ////////////// PLAYERS //////////////
             World.playerCount = 2;
             World.playerInTurnIndex = 0;
-            World.players[0] = new Player(PoolGame.game, "Edgar", (int)PlayerIndex.One, new KeyBoard(PlayerIndex.One), TeamNumber.One, World.poolTable);
-            World.players[1] = new Player(PoolGame.game, "Adry", (int)PlayerIndex.Two, new KeyBoard(PlayerIndex.Two), TeamNumber.Two, World.poolTable);
+            //if (!GamePad.GetState(PlayerIndex.One).IsConnected)
+            {
+                World.players[0] = new Player(PoolGame.game, "Edgar", (int)PlayerIndex.One, new KeyBoard(PlayerIndex.One), TeamNumber.One, World.poolTable);
+                World.players[1] = new Player(PoolGame.game, "Adry", (int)PlayerIndex.Two, new KeyBoard(PlayerIndex.Two), TeamNumber.Two, World.poolTable);
+            }
+            //else
+            //{
+            //    World.players[0] = new Player(PoolGame.game, "Edgar", (int)PlayerIndex.One, new XboxPad(PlayerIndex.One), TeamNumber.One, World.poolTable);
+            //    World.players[1] = new Player(PoolGame.game, "Adry", (int)PlayerIndex.Two, new XboxPad(PlayerIndex.One), TeamNumber.Two, World.poolTable);
+            //}
 
             ////////////// REFEREE //////////////
             World.referee = new Referee(PoolGame.game, World.poolTable, World.players[0], World.players[1]);
@@ -268,13 +279,13 @@ namespace XNA_PoolGame.Screens
             List<TextureInUse> useless = new List<TextureInUse>();
             TextureInUse distortionTIU = null;
 
-            if (!World.scenario.texcubeGenerated && (World.EM == EnvironmentType.Dynamic || World.EM == EnvironmentType.Static))
-            {
-                PoolGame.device.SetRenderTarget(0, null);
+            //if (!World.scenario.texcubeGenerated && (World.EM == EnvironmentType.Dynamic || World.EM == EnvironmentType.Static))
+            //{
+            //    PoolGame.device.SetRenderTarget(0, null);
 
-                World.scenario.DrawEnvironmetMappingScene(gameTime);
-                World.scenario.texcubeGenerated = true;
-            }
+            //    World.scenario.DrawEnvironmetMappingScene(gameTime);
+            //    World.scenario.texcubeGenerated = true;
+            //}
 
             #region SHADOW MAPPING
 
@@ -294,7 +305,7 @@ namespace XNA_PoolGame.Screens
 
             #region LIGHT'S POINT
             //PoolGame.game.PrepareRenderStates();
-            /*PostProcessManager.ChangeRenderMode(RenderMode.BasicRender);
+            PostProcessManager.ChangeRenderMode(RenderPassMode.BasicRender);
             if (LightManager.sphereModel != null)
             {
                 for (int i = 0; i < LightManager.totalLights; ++i)
@@ -304,13 +315,13 @@ namespace XNA_PoolGame.Screens
                     LightManager.sphereModel.Draw(gameTime);
                     
                 }
-            }*/
+            }
             #endregion
 
             #region PARTICLES
             if (World.drawParticles)
             {
-                PostProcessManager.ChangeRenderMode(RenderMode.ParticleSystem);
+                PostProcessManager.ChangeRenderMode(RenderPassMode.ParticleSystemPass);
                 World.scenario.SetParticlesSettings();
                 World.scenario.Draw(gameTime);
             }
@@ -319,7 +330,7 @@ namespace XNA_PoolGame.Screens
             #region DISTORTION PARTICLES
             if (World.doDistortion)
             {
-                PostProcessManager.ChangeRenderMode(RenderMode.DistortionParticleSystem);
+                PostProcessManager.ChangeRenderMode(RenderPassMode.DistortionParticleSystemPass);
                 PostProcessManager.DistorionParticles();
                 World.scenario.SetDistortionParticleSettings();
                 World.scenario.Draw(gameTime);
@@ -373,12 +384,12 @@ namespace XNA_PoolGame.Screens
                 if (World.dofType != DOFType.None)
                 {
                     TextureInUse texturetemp1 = PostProcessManager.GetIntermediateTexture();
-                    PostProcessManager.ChangeRenderMode(RenderMode.MotionBlur);
+                    PostProcessManager.ChangeRenderMode(RenderPassMode.MotionBlur);
                     PostProcessManager.RenderMotionBlur(resultTIU.renderTarget, texturetemp1.renderTarget);
                     resultTIU.DontUse();
 
                     TextureInUse texturetemp2 = PostProcessManager.GetIntermediateTexture();
-                    PostProcessManager.ChangeRenderMode(RenderMode.DoF);
+                    PostProcessManager.ChangeRenderMode(RenderPassMode.DoF);
                     PostProcessManager.DOF(texturetemp1.renderTarget, texturetemp2.renderTarget);
 
                     texturetemp1.DontUse();
@@ -388,7 +399,7 @@ namespace XNA_PoolGame.Screens
                 else
                 {
                     TextureInUse texturetemp = PostProcessManager.GetIntermediateTexture();
-                    PostProcessManager.ChangeRenderMode(RenderMode.MotionBlur);
+                    PostProcessManager.ChangeRenderMode(RenderPassMode.MotionBlur);
                     PostProcessManager.RenderMotionBlur(resultTIU.renderTarget, texturetemp.renderTarget);
 
                     useless.Add(texturetemp);
@@ -400,7 +411,7 @@ namespace XNA_PoolGame.Screens
                 if (World.dofType != DOFType.None)
                 {
                     TextureInUse texturetemp = PostProcessManager.GetIntermediateTexture();
-                    PostProcessManager.ChangeRenderMode(RenderMode.DoF);
+                    PostProcessManager.ChangeRenderMode(RenderPassMode.DoF);
                     PostProcessManager.DOF(resultTIU.renderTarget, texturetemp.renderTarget);
                     resultTIU.DontUse();
                     useless.Add(texturetemp);
@@ -414,7 +425,7 @@ namespace XNA_PoolGame.Screens
             PoolGame.game.PrepareRenderStates();
             if (World.BloomPostProcessing)
             {
-                PostProcessManager.ChangeRenderMode(RenderMode.Bloom);
+                PostProcessManager.ChangeRenderMode(RenderPassMode.Bloom);
                 PostProcessManager.DrawBloomPostProcessing(resultTIU.renderTarget, null, gameTime);
             }
             else

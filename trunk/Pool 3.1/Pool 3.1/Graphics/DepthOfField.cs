@@ -18,7 +18,6 @@ namespace XNA_PoolGame.Graphics
     {
         public float focalDistance, focalWidth;
 
-
         protected float blurSigma;
         protected float attenuation;
         protected Vector3[] frustumCornersWS = new Vector3[8];
@@ -109,7 +108,6 @@ namespace XNA_PoolGame.Graphics
         /// <param name="source">The render target to use as the source</param>
         /// <param name="result">The render target to use as the result</param>
         /// <param name="depthTexture">The depth texture to use</param>
-        /// <param name="sigma">The standard deviation used for gaussian weights</param>
         public void DepthBlur(RenderTarget2D source,
                             RenderTarget2D result,
                             RenderTarget2D depthTexture)

@@ -57,13 +57,14 @@ namespace XNA_PoolGame.Graphics.Shadows
         public override void Draw(GameTime gameTime)
         {
             ///////////////// PASS 1 - Depth Map ////////
-            PostProcessManager.ChangeRenderMode(RenderMode.ShadowMapRender);
+            PostProcessManager.ChangeRenderMode(RenderPassMode.ShadowMapRender);
 
             oldBuffer = PoolGame.device.DepthStencilBuffer;
+            PoolGame.device.DepthStencilBuffer = stencilBuffer;
             lightpass = 0;
             for (int i = 0; i < LightManager.totalLights; ++i)
             {
-                RenderShadowMap(i);
+                SetupShadowMap(i);
                 SetDepthMapParameters(LightManager.lights[i]);
                 shadowMapTIU[i].Use();
                 World.scenario.DrawScene(gameTime);
@@ -71,8 +72,8 @@ namespace XNA_PoolGame.Graphics.Shadows
             }
 
             ///////////////// PASS 2 - PCF //////////////
-            PostProcessManager.ChangeRenderMode(RenderMode.PCFShadowMapRender);
-            RenderPCFShadowMap();
+            PostProcessManager.ChangeRenderMode(RenderPassMode.PCFShadowMapRender);
+            SetupPCFShadowMap();
             SetPCFParameters(ref LightManager.lights);
             shadowTIU.Use();
 
@@ -81,7 +82,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             shadowOcclussionTIU = shadowTIU;
         }
 
-        public void RenderDEM()
+        public void SetupDEM()
         {
             PoolGame.device.RenderState.DepthBufferEnable = true;
             PoolGame.device.RenderState.DepthBufferWriteEnable = true;
@@ -93,18 +94,17 @@ namespace XNA_PoolGame.Graphics.Shadows
             PoolGame.device.SetRenderTarget(2, null);
         }
 
-        public void RenderShadowMap(int lightindex)
+        public void SetupShadowMap(int lightindex)
         {
             PoolGame.device.RenderState.DepthBufferEnable = true;
             PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
 
             //Render Shadow Map
-            PoolGame.device.DepthStencilBuffer = stencilBuffer;
             PoolGame.device.SetRenderTarget(0, ShadowMapRT[lightindex]);
             PoolGame.device.Clear(Color.White);
         }
 
-        public void RenderPCFShadowMap()
+        public void SetupPCFShadowMap()
         {
             //Render PCF Shadow Map
             PoolGame.device.DepthStencilBuffer = oldBuffer;
@@ -196,15 +196,15 @@ namespace XNA_PoolGame.Graphics.Shadows
             ///////////////// PASS 3 - DEM //////////////
             if (World.EM == EnvironmentType.Dynamic)
             {
-                PostProcessManager.ChangeRenderMode(RenderMode.DEMPass);
-                RenderDEM();
+                PostProcessManager.ChangeRenderMode(RenderPassMode.DEMPass);
+                SetupDEM();
 
                 World.scenario.DrawDEMObjects(gameTime);
             }
             else if (World.EM == EnvironmentType.DualParaboloid)
             {
-                PostProcessManager.ChangeRenderMode(RenderMode.DualParaboloidRenderMaps);
-                RenderDEM();
+                PostProcessManager.ChangeRenderMode(RenderPassMode.DualParaboloidRenderMapsPass);
+                SetupDEM();
 
                 World.scenario.DrawDEMObjects(gameTime);
             }
@@ -215,7 +215,7 @@ namespace XNA_PoolGame.Graphics.Shadows
         {
             ///////////////// PASS 4 - SSSM /////////////
             World.camera.ItemsDrawn = 0;
-            PostProcessManager.ChangeRenderMode(RenderMode.ScreenSpaceSoftShadowRender);
+            PostProcessManager.ChangeRenderMode(RenderPassMode.ScreenSpaceSoftShadowRender);
             RenderSoftShadow();
 
             World.scenario.DrawScene(gameTime);
