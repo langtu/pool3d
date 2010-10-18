@@ -209,7 +209,7 @@ namespace XNA_PoolGame.PoolTables
             rack = World.rackfactories[World.gameMode].CreateRack(this);
             rack.BuildsBallsRack();
 
-            TotalBalls = 2;
+            //TotalBalls = 2;
             poolBalls[0] = cueBall;
             for (int i = 0; i < TotalBalls; i++)
             {
@@ -221,7 +221,6 @@ namespace XNA_PoolGame.PoolTables
                 PoolGame.game.Components.Add(poolBalls[i]);
                 World.scenario.Objects.Add(poolBalls[i]);
             }
-
         }
 
 

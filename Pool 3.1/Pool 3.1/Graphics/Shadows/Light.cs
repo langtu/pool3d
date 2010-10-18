@@ -34,7 +34,7 @@ namespace XNA_PoolGame.Graphics.Shadows
         private float lightNearPlane = 0.01f;
         private float lightFarPlane = 1620.0f;
         private float depthBias = 0.0042f;
-        private LightType lightType = LightType.DirectionalLight;
+        private LightType lightType = LightType.Directional;
         private float radius;
         #endregion
 

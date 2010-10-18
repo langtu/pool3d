@@ -35,7 +35,7 @@ namespace XNA_PoolGame.Cameras
         /// <summary>
         /// Frustum culling.
         /// </summary>
-        public virtual BoundingFrustum FrustumCulling
+        public virtual BoundingFrustum Frustum
         {
             get
             {

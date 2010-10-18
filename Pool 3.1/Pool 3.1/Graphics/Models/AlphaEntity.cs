@@ -176,16 +176,16 @@ namespace XNA_PoolGame.Graphics.Models
         public override void Draw(GameTime gameTime)
         {
             if (World.camera == null) return;
-            RenderMode renderMode = PostProcessManager.currentRenderMode;
+            RenderPassMode renderMode = PostProcessManager.currentRenderMode;
 
             updateLocalWorld();
 
             switch (renderMode)
             {
-                case RenderMode.RenderGBuffer:
-                case RenderMode.ScreenSpaceSoftShadowRender:
+                case RenderPassMode.RenderGBufferPass:
+                case RenderPassMode.ScreenSpaceSoftShadowRender:
                     {
-                        frustum = World.camera.FrustumCulling;
+                        frustum = World.camera.Frustum;
                         string basicTechnique = PostProcessManager.shading.GetBasicRenderTechnique();
 
 
@@ -336,7 +336,7 @@ namespace XNA_PoolGame.Graphics.Models
             }
             effect.CurrentTechnique = effect.Techniques[technique];
 
-            bool drawvolume = PostProcessManager.currentRenderMode == RenderMode.ScreenSpaceSoftShadowRender || PostProcessManager.currentRenderMode == RenderMode.BasicRender || PostProcessManager.currentRenderMode == RenderMode.RenderGBuffer;
+            bool drawvolume = PostProcessManager.currentRenderMode == RenderPassMode.ScreenSpaceSoftShadowRender || PostProcessManager.currentRenderMode == RenderPassMode.BasicRender || PostProcessManager.currentRenderMode == RenderPassMode.RenderGBufferPass;
 #if !DRAW_BOUNDINGVOLUME
             drawvolume &= drawboundingvolume;
 #endif

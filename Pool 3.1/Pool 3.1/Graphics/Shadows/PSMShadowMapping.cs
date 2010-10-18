@@ -48,18 +48,18 @@ namespace XNA_PoolGame.Graphics.Shadows
 
         public override void Draw(GameTime gameTime)
         {
-            PostProcessManager.ChangeRenderMode(RenderMode.ShadowMapRender);
+            PostProcessManager.ChangeRenderMode(RenderPassMode.ShadowMapRender);
             RenderShadowMap();
 
             World.scenario.DrawScene(gameTime);
 
-            PostProcessManager.ChangeRenderMode(RenderMode.PCFShadowMapRender);
+            PostProcessManager.ChangeRenderMode(RenderPassMode.PCFShadowMapRender);
             RenderPSM();
 
             World.scenario.DrawScene(gameTime);
 
 
-            PostProcessManager.ChangeRenderMode(RenderMode.BasicRender);
+            PostProcessManager.ChangeRenderMode(RenderPassMode.BasicRender);
             RenderFinal();
 
             World.scenario.DrawScene(gameTime);

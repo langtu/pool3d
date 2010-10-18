@@ -55,21 +55,28 @@ namespace XNA_PoolGame.Graphics.Shadows
         public override void Draw(GameTime gameTime)
         {
             ///////////////// PASS 1 - Depth Map ////////
-            PostProcessManager.ChangeRenderMode(RenderMode.ShadowMapRender);
+            PostProcessManager.ChangeRenderMode(RenderPassMode.ShadowMapRender);
 
             oldBuffer = PoolGame.device.DepthStencilBuffer;
             lightpass = 0;
             for (int i = 0; i < LightManager.totalLights; ++i)
             {
                 RenderShadowMap(i);
-                SetDepthMapParameters(LightManager.lights[i]);
                 shadowMapTIU[i].Use();
+                if (World.camera.Frustum.Contains(LightManager.lights[i].Frustum) == ContainmentType.Disjoint)
+                {
+                    ++lightpass;
+                    continue;
+                }
+
+                SetDepthMapParameters(LightManager.lights[i]);
+                
                 World.scenario.DrawScene(gameTime);
                 ++lightpass;
             }
 
             ///////////////// PASS 2 - PCF //////////////
-            PostProcessManager.ChangeRenderMode(RenderMode.PCFShadowMapRender);
+            PostProcessManager.ChangeRenderMode(RenderPassMode.PCFShadowMapRender);
             RenderVSMShadowMap();
             SetPCFParameters(ref LightManager.lights);
             shadowTIU.Use();
@@ -80,8 +87,8 @@ namespace XNA_PoolGame.Graphics.Shadows
             if (PostProcessManager.shadowBlurTech == ShadowBlurTechnnique.SoftShadow)
             {
                 TextureInUse tmp = PostProcessManager.GetIntermediateTexture();
-                PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurHEffect);
-                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurVEffect);
+                PostProcessManager.SetBlurEffectParameters(0.5f / (float)PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurHEffect);
+                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / (float)PoolGame.device.Viewport.Height, PostProcessManager.GBlurVEffect);
 
                 //Gaussian Blur H
                 PoolGame.device.SetRenderTarget(0, tmp.renderTarget);
@@ -91,8 +98,8 @@ namespace XNA_PoolGame.Graphics.Shadows
                 PoolGame.device.SetRenderTarget(0, shadowTIU.renderTarget);
                 PostProcessManager.DrawQuad(tmp.renderTarget.GetTexture(), PostProcessManager.GBlurVEffect);
 
-                PostProcessManager.SetBlurEffectParameters(0.5f / PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurHEffect);
-                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / PoolGame.device.Viewport.Height, PostProcessManager.GBlurVEffect);
+                PostProcessManager.SetBlurEffectParameters(0.5f / (float)PoolGame.device.Viewport.Width, 0.0f, PostProcessManager.GBlurHEffect);
+                PostProcessManager.SetBlurEffectParameters(0.0f, 0.5f / (float)PoolGame.device.Viewport.Height, PostProcessManager.GBlurVEffect);
 
                 tmp.DontUse();
                 shadowTIU.Use();
@@ -142,7 +149,7 @@ namespace XNA_PoolGame.Graphics.Shadows
         {
             ///////////////// PASS 4 - SSSM /////////////
             World.camera.ItemsDrawn = 0;
-            PostProcessManager.ChangeRenderMode(RenderMode.ScreenSpaceSoftShadowRender);
+            PostProcessManager.ChangeRenderMode(RenderPassMode.ScreenSpaceSoftShadowRender);
             RenderSoftShadow();
 
             World.scenario.DrawScene(gameTime);

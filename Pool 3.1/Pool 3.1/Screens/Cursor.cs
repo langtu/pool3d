@@ -96,10 +96,7 @@ namespace XNA_PoolGame.Screens
 
                     if (controller is KeyBoard)
                     {
-                        int centerX = PoolGame.game.Window.ClientBounds.Width / 2;
-                        int centerY = PoolGame.game.Window.ClientBounds.Height / 2;
-
-                        Vector2 center = new Vector2((float)centerX, (float)centerY);
+                        Vector2 center = new Vector2((float)PoolGame.game.Window.ClientBounds.Width / 2, (float)PoolGame.game.Window.ClientBounds.Height / 2);
 
                         Vector2 mousedt = new Vector2((float)((KeyBoard)controller).MouseState().X - center.X,
                             (float)((KeyBoard)controller).MouseState().Y - center.Y);

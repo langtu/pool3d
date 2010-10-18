@@ -50,7 +50,7 @@ namespace XNA_PoolGame.Graphics.Shading
                 PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
 
 
-                PostProcessManager.ChangeRenderMode(RenderMode.SSAOPrePass);
+                PostProcessManager.ChangeRenderMode(RenderPassMode.SSAOPrePass);
                 World.scenario.DrawScene(gameTime);
 
                 PoolGame.device.DepthStencilBuffer = oldbuffer;
@@ -103,7 +103,7 @@ namespace XNA_PoolGame.Graphics.Shading
                 PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
 
 
-                PostProcessManager.ChangeRenderMode(RenderMode.SSAOPrePass);
+                PostProcessManager.ChangeRenderMode(RenderPassMode.SSAOPrePass);
                 World.scenario.DrawScene(gameTime);
 
                 PoolGame.device.DepthStencilBuffer = oldbuffer;

@@ -9,13 +9,30 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace XNA_PoolGame.Graphics.Shading
 {
+    /// <summary>
+    /// Abstract class.
+    /// </summary>
     public abstract class BaseShading
     {
-        public Vector2 halfPixel;
-        public Shadow shadows;
+        protected Vector2 halfPixel;
+        protected Shadow shadows;
         public TextureInUse resultTIU;
-        public DepthStencilBuffer stencilBuffer;
+        protected DepthStencilBuffer stencilBuffer;
         protected SurfaceFormat format;
+
+        public Shadow Shadows 
+        { 
+            get { return shadows; }
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException();
+
+                shadows = value;
+            }
+        }
+
+
 
         /// <summary>
         /// 

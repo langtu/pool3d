@@ -29,6 +29,7 @@ using XNA_PoolGame.Graphics.Models;
 using XNA_PoolGame.Threading;
 using XNA_PoolGame.Graphics.Shading;
 using XNA_PoolGame.PoolTables.Racks;
+using XNA_PoolGame.Graphics.Shadows;
 #endregion
 
 namespace XNA_PoolGame
@@ -443,9 +444,8 @@ namespace XNA_PoolGame
 
             ////////////////////////////////////////// LIGHTS
 
-            if (LightManager.sphereModel != null && false)
+            if (LightManager.sphereModel != null)
             {
-                
                 if (kb.IsKeyDown(Keys.C) && lastkb.IsKeyUp(Keys.C)) currentlight = (currentlight + 1) % LightManager.totalLights;
                 GamePadState state = GamePad.GetState(PlayerIndex.One);
 
@@ -532,9 +532,9 @@ namespace XNA_PoolGame
             if (World.displayShadows && World.displayShadowsTextures)
             {
                 Texture2D endTexture = null;
-                //endTexture = PostProcessManager.shading.shadows.ShadowMapRT[0].GetTexture();
-                //endTexture = PostProcessManager.shading.shadows.ShadowRT.GetTexture();
-                endTexture = World.poolTable.poolBalls[0].mDPMapFront.GetTexture();
+                //endTexture = PostProcessManager.shading.Shadows.ShadowMapRT[0].GetTexture();
+                endTexture = PostProcessManager.shading.Shadows.ShadowRT.GetTexture();
+                //endTexture = World.poolTable.poolBalls[0].mDPMapFront.GetTexture();
                 //endTexture = PostProcessManager.ssao.ssaoTIU.renderTarget.GetTexture();
                 //endTexture = PostProcessManager.ssao.normalTIU.renderTarget.GetTexture();
                 //if (PostProcessManager.ssao.viewTIU != null) endTexture = PostProcessManager.ssao.viewTIU.renderTarget.GetTexture();
@@ -549,19 +549,20 @@ namespace XNA_PoolGame
 
                 
                 batch.Begin(SpriteBlendMode.None);
+                
                 //batch.Begin();
                 if (endTexture != null) batch.Draw(endTexture, rect, Color.White);
 
-
-                endTexture = World.poolTable.poolBalls[0].mDPMapBack.GetTexture();
-                //endTexture = PostProcessManager.shading.shadows.ShadowRT.GetTexture();
+                //endTexture = ((CubeShadowMapping)PostProcessManager.shading.Shadows).frontTexture;
+                //endTexture = World.poolTable.poolBalls[0].mDPMapBack.GetTexture();
+                //endTexture = PostProcessManager.shading.Shadows.ShadowRT.GetTexture();
                 //endTexture = PostProcessManager.shadows.ShadowMapRT[1].GetTexture();
                 //endTexture = PostProcessManager.ssao.normalTIU.renderTarget.GetTexture();
                 //if (PostProcessManager.distortionsample != null) endTexture = PostProcessManager.distortionsample.renderTarget.GetTexture();
                 //endTexture = ((DeferredShading)PostProcessManager.shading).diffuseColorTIU.renderTarget.GetTexture();
                 rect = new Rectangle(0, 128, 128, 128);
                 //rect = new Rectangle(0, 0, Width, Height);
-                if (endTexture != null) batch.Draw(endTexture, rect, Color.White);
+                //if (endTexture != null) batch.Draw(endTexture, rect, Color.White);
 
 
                 //endTexture = ((DeferredShading)PostProcessManager.shading).lightTIU.renderTarget.GetTexture();
@@ -588,7 +589,7 @@ namespace XNA_PoolGame
             batch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Deferred,
                 SaveStateMode.SaveState);
             string text = "";
-            text += World.players[World.playerInTurnIndex].playerName + " " + World.players[World.playerInTurnIndex].team.BallType.ToString();
+            text += World.players[World.playerInTurnIndex].playerName + " BallType: " + World.players[World.playerInTurnIndex].team.BallType.ToString();
             text += "\nTotal balls pocketed: " + World.players[World.playerInTurnIndex].team.TotalBallsPocketed;
             if (World.poolTable != null && World.poolTable.roundInfo.calledBall != null)
             {

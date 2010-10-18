@@ -31,7 +31,8 @@ namespace XNA_PoolGame
     public enum LightType : int
     {
         PointLight = 0,
-        DirectionalLight
+        Directional,
+        OmniDirectional
     }
     public enum VolumeType
     {
@@ -107,10 +108,11 @@ namespace XNA_PoolGame
     }
 
 
-    public enum RenderMode
+    public enum RenderPassMode
     {
         BasicRender,
         ShadowMapRender,
+        CubeShadowMapPass,
         PCFShadowMapRender,
         ScreenSpaceSoftShadowRender,
         PSMRender,
@@ -124,11 +126,11 @@ namespace XNA_PoolGame
         Menu,
         FPS,
         Light,
-        ParticleSystem,
-        DistortionParticleSystem,
-        RenderGBuffer,
+        ParticleSystemPass,
+        DistortionParticleSystemPass,
+        RenderGBufferPass,
         SSAOPrePass,
-        DualParaboloidRenderMaps,
+        DualParaboloidRenderMapsPass,
         DPBasicRender
     }
     /// <summary>
@@ -163,7 +165,8 @@ namespace XNA_PoolGame
     {
         ScreenSpaceShadowMapping,
         PSMShadowMapping,
-        VarianceShadowMapping
+        VarianceShadowMapping,
+        CubeShadowMapping
     }
     public enum ShadingTechnnique
     {

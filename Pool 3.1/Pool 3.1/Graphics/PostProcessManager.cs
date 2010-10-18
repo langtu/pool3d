@@ -55,7 +55,7 @@ namespace XNA_PoolGame.Graphics
         public static EffectParameter depthProjectionParam;
 
         // SHADER
-        public static RenderMode currentRenderMode = RenderMode.BasicRender;
+        public static RenderPassMode currentRenderMode = RenderPassMode.BasicRender;
 
         // SHADOW MAPPING
         public static BaseShading shading;
@@ -120,9 +120,9 @@ namespace XNA_PoolGame.Graphics
         /// <returns>Returns true or false.</returns>
         public static bool isFinalSceneRenderMode()
         {
-            return currentRenderMode == RenderMode.ScreenSpaceSoftShadowRender || 
-                currentRenderMode == RenderMode.BasicRender || 
-                currentRenderMode == RenderMode.RenderGBuffer;
+            return currentRenderMode == RenderPassMode.ScreenSpaceSoftShadowRender || 
+                currentRenderMode == RenderPassMode.BasicRender || 
+                currentRenderMode == RenderPassMode.RenderGBufferPass;
         }
 
         #region LoadEffects
@@ -534,7 +534,7 @@ namespace XNA_PoolGame.Graphics
         }
         #endregion
 
-        public static void ChangeRenderMode(RenderMode thisMode)
+        public static void ChangeRenderMode(RenderPassMode thisMode)
         {
             currentRenderMode = thisMode;
             
