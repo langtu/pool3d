@@ -145,11 +145,9 @@ struct VS_OUTPUT_CUBEDEPTH
 VS_OUTPUT_CUBEDEPTH CubeDepthMap_VS( float4 inPosition : POSITION0 )
 {
     VS_OUTPUT_CUBEDEPTH output;
-    //float4x4 wvp = World * ViewProj;
-    float4 positionW = mul(inPosition, World);
     
+    float4 positionW = mul(inPosition, World);
     output.oPositionLight = mul(positionW, ViewProj);
-    //output.oPositionLight = mul(inPosition, wvp);
     
     output.lightVec = LightPosition - positionW.xyz; 
 
