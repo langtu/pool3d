@@ -627,6 +627,7 @@ namespace XNA_PoolGame.Graphics.Models
             switch (renderMode)
             {
                 case RenderPassMode.ShadowMapRender:
+                    #region Depth Map
                     {
                         if (!occluder) return;
 
@@ -635,22 +636,21 @@ namespace XNA_PoolGame.Graphics.Models
                         //frustum = LightManager.lights[PostProcessManager.shading.Shadows.lightpass].Frustum;
                         DrawModel(false, PostProcessManager.DepthEffect, PostProcessManager.shading.Shadows.GetDepthMapTechnique(), null);
                     }
+                    #endregion
                     break;
                 case RenderPassMode.CubeShadowMapPass:
                     #region Cube Shadow Map
                     {
-                        if (!occluder) return;
+                        //if (!occluder) return;
 
-                        //frustum = ((CubeShadowMapping)PostProcessManager.shading.Shadows).CurrentFrustum;
-                        frustum = null;
+                        frustum = ((CubeShadowMapping)PostProcessManager.shading.Shadows).CurrentFrustum;
                         DrawModel(false, PostProcessManager.DepthEffect, PostProcessManager.shading.Shadows.GetDepthMapTechnique(), null);
                     }
                     #endregion
                     break;
                 case RenderPassMode.PCFShadowMapRender:
+                    #region PCF Shadow Render
                     {
-                        //if (!occluder) return;
-
                         frustum = World.camera.Frustum;
                         if (World.shadowTechnique == ShadowTechnnique.VarianceShadowMapping)
                             DrawModel(false, PostProcessManager.VSMEffect, "PCFSMTechnique", null);
@@ -659,8 +659,10 @@ namespace XNA_PoolGame.Graphics.Models
                         else
                             DrawModel(false, PostProcessManager.PCFShadowMap, "PCFSMTechnique", null);
                     }
+                    #endregion
                     break;
                 case RenderPassMode.ScreenSpaceSoftShadowRender:
+                    #region Screen Space Soft Shadow
                     {
                         frustum = World.camera.Frustum;
                         string basicTechnique = "SSSTechnique";
@@ -674,14 +676,18 @@ namespace XNA_PoolGame.Graphics.Models
                         
                         DrawModel(true, PostProcessManager.SSSoftShadow_MRT, basicTechnique, delegate { SetParametersSoftShadowMRT(ref LightManager.lights); });
                     }
+                    #endregion
                     break;
                 case RenderPassMode.SSAOPrePass:
+                    #region SSAOPrePass
                     {
                         frustum = World.camera.Frustum;
                         DrawModel(false, PostProcessManager.SSAOPrePassEffect, "SSAO", delegate { SetParametersSSAO(); });
                     }
+                    #endregion
                     break;
                 case RenderPassMode.DEMBasicRender:
+                    #region Dynamic Environment Mapping Basic Render
                     {
                         frustum = World.camera.Frustum;
                         string basicTechnique = "ModelTechnique";
@@ -692,6 +698,7 @@ namespace XNA_PoolGame.Graphics.Models
                         DrawModel(true, PostProcessManager.modelEffect, basicTechnique, delegate { SetParametersModelEffectMRT(ref LightManager.lights); });
                         modelL1 = tmpmodel;
                     }
+                    #endregion
                     break;
                 case RenderPassMode.BasicRender:
                     {
@@ -703,6 +710,7 @@ namespace XNA_PoolGame.Graphics.Models
                     }
                     break;
                 case RenderPassMode.RenderGBufferPass:
+                    #region Render G-Buffer
                     {
                         frustum = World.camera.Frustum;
                         string basicTechnique = PostProcessManager.shading.GetBasicRenderTechnique();
@@ -713,6 +721,7 @@ namespace XNA_PoolGame.Graphics.Models
                         if (World.doLightshafts) basicTechnique += "LightShafts";
                         DrawModel(true, PostProcessManager.renderGBuffer_DefEffect, basicTechnique, delegate { SetParameterRenderGBuffer(); });
                     }
+                    #endregion
                     break;
                 case RenderPassMode.DPBasicRender:
                     {

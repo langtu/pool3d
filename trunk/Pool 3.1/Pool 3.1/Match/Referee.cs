@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region Using Statements
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,7 @@ using XNA_PoolGame.PoolTables;
 using XNA_PoolGame.Cameras;
 using Microsoft.Xna.Framework;
 using XNA_PoolGame.PoolTables.Racks;
+#endregion
 
 namespace XNA_PoolGame.Match
 {

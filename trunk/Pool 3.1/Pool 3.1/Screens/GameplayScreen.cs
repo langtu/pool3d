@@ -1,4 +1,4 @@
-﻿#region Using statement
+﻿#region Using Statements
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -305,17 +305,17 @@ namespace XNA_PoolGame.Screens
 
             #region LIGHT'S POINT
             //PoolGame.game.PrepareRenderStates();
-            PostProcessManager.ChangeRenderMode(RenderPassMode.BasicRender);
-            if (LightManager.sphereModel != null)
-            {
-                for (int i = 0; i < LightManager.totalLights; ++i)
-                {
+            //PostProcessManager.ChangeRenderMode(RenderPassMode.BasicRender);
+            //if (LightManager.sphereModel != null)
+            //{
+            //    for (int i = 0; i < LightManager.totalLights; ++i)
+            //    {
 
-                    LightManager.sphereModel.Position = new Vector3(LightManager.lights[i].Position.X, LightManager.lights[i].Position.Y, LightManager.lights[i].Position.Z);
-                    LightManager.sphereModel.Draw(gameTime);
+            //        LightManager.sphereModel.Position = new Vector3(LightManager.lights[i].Position.X, LightManager.lights[i].Position.Y, LightManager.lights[i].Position.Z);
+            //        LightManager.sphereModel.Draw(gameTime);
                     
-                }
-            }
+            //    }
+            //}
             #endregion
 
             #region PARTICLES

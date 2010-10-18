@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region Using Statements
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,7 @@ using XNA_PoolGame.Graphics.Shadows;
 using Microsoft.Xna.Framework.Graphics;
 using XNA_PoolGame.Graphics;
 using XNA_PoolGame.Graphics.Models;
+#endregion
 
 namespace XNA_PoolGame.Graphics
 {
