@@ -10,6 +10,8 @@ using XNA_PoolGame.Graphics;
 using XNA_PoolGame.Match;
 using XNA_PoolGame.PoolTables.Racks;
 using XNA_PoolGame.Screens;
+using XNA_PoolGame.Graphics.Models;
+using XNA_PoolGame.Graphics.Shadows;
 
 namespace XNA_PoolGame
 {
@@ -116,9 +118,14 @@ namespace XNA_PoolGame
 
         //
         public static EnvironmentType EM = EnvironmentType.None;
+        /// <summary>
+        /// Dual paraboloid divisor factor.
+        /// </summary>
         public static int DPDivisor = 2;
         public static int EMSize = 64;
 
         public static bool doLightshafts = false;
     }
+
+    
 }

@@ -12,7 +12,7 @@ namespace XNA_PoolGame.GameControllers
     /// Game controller. Used to retrieval players interaction in
     /// a game match. Abstract class of all types of game controllers.
     /// </summary>
-    public abstract class GameController : ICloneable, IEquatable<GameController>
+    public abstract class GameController : IEquatable<GameController>
     {
         #region Variables
         protected PlayerIndex playerIndex;
@@ -128,7 +128,7 @@ namespace XNA_PoolGame.GameControllers
 
         #region Cloneable
 
-        public abstract object Clone();
+        public abstract GameController Clone();
 
         #endregion
 

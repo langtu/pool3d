@@ -37,9 +37,9 @@ namespace XNA_PoolGame.Match
         private List<Ball> ballsPottedThisRound;
         
         /// <summary>
-        /// Collection of balls state.
+        /// Collection of ball states.
         /// </summary>
-        public List<PoolBallState> ballsState;
+        public List<PoolBallState> ballStates;
         public PoolBallState cueballState;
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace XNA_PoolGame.Match
         public Ball calledBall;
         public Pocket calledPocket;
 
-        public Dictionary<Ball, bool> ballsRailsHit;
+        public Dictionary<Ball, bool> ballRailsHit;
 
         public Ball BallHitFirstThisRound
         {
@@ -97,8 +97,8 @@ namespace XNA_PoolGame.Match
         public RoundInformation()
         {
             ballsPottedThisRound = new List<Ball>();
-            ballsState = new List<PoolBallState>();
-            ballsRailsHit = new Dictionary<Ball, bool>();
+            ballStates = new List<PoolBallState>();
+            ballRailsHit = new Dictionary<Ball, bool>();
             table = null;
             calledBall = null;
             calledPocket = null;
@@ -118,18 +118,18 @@ namespace XNA_PoolGame.Match
 
             ballHitFirstThisRound = null;
             ballsPottedThisRound.Clear();
-            ballsState.Clear();
+            ballStates.Clear();
             cueballRailHits = 0;
 
             for (int i = 0; i < table.TotalBalls; i++)
             {
-                this.ballsState.Add(new PoolBallState(table.poolBalls[i].Position, table.poolBalls[i].PreRotation, table.poolBalls[i].pocketWhereAt,
+                this.ballStates.Add(new PoolBallState(table.poolBalls[i].Position, table.poolBalls[i].PreRotation, table.poolBalls[i].pocketWhereAt,
                     table.poolBalls[i].currentTrajectory));
 
-                table.roundInfo.ballsRailsHit[table.poolBalls[i]] = false;
+                table.roundInfo.ballRailsHit[table.poolBalls[i]] = false;
             }
 
-            this.cueballState = this.ballsState[0];
+            this.cueballState = this.ballStates[0];
         }
 
         public void EndSet()
@@ -142,7 +142,7 @@ namespace XNA_PoolGame.Match
         {
             ballsPottedThisRound.Clear();
             for (int i = 0; i < table.TotalBalls; ++i)
-                table.roundInfo.ballsRailsHit[table.poolBalls[i]] = false;
+                table.roundInfo.ballRailsHit[table.poolBalls[i]] = false;
         }
 
         public void EndRound()
@@ -155,8 +155,7 @@ namespace XNA_PoolGame.Match
             calledPocket = null;
         }
 
-
-        public void cueBallHitRail(int index)
+        public void CueBallHitRail(int index)
         {
             if (cueballRailHits == 0)
                 cueballRailHitIndex = index;
@@ -167,13 +166,13 @@ namespace XNA_PoolGame.Match
         public void Dispose()
         {
             ballsPottedThisRound.Clear();
-            ballsRailsHit.Clear();
+            ballRailsHit.Clear();
             ballsPottedThisRound = null;
             ballHitFirstThisRound = null;
             table = null;
             cueballState = null;
-            ballsState.Clear();
-            ballsState = null; 
+            ballStates.Clear();
+            ballStates = null; 
             calledBall = null;
             calledPocket = null;
         }

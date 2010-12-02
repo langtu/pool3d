@@ -48,6 +48,12 @@ namespace XNA_PoolGame
 
         public bool waitingforOther;
         public bool aimLagShot;
+        
+        /// <summary>
+        /// Raised when the player is ready to excecuted his
+        /// lagging shot.
+        /// </summary>
+        public event EventHandler LaggingShotReady;
 
         #region Constructors
         public Player(Game game, int playerIndex, GameController controller)
@@ -134,7 +140,6 @@ namespace XNA_PoolGame
 
                         if (prevcontroller.LeftStick.X != 0.0f && controller.LeftStick.X == 0.0f) repeater = 1.0f;
 
-
                         stick.AngleY -= controller.LeftStick.X * repeater * dt * 20.0f;
 
                         if (!prevcontroller.isAPressed && controller.isAPressed) stick.charging = true;
@@ -147,6 +152,8 @@ namespace XNA_PoolGame
                             {                                
                                 aimLagShot = false;
                                 waitingforOther = true;
+                                if (LaggingShotReady != null)
+                                    LaggingShotReady(this, EventArgs.Empty);
                             }
                             stick.charging = false;
                         }
@@ -154,8 +161,8 @@ namespace XNA_PoolGame
                             stick.Power = MathHelper.Clamp(stick.Power + (controller.RightTrigger - controller.LeftStick.Y * 10.0f) * dt * 40.0f, 0.0f, stick.MAX_POWER);
 
                     }
-                    break;
                 #endregion
+                    break;
                 #region Playing
                 case MatchPhase.Playing:
 
@@ -259,8 +266,8 @@ namespace XNA_PoolGame
 
                     }
                 }
-                break;
                 #endregion
+                    break;
             }
             base.Update(gameTime);
         }
@@ -278,15 +285,15 @@ namespace XNA_PoolGame
             if (stick.Power >= stick.MIN_POWER)
             {
                 stick.Visible = false;
-                table.roundInfo.ballsState.Clear();
+                table.roundInfo.ballStates.Clear();
 
                 for (int i = 0; i < table.TotalBalls; i++)
                 {
-                    table.roundInfo.ballsState.Add(new PoolBallState(table.poolBalls[i].Position, table.poolBalls[i].PreRotation * table.poolBalls[i].Rotation, 
+                    table.roundInfo.ballStates.Add(new PoolBallState(table.poolBalls[i].Position, table.poolBalls[i].PreRotation * table.poolBalls[i].Rotation, 
                         table.poolBalls[i].pocketWhereAt, table.poolBalls[i].currentTrajectory));
                 }
 
-                table.roundInfo.cueballState = table.roundInfo.ballsState[0];
+                table.roundInfo.cueballState = table.roundInfo.ballStates[0];
 
                 table.roundInfo.cueballPotted = false;
                 table.roundInfo.cueBallInHand = false;

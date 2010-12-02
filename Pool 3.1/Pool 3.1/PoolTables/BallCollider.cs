@@ -9,6 +9,15 @@ using System.Threading;
 
 namespace XNA_PoolGame.PoolTables
 {
+    public enum BallCollisionType
+    {
+        None,
+        TwoBalls,
+        BallWithRail,
+        BallWithInsideRailPocket,
+        BallWithPocket
+    }
+
     /// <summary>
     /// Entity in charge of collisions synchronously.
     /// </summary>

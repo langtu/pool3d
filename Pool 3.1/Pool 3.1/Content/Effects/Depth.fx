@@ -47,7 +47,8 @@ VertexShaderOutput ShadowMapVS(VertexShaderInput input)
 //--- PixelShader ---
 float4 ShadowMapPS(VertexShaderOutput IN) : COLOR0
 {
-    return float4(IN.Depth, IN.Depth, IN.Depth, 1.0f);
+	return float4(IN.Depth, 0.0f, 0.0f, 1.0f);
+    //return float4(IN.Depth, IN.Depth, IN.Depth, 1.0f);
 }
 
 //-------------------

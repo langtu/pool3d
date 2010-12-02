@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using TextureInUse = XNA_PoolGame.Graphics.PostProcessManager.TextureInUse;
+using XNA_PoolGame.Graphics.Models;
 
 namespace XNA_PoolGame.Graphics.Shadows
 {
@@ -34,8 +35,8 @@ namespace XNA_PoolGame.Graphics.Shadows
             pp = PoolGame.device.PresentationParameters;
 
             ShadowMapRT = new RenderTarget2D[2];
-            ShadowMapRT[0] = new RenderTarget2D(PoolGame.device, shadowMapSize, shadowMapSize, 1, pp.BackBufferFormat);
-            ShadowMapRT[1] = new RenderTarget2D(PoolGame.device, shadowMapSize, shadowMapSize, 1, pp.BackBufferFormat);
+            ShadowMapRT[0] = new RenderTarget2D(PoolGame.device, shadowMapSize, shadowMapSize, 1, SurfaceFormat.Single);
+            ShadowMapRT[1] = new RenderTarget2D(PoolGame.device, shadowMapSize, shadowMapSize, 1, SurfaceFormat.Single);
 
             shadowMapTIU = new TextureInUse[2];
             shadowMapTIU[0] = new TextureInUse(ShadowMapRT[0], false);
@@ -59,6 +60,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             ///////////////// PASS 1 - Depth Map ////////
             PostProcessManager.ChangeRenderMode(RenderPassMode.ShadowMapRender);
 
+            PoolGame.device.RenderState.ColorWriteChannels = ColorWriteChannels.Red;
             oldBuffer = PoolGame.device.DepthStencilBuffer;
             PoolGame.device.DepthStencilBuffer = stencilBuffer;
             lightpass = 0;
@@ -70,15 +72,18 @@ namespace XNA_PoolGame.Graphics.Shadows
                 World.scenario.DrawScene(gameTime);
                 ++lightpass;
             }
+            PoolGame.device.RenderState.ColorWriteChannels = ColorWriteChannels.All;
 
             ///////////////// PASS 2 - PCF //////////////
             PostProcessManager.ChangeRenderMode(RenderPassMode.PCFShadowMapRender);
+            //PoolGame.device.RenderState.ScissorTestEnable = true;
+            //PoolGame.device.ScissorRectangle = PoolGame.fullscreen;
             SetupPCFShadowMap();
             SetPCFParameters(ref LightManager.lights);
             shadowTIU.Use();
 
             World.scenario.DrawScene(gameTime);
-
+            //PoolGame.device.RenderState.ScissorTestEnable = false;
             shadowOcclussionTIU = shadowTIU;
         }
 

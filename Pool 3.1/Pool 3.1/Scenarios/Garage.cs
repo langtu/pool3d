@@ -22,7 +22,7 @@ namespace XNA_PoolGame.Scenarios
         }
         
 
-        public override void LoadLights()
+        public override void CreateLights()
         {
             throw new NotImplementedException();
         }

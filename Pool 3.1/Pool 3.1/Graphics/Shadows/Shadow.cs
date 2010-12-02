@@ -10,6 +10,20 @@ using TextureInUse = XNA_PoolGame.Graphics.PostProcessManager.TextureInUse;
 
 namespace XNA_PoolGame.Graphics.Shadows
 {
+    public enum ShadowBlurTechnnique
+    {
+        Normal,
+        SoftShadow
+    }
+
+    public enum ShadowTechnnique
+    {
+        ScreenSpaceShadowMapping,
+        PSMShadowMapping,
+        VarianceShadowMapping,
+        CubeShadowMapping
+    }
+
     /// <summary>
     /// Abstract class.
     /// </summary>
@@ -26,10 +40,8 @@ namespace XNA_PoolGame.Graphics.Shadows
         /// </summary>
         public DepthStencilBuffer oldBuffer;
 
-
         public TextureInUse[] shadowMapTIU;
         public TextureInUse shadowTIU;
-
 
         public int shadowMapSize;
 

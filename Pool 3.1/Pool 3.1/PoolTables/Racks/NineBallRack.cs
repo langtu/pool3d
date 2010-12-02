@@ -46,17 +46,21 @@ namespace XNA_PoolGame.PoolTables.Racks
         protected override void BuildPoolBalls()
         {
             table.TotalBalls = 9 + 1;
-            table.poolBalls = new Ball[9 + 1];
+            if (table.poolBalls == null) table.poolBalls = new List<Ball>();
+            table.poolBalls.Clear();
+            // Add the cueball that belong to this rack.
+            table.poolBalls.Add(table.cueBall);
+
             ballsReady = new bool[9];
 
             for (int i = 0; i < 9; i++)
             {
-                table.poolBalls[i + 1] = new Ball(PoolGame.game, i + 1,
-                    "Models\\Balls\\newball", "Textures\\Balls\\ball " + (i + 1), table, World.ballRadius);
+                table.poolBalls.Add(new Ball(PoolGame.game, i + 1,
+                    "Models\\Balls\\newball", "Textures\\Balls\\ball " + (i + 1), table, World.ballRadius));
             }
         }
 
-        public override void BuildsBallsRack()
+        public override void BuildBallsRack()
         {
             for (int k = 0; k < 9; k++)
                 ballsReady[k] = false;

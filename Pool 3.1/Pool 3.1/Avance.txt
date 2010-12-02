@@ -1,12 +1,22 @@
-
+- Engine
+- Algoritmo de z-prepass
+- IDisposable para todas las clases
 - Realizar HUD
 	- Menus
 	- Gameplay
 	
 - Colisiones de pelotas con BFS (Listo)
+- Verificar viewangle culling (ver clase Model en el juego de RacingGameWindows)
+- Crear una clase Material para encapsular el material de un model
+  - Diffuse, Normal and Height Textures, etc.
+- Crear clase ShaderEffect
+  
+- Crear una clase ShaderEffect. Clases hijas???
+- 
 - Sombras y múltiples luces con Phong (Listo)
-- Point Lights (Medio Listo)
+- Point Lights (Listo)
 - Agregar objetos a la escena
+- Calcular bien la view matrix de una luz
 - Hardware instancing
 	- Separar instancemodel de entity (crear nueva clase)
 	- Terminar todas las técnicas
@@ -17,6 +27,7 @@
 - Sonido3D
 - Mejorar partículas (Listo)
 - Hacer lógica del juego jaja
+  - 
 - Acomodar normal mapping e incluir parallax mapping (Listo)
 - DynamicEnvironmentmapping con 1 nivel de detalle (Listo)
 - Cambiar el formato de las texturas a jpg
@@ -34,9 +45,11 @@
 - Optimizar shaders (Vector4 to Vector3, etc..)
 - Multithreading (Listo)
 - BSP
-- Colocar los parametros de los efectos en las clases (effect.Parameters[""]) a variables para ser mas eficiente
+- Colocar los parametros de los efectos en las clases (effect.Parameters[""]) a variables para ser más eficiente
 - Realizar Antialiasing a pata (Edge detection and blur)
 - Incluir buen chequeo de frustrum culling a las sombras
 - Dual-Paraboloid Reflection
 - Dual-Paraboloid Shadow Maps
 - Tamaño del Shadow Map no cuadrado
+- Cube Shadow map (Listo)
+- Implementar subclases de la clase light (DirectionalLight, etc...) con sus atributos respectivos

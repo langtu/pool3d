@@ -86,7 +86,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cameras\EmptyCamera.cs" />
-    <Compile Include="GameEvents\GameEvent.cs" />
     <Compile Include="Graphics\DepthOfField.cs" />
     <Compile Include="Graphics\FullQuad.cs" />
     <Compile Include="Graphics\LensFlare.cs" />
@@ -111,6 +110,7 @@
     <Compile Include="Graphics\Skybox.cs" />
     <Compile Include="Graphics\SSAO.cs" />
     <Compile Include="Helpers\Tuple.cs" />
+    <Compile Include="Match\MatchManager.cs" />
     <Compile Include="Match\Referee.cs" />
     <Compile Include="Match\Team.cs" />
     <Compile Include="PoolTables\BallCollider.cs" />
@@ -128,7 +128,6 @@
     <Compile Include="GameControllers\GameController.cs" />
     <Compile Include="GameControllers\XboxPad.cs" />
     <Compile Include="GameControllers\KeyBoard.cs" />
-    <Compile Include="Enums.cs" />
     <Compile Include="Graphics\Bloom PostProcessing\BloomSettings.cs" />
     <Compile Include="Graphics\DrawableComponent.cs" />
     <Compile Include="Graphics\FrustumCulling.cs" />

@@ -30,6 +30,10 @@ namespace XNA_PoolGame.Match
             this.table = table;
             this.player1 = player1;
             this.player2 = player2;
+
+            table.BallsStopped += new EventHandler(PoolTable_BallsStopped);
+            player1.LaggingShotReady += new EventHandler(Player_Ready);
+            player2.LaggingShotReady += new EventHandler(Player_Ready);
         }
 
         public void SetMatchReady()
@@ -63,190 +67,174 @@ namespace XNA_PoolGame.Match
             table.InitializeMatch();
         }
 
-        public override void Update(GameTime gameTime)
+        void Player_Ready(object sender, EventArgs args)
         {
-            if (table == null) return;
-
-            if (player1 != null && player2 != null && table.phase == MatchPhase.LaggingShot)
+            if (player1.waitingforOther && player2.waitingforOther)
             {
-                if (player1.waitingforOther && player2.waitingforOther)
-                {
-                    player1.waitingforOther = false;
-                    player2.waitingforOther = false;
+                player1.waitingforOther = false;
+                player2.waitingforOther = false;
 
-                    player1.TakeShot();
-                    player2.TakeShot();
-                }
-                else
-                {
-                    if (!table.ballsMoving && table.previousBallsMoving)
-                        CheckLagPlayersStatus();
-                }
+                player1.TakeShot();
+                player2.TakeShot();
             }
-            else if (table.phase == MatchPhase.Playing)
+        }
+
+        void PoolTable_BallsStopped(object sender, EventArgs args)
+        {
+            if (table.phase == MatchPhase.Playing)
             {
-                if (!table.ballsMoving && table.previousBallsMoving)
+                // Check billard rules according to the rule set.
+                switch (World.gameMode)
                 {
-                    // Check billard rules according to the game match.
-
-                    switch(World.gameMode)
-                    {
+                    case GameMode.EightBalls:
                         #region 8 ball
-                        case GameMode.EightBalls:
-                            // An inning is a player's turn at the table. It ends when at the end of a shot
-                            // it is no longer legal for him to take a shot.
-                            bool inningOver = false;
-                            bool fouled = false;
-                            bool breakShotFouled = false;
-                            bool cueBallScratch = false;
-                            int setState = 0;   // 0 nothing happens
-                                                // 1 win
-                                                // 2 lose
-                            
-                            if (table.roundInfo.cueballPotted || table.roundInfo.cueballDrivenOff)
-                            {
-                                table.roundInfo.cueBallInHand = true;
-                                table.roundInfo.cueballPotted = false;
-                                table.roundInfo.cueballDrivenOff = false;
-                                //table.UnpocketCueBall();
-                                cueBallScratch = true;
-                            }
+                        // An inning is a player's turn at the table. It ends when at the end of a shot
+                        // it is no longer legal for him to take a shot.
+                        bool inningOver = false;
+                        bool fouled = false;
+                        bool breakShotFouled = false;
+                        bool cueBallScratch = false;
+                        int setState = 0;   // 0 nothing happens
+                                            // 1 win
+                                            // 2 lose
 
-                            // The game is considered to have commenced once the cue ball
-                            // has been struck by the cue tip and crosses the head string.
-                            if (table.roundInfo.cueBallBehindHeadString && table.roundInfo.firstShotOfSet)
-                            {
-                                //if (table.MIN_HEAD_STRING_X < table.cueBall.Position.X)
-                                //    breakShotFouled = true;
-                                //else if (table.roundInfo.BallHitFirstThisRound == null)
-                                //    breakShotFouled = true;
+                        if (table.roundInfo.cueballPotted || table.roundInfo.cueballDrivenOff)
+                        {
+                            table.roundInfo.cueBallInHand = true;
+                            table.roundInfo.cueballPotted = false;
+                            table.roundInfo.cueballDrivenOff = false;
+                            //table.UnpocketCueBall();
+                            cueBallScratch = true;
+                        }
 
-                                if (!breakShotFouled)
-                                {
-                                    if (table.roundInfo.BallsPottedThisRound.Count == 0)
-                                    {
-                                        int hits = 0;
-                                        for (int k = 1; k < table.TotalBalls; ++k)
-                                        {
-                                            if (table.roundInfo.ballsRailsHit[table.poolBalls[k]])
-                                                ++hits;
-                                        }
+                        // The game is considered to have commenced once the cue ball
+                        // has been struck by the cue tip and crosses the head string.
+                        if (table.roundInfo.cueBallBehindHeadString && table.roundInfo.firstShotOfSet)
+                        {
+                            //if (table.MIN_HEAD_STRING_X < table.cueBall.Position.X)
+                            //    breakShotFouled = true;
+                            //else if (table.roundInfo.BallHitFirstThisRound == null)
+                            //    breakShotFouled = true;
 
-                                        if (hits < 4)
-                                            breakShotFouled = true;
-                                        else
-                                            inningOver = true;
-
-                                    }
-                                    else
-                                    {
-                                        if (EightBallPocketed())
-                                        {
-                                            if (!cueBallScratch)
-                                            {
-                                                // (1) re-spotting the eight ball and accepting the balls in position,
-                                                // or
-                                                // (2) re-breaking.
-                                                inningOver = false;
-                                            }
-                                            else
-                                            {
-                                                // (1) re-spotting the eight ball and shooting with cue ball in hand behind the head string;
-                                                // or
-                                                // (2) re-breaking.
-                                                breakShotFouled = true;
-
-
-                                            }
-
-                                        }
-                                        else
-                                        {
-                                            breakShotFouled = cueBallScratch;
-                                            if (cueBallScratch)
-                                            {
-                                                table.InitializeGameSet();
-                                                inningOver = true;
-                                            }
-                                        }
-                                    }
-                                }
-                                if (!breakShotFouled)
-                                    table.roundInfo.EndSet();
-                            }
-                            else
+                            if (!breakShotFouled)
                             {
                                 if (table.roundInfo.BallsPottedThisRound.Count == 0)
                                 {
-                                    if (!IsALegalShot())
+                                    int hits = 0;
+                                    for (int k = 1; k < table.TotalBalls; ++k)
+                                    {
+                                        if (table.roundInfo.ballRailsHit[table.poolBalls[k]])
+                                            ++hits;
+                                    }
+
+                                    if (hits < 4)
+                                        breakShotFouled = true;
+                                    else
                                         inningOver = true;
                                 }
                                 else
                                 {
-                                    if (table.openTable)
+                                    if (EightBallPocketed())
                                     {
-                                        bool tableremainsopened = IsTableRemainsOpen();
-                                        
-                                        bool illegallypocketedballs = false;
-                                        if (tableremainsopened)
-                                            inningOver = true;
+                                        if (!cueBallScratch)
+                                        {
+                                            // (1) re-spotting the eight ball and accepting the balls in position,
+                                            // or
+                                            // (2) re-breaking.
+                                            inningOver = false;
+                                        }
                                         else
                                         {
-                                            illegallypocketedballs = AreBallsIllegallyPocketed();
+                                            // (1) re-spotting the eight ball and shooting with cue ball in hand behind the head string;
+                                            // or
+                                            // (2) re-breaking.
+                                            breakShotFouled = true;
+
+
                                         }
 
-                                        if (!tableremainsopened)
-                                        {
-                                            foreach (Ball ball in table.poolBalls)
-                                            {
-                                                if (ball.pocketWhereAt == -1 || ball == table.cueBall) continue;
-                                                bool found = false;
-                                                foreach (Ball pocketed in table.roundInfo.BallsPottedThisRound)
-                                                {
-                                                    if (ball == pocketed)
-                                                    {
-                                                        found = true;
-                                                        break;
-                                                    }
-                                                }
-                                                if (!found)
-                                                {
-                                                    if (ball.ballNumber >= 1 && ball.ballNumber <= 7 &&
-                                                        World.CurrentPlayer.team.BallType == BallGroupType.Solid)
-                                                        World.CurrentPlayer.team.IncresePocketedBallsCounter();
-                                                    else if (ball.ballNumber >= 9 && ball.ballNumber <= 15 &&
-                                                        World.CurrentPlayer.team.BallType == BallGroupType.Stripe)
-                                                        World.CurrentPlayer.team.IncresePocketedBallsCounter();
-                                                    else
-                                                        World.CurrentPlayer.team.OppositeTeam.IncresePocketedBallsCounter();
-                                                }
-                                            }
-                                            table.openTable = false;
-                                        }
                                     }
                                     else
                                     {
-                                        if (AreBallsIllegallyPocketed())
-                                            inningOver = true;
-                                        else if (!IsALegalShot())
-                                            inningOver = fouled = true;
-                                        
-                                        if (EightBallPocketed())
+                                        breakShotFouled = cueBallScratch;
+                                        if (cueBallScratch)
                                         {
-                                            if (World.CurrentPlayer.team.TotalBallsPocketed == 7)
+                                            table.InitializeGameSet();
+                                            inningOver = true;
+                                        }
+                                    }
+                                }
+                            }
+                            if (!breakShotFouled)
+                                table.roundInfo.EndSet();
+                        }
+                        else
+                        {
+                            if (table.roundInfo.BallsPottedThisRound.Count == 0)
+                            {
+                                if (!IsALegalShot())
+                                    inningOver = true;
+                            }
+                            else
+                            {
+                                if (table.openTable)
+                                {
+                                    bool tableremainsopened = IsTableRemainsOpen();
+
+                                    bool illegallypocketedballs = false;
+                                    if (tableremainsopened)
+                                        inningOver = true;
+                                    else
+                                    {
+                                        illegallypocketedballs = AreBallsIllegallyPocketed();
+                                    }
+
+                                    if (!tableremainsopened)
+                                    {
+                                        foreach (Ball ball in table.poolBalls)
+                                        {
+                                            if (ball.pocketWhereAt == -1 || ball == table.cueBall) continue;
+                                            bool found = false;
+                                            foreach (Ball pocketed in table.roundInfo.BallsPottedThisRound)
                                             {
-                                                if (table.poolBalls[EightBallRack.EIGHTBALLNUMBER + 1].pocketWhereAt == table.roundInfo.calledPocket.pocketIndex &&
-                                                    table.roundInfo.calledPocket.pocketIndex != World.CurrentPlayer.team.LastPocketIndex)
+                                                if (ball == pocketed)
                                                 {
-                                                    // the team has won.
-                                                    inningOver = false;
-                                                    setState = 1;
+                                                    found = true;
+                                                    break;
                                                 }
+                                            }
+                                            if (!found)
+                                            {
+                                                if (ball.ballNumber >= 1 && ball.ballNumber <= 7 &&
+                                                    World.CurrentPlayer.team.BallType == BallGroupType.Solid)
+                                                    World.CurrentPlayer.team.IncresePocketedBallsCounter();
+                                                else if (ball.ballNumber >= 9 && ball.ballNumber <= 15 &&
+                                                    World.CurrentPlayer.team.BallType == BallGroupType.Stripe)
+                                                    World.CurrentPlayer.team.IncresePocketedBallsCounter();
                                                 else
-                                                {
-                                                    inningOver = true;
-                                                    setState = 2;
-                                                }
+                                                    World.CurrentPlayer.team.OppositeTeam.IncresePocketedBallsCounter();
+                                            }
+                                        }
+                                        table.openTable = false;
+                                    }
+                                }
+                                else
+                                {
+                                    if (AreBallsIllegallyPocketed())
+                                        inningOver = true;
+                                    else if (!IsALegalShot())
+                                        inningOver = fouled = true;
+
+                                    if (EightBallPocketed())
+                                    {
+                                        if (World.CurrentPlayer.team.TotalBallsPocketed == 7)
+                                        {
+                                            if (table.poolBalls[EightBallRack.EIGHTBALLNUMBER + 1].pocketWhereAt == table.roundInfo.calledPocket.pocketIndex &&
+                                                table.roundInfo.calledPocket.pocketIndex != World.CurrentPlayer.team.LastPocketIndex)
+                                            {
+                                                // the team has won.
+                                                inningOver = false;
+                                                setState = 1;
                                             }
                                             else
                                             {
@@ -254,79 +242,92 @@ namespace XNA_PoolGame.Match
                                                 setState = 2;
                                             }
                                         }
+                                        else
+                                        {
+                                            inningOver = true;
+                                            setState = 2;
+                                        }
                                     }
-
-                                    if (table.roundInfo.calledPocket != null && !fouled) 
-                                        World.CurrentPlayer.team.LastPocketIndex = table.roundInfo.calledPocket.pocketIndex;
                                 }
-                            }
-                            if (cueBallScratch)
-                                table.UnpocketCueBall();
 
-                            if (breakShotFouled)
-                            {
-                                //table.roundInfo.cueBallInHand = true;
-                                //table.roundInfo.cueballPotted = false;
-                                //table.roundInfo.cueballDrivenOff = false;
-                                //table.RestoreCueBall();
+                                if (table.roundInfo.calledPocket != null && !fouled)
+                                    World.CurrentPlayer.team.LastPocketIndex = table.roundInfo.calledPocket.pocketIndex;
                             }
-                            else
-                            {
-                                //fouled = CheckBasicRules(World.gameMode);
+                        }
+                        if (cueBallScratch)
+                            table.UnpocketCueBall();
 
-                                
-                                //table.roundInfo.EndSet();
-                            }
-                            inningOver |= fouled | breakShotFouled | cueBallScratch;
+                        if (breakShotFouled)
+                        {
+                            //table.roundInfo.cueBallInHand = true;
+                            //table.roundInfo.cueballPotted = false;
+                            //table.roundInfo.cueballDrivenOff = false;
+                            //table.RestoreCueBall();
+                        }
+                        else
+                        {
+                            //fouled = CheckBasicRules(World.gameMode);
 
-                            // The shooter remains at the table as long as he continues
-                            // to legally pocket called balls, or he wins the rack by pocketing
-                            // the eight ball.
-                            table.roundInfo.EndRound();
-                            if (setState == 2) // The team has lost.
-                            {
-                                World.CurrentPlayer.stick.Visible = false;
-                                World.CurrentPlayer.team.RotatePlayer();
-                                World.playerInTurnIndex = World.CurrentPlayer.team.OppositeTeam.NextPlayerInTurn();
-                                World.cursor.Controller = World.CurrentPlayer.controller;
 
-                                World.CurrentPlayer.team.ResetForGameSet();
-                                World.CurrentPlayer.team.OppositeTeam.ResetForGameSet();
-                                table.InitializeGameSet();
-                            }
-                            else if (setState == 1) // the team has won.
-                            {
-                                World.CurrentPlayer.team.ResetForGameSet();
-                                World.CurrentPlayer.team.OppositeTeam.ResetForGameSet();
-                                table.InitializeGameSet();
-                            }
-                            else if (inningOver && setState == 0)
-                            {
-                                World.CurrentPlayer.stick.Visible = false;
-                                World.CurrentPlayer.team.RotatePlayer();
-                                World.playerInTurnIndex = World.CurrentPlayer.team.OppositeTeam.NextPlayerInTurn();
-                                World.cursor.Controller = World.CurrentPlayer.controller;
-                            }
+                            //table.roundInfo.EndSet();
+                        }
+                        inningOver |= fouled | breakShotFouled | cueBallScratch;
 
-                            if (World.CurrentPlayer.team.TotalBallsPocketed == 7)
-                            {
-                                table.roundInfo.calledBall = table.poolBalls[EightBallRack.EIGHTBALLNUMBER + 1];
-                                table.roundInfo.enabledCalledBall = false;
-                            }
-                            else if (!table.roundInfo.cueBallBehindHeadString || !table.roundInfo.firstShotOfSet)
-                            {
-                                table.roundInfo.enabledCalledBall = true;
-                                table.roundInfo.enabledCalledPocket = true;
-                            }
-                            break;
+                        // The shooter remains at the table as long as he continues
+                        // to legally pocket called balls, or he wins the rack by pocketing
+                        // the eight ball.
+                        table.roundInfo.EndRound();
+                        if (setState == 2) // The team has lost.
+                        {
+                            World.CurrentPlayer.stick.Visible = false;
+                            World.CurrentPlayer.team.RotatePlayer();
+                            World.playerInTurnIndex = World.CurrentPlayer.team.OppositeTeam.NextPlayerInTurn();
+                            World.cursor.Controller = World.CurrentPlayer.controller;
+
+                            World.CurrentPlayer.team.ResetForGameSet();
+                            World.CurrentPlayer.team.OppositeTeam.ResetForGameSet();
+                            table.InitializeGameSet();
+                        }
+                        else if (setState == 1) // the team has won.
+                        {
+                            World.CurrentPlayer.team.ResetForGameSet();
+                            World.CurrentPlayer.team.OppositeTeam.ResetForGameSet();
+                            table.InitializeGameSet();
+                        }
+                        else if (inningOver && setState == 0)
+                        {
+                            World.CurrentPlayer.stick.Visible = false;
+                            World.CurrentPlayer.team.RotatePlayer();
+                            World.playerInTurnIndex = World.CurrentPlayer.team.OppositeTeam.NextPlayerInTurn();
+                            World.cursor.Controller = World.CurrentPlayer.controller;
+                        }
+
+                        if (World.CurrentPlayer.team.TotalBallsPocketed == 7)
+                        {
+                            table.roundInfo.calledBall = table.poolBalls[EightBallRack.EIGHTBALLNUMBER + 1];
+                            table.roundInfo.enabledCalledBall = false;
+                        }
+                        else if (!table.roundInfo.cueBallBehindHeadString || !table.roundInfo.firstShotOfSet)
+                        {
+                            table.roundInfo.enabledCalledBall = true;
+                            table.roundInfo.enabledCalledPocket = true;
+                        }
                         #endregion
-                    }
+                        break;
                 }
+
             }
-            base.Update(gameTime);
+            else if (table.phase == MatchPhase.LaggingShot)
+            {
+                CheckLagPlayersStatus();
+            }
         }
 
-
+        /// <summary>
+        /// Returns whether the table remains open after a shot.
+        /// If not assigned to each team their ball type.
+        /// </summary>
+        /// <returns></returns>
         public bool IsTableRemainsOpen()
         {
             if (table.roundInfo.calledBall == null || table.roundInfo.calledPocket == null) return true;
@@ -391,13 +392,13 @@ namespace XNA_PoolGame.Match
             if (table.longStringPlanes[(int)who.teamNumber].DotCoordinate(who.stick.ballTarget.Position) < 0.0f)
                 return true;
 
-            if (who.stick.ballTarget.ballRailHitsIndexes.Count != 2)
+            if (who.stick.ballTarget.ballRailHitIndexes.Count != 2)
                 return true;
 
             if (who.stick.ballTarget.pocketWhereAt != -1)
                 return true;
 
-            if (who.stick.ballTarget.ballRailHitsIndexes[1] != table.headCushionIndex)
+            if (who.stick.ballTarget.ballRailHitIndexes[1] != table.headCushionIndex)
                 return true;
 
             return false;
@@ -415,8 +416,8 @@ namespace XNA_PoolGame.Match
                 player1.waitingforOther = false;
                 player2.waitingforOther = false;
 
-                player1.stick.ballTarget.ballRailHitsIndexes.Clear();
-                player2.stick.ballTarget.ballRailHitsIndexes.Clear();
+                player1.stick.ballTarget.ballRailHitIndexes.Clear();
+                player2.stick.ballTarget.ballRailHitIndexes.Clear();
 
                 if (player1.stick.ballTarget.pocketWhereAt != -1)
                 {
@@ -466,7 +467,6 @@ namespace XNA_PoolGame.Match
                         if (intersectPos1 > intersectPos2)
                             winner = player2;
                         else winner = player1;
-                        
                     }
                 }
                 else if (fail_player1)
@@ -509,7 +509,7 @@ namespace XNA_PoolGame.Match
                     int hits = 0;
                     foreach (Ball ball in table.poolBalls)
                     {
-                        if (table.roundInfo.ballsRailsHit[ball])
+                        if (table.roundInfo.ballRailsHit[ball])
                             ++hits;
                     }
                     if (hits == 0) 
@@ -521,7 +521,7 @@ namespace XNA_PoolGame.Match
         }
         #endregion
 
-        #region Are balls illegally pockected this round?
+        #region Are balls illegally pockected on this round?
         public bool AreBallsIllegallyPocketed()
         {
             bool r = false;            
@@ -564,12 +564,18 @@ namespace XNA_PoolGame.Match
             //    return true;
 
             return false;
-        }
-
-        
+        }        
 
         protected override void Dispose(bool disposing)
         {
+            if (table != null)
+                table.BallsStopped -= new EventHandler(PoolTable_BallsStopped);
+
+            if (player1 != null)
+                player1.LaggingShotReady -= new EventHandler(Player_Ready);
+            if (player2 != null)
+                player2.LaggingShotReady -= new EventHandler(Player_Ready);
+
             this.table = null;
             this.player1 = null;
             this.player2 = null;

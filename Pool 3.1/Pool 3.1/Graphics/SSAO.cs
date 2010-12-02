@@ -63,7 +63,8 @@ namespace XNA_PoolGame.Graphics
 
         public void Draw(TextureInUse source)
         {
-            ssaoTIU = PostProcessManager.GetIntermediateTexture();
+            //ssaoTIU = PostProcessManager.GetIntermediateTexture();
+            ssaoTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width / 4, PoolGame.Height / 4);
             PoolGame.device.SetRenderTarget(0, ssaoTIU.renderTarget);
             PoolGame.device.SetRenderTarget(1, null);
             PoolGame.device.SetRenderTarget(2, null);

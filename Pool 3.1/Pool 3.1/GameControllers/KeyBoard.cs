@@ -41,7 +41,7 @@ namespace XNA_PoolGame.GameControllers
             this.startPressed = other.startPressed;
         }
 
-        public override object Clone()
+        public override GameController Clone()
         {
             return new KeyBoard(this.playerIndex, this);
         }

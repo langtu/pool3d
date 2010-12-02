@@ -6,6 +6,13 @@ using Microsoft.Xna.Framework;
 
 namespace XNA_PoolGame.Graphics
 {
+    public enum FrustumTest
+    {
+        Outside,
+        Intersect,
+        Inside
+    }
+
     public class FrustumCulling
     {
         

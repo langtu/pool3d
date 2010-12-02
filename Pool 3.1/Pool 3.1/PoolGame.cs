@@ -97,8 +97,8 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 640;
-            graphics.PreferredBackBufferHeight = 480;
+            graphics.PreferredBackBufferWidth = 1280;
+            graphics.PreferredBackBufferHeight = 720;
             graphics.SynchronizeWithVerticalRetrace = false;
             graphics.PreferMultiSampling = false;
 
@@ -394,6 +394,7 @@ namespace XNA_PoolGame
                 {
                     World.camera.Dispose();
                     World.camera = new ChaseCamera(this);
+                    World.camera.CameraPosition = position;
                 }
                 World.camera.FarPlane = farPlane;
                 Components.Add(World.camera);
@@ -533,7 +534,7 @@ namespace XNA_PoolGame
             {
                 Texture2D endTexture = null;
                 //endTexture = PostProcessManager.shading.Shadows.ShadowMapRT[0].GetTexture();
-                endTexture = PostProcessManager.shading.Shadows.ShadowRT.GetTexture();
+                //endTexture = PostProcessManager.shading.Shadows.ShadowRT.GetTexture();
                 //endTexture = World.poolTable.poolBalls[0].mDPMapFront.GetTexture();
                 //endTexture = PostProcessManager.ssao.ssaoTIU.renderTarget.GetTexture();
                 //endTexture = PostProcessManager.ssao.normalTIU.renderTarget.GetTexture();

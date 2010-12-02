@@ -5,6 +5,18 @@ using System.Text;
 
 namespace XNA_PoolGame.Match
 {
+    public enum TeamNumber
+    {
+        One = 0,
+        Two = 1
+    }
+
+    public enum BallGroupType
+    {
+        None,
+        Stripe,
+        Solid
+    }
     /// <summary>
     /// Define a team.
     /// </summary>
