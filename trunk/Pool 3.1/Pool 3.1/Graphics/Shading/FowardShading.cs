@@ -69,6 +69,9 @@ namespace XNA_PoolGame.Graphics.Shading
             shadows.PostDraw();
             if (World.motionblurType != MotionBlurType.None || World.dofType != DOFType.None)
             {
+
+                PostProcessManager.depthTIU.DontUse(); PostProcessManager.velocityTIU.DontUse(); PostProcessManager.velocityLastFrameTIU.DontUse();
+
                 PoolGame.device.SetRenderTarget(1, null);
                 PoolGame.device.SetRenderTarget(2, null);
             }

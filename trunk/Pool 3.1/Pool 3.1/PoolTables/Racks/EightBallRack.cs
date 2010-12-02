@@ -23,7 +23,7 @@ namespace XNA_PoolGame.PoolTables.Racks
         /// </summary>
         public static int EIGHTBALLNUMBER = 7;
         /// <summary>
-        /// Numbers of rows in the triangle.
+        /// Number of rows in the triangle.
         /// </summary>
         const int ROWS = 5;
         /// <summary>
@@ -50,17 +50,20 @@ namespace XNA_PoolGame.PoolTables.Racks
         protected override void BuildPoolBalls()
         {
             table.TotalBalls = 15 + 1;
-            table.poolBalls = new Ball[15 + 1];
+            if (table.poolBalls == null) table.poolBalls = new List<Ball>();
+            table.poolBalls.Clear();
+            // Add the cueball that belong to this rack.
+            table.poolBalls.Add(table.cueBall);
             ballsReady = new bool[15];
 
             for (int i = 0; i < 15; i++)
             {
-                table.poolBalls[i + 1] = new Ball(PoolGame.game, i + 1, 
-                    "Models\\Balls\\newball", "Textures\\Balls\\ball " + (i + 1), table, World.ballRadius);
+                table.poolBalls.Add(new Ball(PoolGame.game, i + 1, 
+                    "Models\\Balls\\newball", "Textures\\Balls\\ball " + (i + 1), table, World.ballRadius));
             }
         }
 
-        public override void BuildsBallsRack()
+        public override void BuildBallsRack()
         {
             for (int k = 0; k < 15; k++)
                 ballsReady[k] = false;

@@ -299,6 +299,7 @@ namespace XNA_PoolGame.Screens.Screen_Manager
 
             spriteBatch.End();
         }
+
         protected override void Dispose(bool disposing)
         {
             if (blankTexture != null) blankTexture.Dispose();

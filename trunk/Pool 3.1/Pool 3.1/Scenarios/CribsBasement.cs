@@ -491,13 +491,14 @@ namespace XNA_PoolGame.Scenarios
         }
 
         /// <summary>
-        /// Set the lights for this scene.
+        /// Creates the lights for this scene.
         /// </summary>
-        public override void LoadLights()
+        public override void CreateLights()
         {
             lights = new List<Light>();
 
-            Light light1 = new Light(new Vector3(-178, 383, 0));
+            //Light light1 = new Light(new Vector3(-178, 383, 0));
+            Light light1 = new Light(new Vector3(0, 383, 0));
 
             light1.DiffuseColor = new Vector4(0.9f, 0.85f, 0.9f, 1.0f);
             //light1.DepthBias = 0.01193f; // 2048

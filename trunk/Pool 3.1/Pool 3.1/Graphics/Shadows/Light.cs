@@ -11,6 +11,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace XNA_PoolGame.Graphics.Shadows
 {
+    public enum LightType : int
+    {
+        PointLight = 0,
+        Directional,
+        OmniDirectional
+    }
+
     /// <summary>
     /// Light source.
     /// </summary>
@@ -205,5 +212,10 @@ namespace XNA_PoolGame.Graphics.Shadows
             frustum = new BoundingFrustum(LightViewProjection);
         }
         #endregion
+    }
+
+    public class DirectionalLight
+    {
+
     }
 }

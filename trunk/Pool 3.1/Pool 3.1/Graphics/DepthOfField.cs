@@ -12,7 +12,18 @@ using TextureInUse = XNA_PoolGame.Graphics.PostProcessManager.TextureInUse;
 namespace XNA_PoolGame.Graphics
 {
     /// <summary>
-    /// DOF
+    /// Controls the DOF effect being applied
+    /// </summary>
+    public enum DOFType
+    {
+        None = 0,
+        BlurBuffer = 1,
+        BlurBufferDepthCorrection = 2,
+        DiscBlur = 3
+    }
+
+    /// <summary>
+    /// Depth of field effect.
     /// </summary>
     public class DepthOfField
     {

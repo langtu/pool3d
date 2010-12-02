@@ -27,7 +27,7 @@ namespace XNA_PoolGame.Helpers
         #region Add/Remove
 
         /// <summary>
-        /// Add a element sorted to the MultiMap
+        /// Adds an element sorted to the MultiMap
         /// </summary>
         /// <param name="key">Key of the element</param>
         /// <param name="value">Value of the element</param>
@@ -49,7 +49,7 @@ namespace XNA_PoolGame.Helpers
         }
 
         /// <summary>
-        /// Add a element sorted to the MultiMap. Use Key of IKey interface
+        /// Adds an element sorted to the MultiMap. Use Key of IKey interface
         /// </summary>
         /// <param name="value"></param>
         public void Add(TValue value)
@@ -59,7 +59,7 @@ namespace XNA_PoolGame.Helpers
         }
 
         /// <summary>
-        /// Add or Set a element given the key.
+        /// Adds or set a element given the key.
         /// </summary>
         /// <param name="key">The Key of the value to set</param>
         /// <returns></returns>
@@ -86,9 +86,9 @@ namespace XNA_PoolGame.Helpers
                 }
                 else
                 {
-                    List<TValue> newlist = new List<TValue>();
-                    newlist.Add(value);
-                    multimap[key] = newlist;
+                    list = new List<TValue>();
+                    list.Add(value);
+                    multimap[key] = list;
                 }
                 ++count;
             }
@@ -123,7 +123,7 @@ namespace XNA_PoolGame.Helpers
 
         #region KeyCollection
         /// <summary>
-        /// Get the keys collection
+        /// Get the keys collection.
         /// </summary>
         public IEnumerable<TKey> Keys
         {
@@ -136,7 +136,7 @@ namespace XNA_PoolGame.Helpers
 
         #region Count
         /// <summary>
-        /// Get the total elements from the MultiMap
+        /// Get the total elements from the MultiMap.
         /// </summary>
         public int Count
         {
@@ -146,7 +146,7 @@ namespace XNA_PoolGame.Helpers
 
         #region Clear
         /// <summary>
-        /// Removes all elements from the MultiMap
+        /// Removes all elements from the MultiMap.
         /// </summary>
         public void Clear()
         {
@@ -160,7 +160,7 @@ namespace XNA_PoolGame.Helpers
         /// Get the enumerator.
         /// </summary>
         /// <returns></returns>
-        public IEnumerator GetEnumerator()
+       public IEnumerator GetEnumerator()
         {
             foreach (TKey key in multimap.Keys)
             {
@@ -171,5 +171,6 @@ namespace XNA_PoolGame.Helpers
         }
 
         #endregion
+
     }
 }

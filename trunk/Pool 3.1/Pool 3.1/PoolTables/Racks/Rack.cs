@@ -18,7 +18,7 @@ namespace XNA_PoolGame.PoolTables.Racks
         /// Abstract method. This should be called before
         /// a game set begins.
         /// </summary>
-        public abstract void BuildsBallsRack();
+        public abstract void BuildBallsRack();
 
         /// <summary>
         /// Abstract method. This should be called after

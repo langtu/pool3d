@@ -13,6 +13,47 @@ using XNA_PoolGame.Graphics.Shading;
 
 namespace XNA_PoolGame.Graphics
 {
+    #region Enums
+    public enum IntermediateBuffer
+    {
+        PreBloom,
+        BlurredHorizontally,
+        BlurredBothWays,
+        FinalResult,
+    }
+    public enum RenderPassMode
+    {
+        BasicRender,
+        ShadowMapRender,
+        CubeShadowMapPass,
+        PCFShadowMapRender,
+        ScreenSpaceSoftShadowRender,
+        PSMRender,
+        ShadowPostProcessing,
+        DEMPass,
+        DEMBasicRender,
+        MotionBlur,
+        DoF,
+        DOFCombine,
+        Bloom,
+        Menu,
+        FPS,
+        Light,
+        ParticleSystemPass,
+        DistortionParticleSystemPass,
+        RenderGBufferPass,
+        SSAOPrePass,
+        DualParaboloidRenderMapsPass,
+        DPBasicRender
+    }
+    
+    public enum ShadingTechnnique
+    {
+        Foward,
+        Deferred
+    }
+    #endregion
+
     public static class PostProcessManager
     {
         public static SpriteBatch spriteBatch;
@@ -633,6 +674,12 @@ namespace XNA_PoolGame.Graphics
         public static TextureInUse GetIntermediateTexture(int width, int height, SurfaceFormat format)
         {
             return GetIntermediateTexture(width, height, format, MultiSampleType.None, 0);
+        }
+
+        public static TextureInUse GetIntermediateTexture(int width, int height)
+        {
+            PresentationParameters pp = PoolGame.device.PresentationParameters;
+            return GetIntermediateTexture(width, height, pp.BackBufferFormat, pp.MultiSampleType, pp.MultiSampleQuality);
         }
 
         public static TextureInUse GetIntermediateTexture(int width, int height, SurfaceFormat format, MultiSampleType msType, int msQuality)

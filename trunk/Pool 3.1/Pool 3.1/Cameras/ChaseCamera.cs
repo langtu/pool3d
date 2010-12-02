@@ -170,7 +170,7 @@ namespace XNA_PoolGame.Cameras
 
         #region Methods
         /// <summary>
-        /// Forces camera to be at desired position and to stop moving. The is useful
+        /// Forces camera to be at desired position and to stop moving. This is useful
         /// when the chased object is first created or after it has been teleported.
         /// Failing to call this after a large change to the chased object's position
         /// will result in the camera quickly flying across the world.

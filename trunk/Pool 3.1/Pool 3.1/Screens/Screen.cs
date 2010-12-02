@@ -8,6 +8,14 @@ using XNA_PoolGame.Screens.Screen_Manager;
 
 namespace XNA_PoolGame.Screens
 {
+    public enum ScreenState
+    {
+        TransitionOn,
+        Active,
+        TransitionOff,
+        Hidden,
+    }
+
     /// <summary>
     /// A screen is a single layer that has update and draw logic, and which
     /// can be combined with other layers to build up a complex menu system.

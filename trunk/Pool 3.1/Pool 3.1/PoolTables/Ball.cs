@@ -18,6 +18,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace XNA_PoolGame
 {
+    public enum Trajectory
+    {
+        Motion,
+        Free,
+        English
+    }
+
     /// <summary>
     /// Define a ball.
     /// </summary>
@@ -84,7 +91,7 @@ namespace XNA_PoolGame
         /// Determinate if this ball is in lagging phase.
         /// </summary>
         private bool isLagging = false;
-        public List<int> ballRailHitsIndexes;
+        public List<int> ballRailHitIndexes;
 
         #region Properties
         public float Radius
@@ -167,7 +174,7 @@ namespace XNA_PoolGame
             volume = VolumeType.BoundingSpheres;
             useModelPartBB = false;
             rightVector = Vector3.Zero;
-            ballRailHitsIndexes = new List<int>();
+            ballRailHitIndexes = new List<int>();
 #if DRAWBALL_BV
             drawboundingvolume = true;
 #endif
@@ -301,29 +308,27 @@ namespace XNA_PoolGame
                 int railIndex;
                 if ((railIndex = CheckBallWithRailCollision(remainingTime)) != -1)
                 {
+                    // TODO: Add a event and raise it.
                     if (this == table.cueBall)
                     {
                         // cue ball hit a side
-                        table.roundInfo.cueBallHitRail(railIndex);
+                        table.roundInfo.CueBallHitRail(railIndex);
                     }
                     else if (IsLagging)
                     {
-                        ballRailHitsIndexes.Add(railIndex);
-
+                        ballRailHitIndexes.Add(railIndex);
                     }
                 }
                 else
                 {
                     if (CheckInsidePocketCollision())
                     {
+                        // TODO: Add a event and raise it.
                     }
-                }
-
-                
+                }                
 
                 // (x - x0) = vo * dt + 0.5 * a * dt * dt
                 Vector3 movementDelta = velocity * remainingTime + 0.5f * acceleration * remainingTime * remainingTime;
-
 
                 this.Position += movementDelta;
 
@@ -346,6 +351,7 @@ namespace XNA_PoolGame
 
                 if (this.pocketWhereAt == -1 && CheckBallIsPotted())
                 {
+                    // TODO: Add a event and raise it.
                     table.roundInfo.BallsPottedThisRound.Add(this);
                     if (this == table.cueBall)
                         table.roundInfo.cueballPotted = true;
@@ -429,7 +435,7 @@ namespace XNA_PoolGame
                 //Console.WriteLine("acceleration = " + acceleration);
 
 
-                if (this.pocketWhereAt != -1 && CheckPocketsBoundaries(remainingTime))
+                if (this.pocketWhereAt != -1 && CheckPocketBoundaries(remainingTime))
                 {
 
                 }
@@ -1055,7 +1061,7 @@ namespace XNA_PoolGame
                             this.initialvelocity = this.velocity;
                             totaltime = 0.0f;
 
-                            table.roundInfo.ballsRailsHit[this] = true;
+                            table.roundInfo.ballRailsHit[this] = true;
                         }
                         return true;
                     }
@@ -1106,7 +1112,7 @@ namespace XNA_PoolGame
                                 this.initialvelocity = this.velocity;
                                 totaltime = 0.0f;
 
-                                table.roundInfo.ballsRailsHit[this] = true;
+                                table.roundInfo.ballRailsHit[this] = true;
                             }
                             return i;
                         }
@@ -1142,7 +1148,7 @@ namespace XNA_PoolGame
         /// 
         /// </summary>
         /// <returns></returns>
-        private bool CheckPocketsBoundaries(float remainingTime)
+        private bool CheckPocketBoundaries(float remainingTime)
         {
             bool coll = false;
             Vector3 point = this.direction;

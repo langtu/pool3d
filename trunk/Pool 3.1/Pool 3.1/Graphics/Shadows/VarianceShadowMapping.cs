@@ -28,8 +28,8 @@ namespace XNA_PoolGame.Graphics.Shadows
             pp = PoolGame.device.PresentationParameters;
 
             ShadowMapRT = new RenderTarget2D[2];
-            ShadowMapRT[0] = new RenderTarget2D(PoolGame.device, shadowMapSize, shadowMapSize, 1, SurfaceFormat.Rg32);
-            ShadowMapRT[1] = new RenderTarget2D(PoolGame.device, shadowMapSize, shadowMapSize, 1, SurfaceFormat.Rg32);
+            ShadowMapRT[0] = new RenderTarget2D(PoolGame.device, shadowMapSize, shadowMapSize, 1, SurfaceFormat.HalfVector2);
+            ShadowMapRT[1] = new RenderTarget2D(PoolGame.device, shadowMapSize, shadowMapSize, 1, SurfaceFormat.HalfVector2);
 
             shadowMapTIU = new TextureInUse[2];
             shadowMapTIU[0] = new TextureInUse(ShadowMapRT[0], false);
@@ -57,6 +57,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             ///////////////// PASS 1 - Depth Map ////////
             PostProcessManager.ChangeRenderMode(RenderPassMode.ShadowMapRender);
 
+            PoolGame.device.RenderState.ColorWriteChannels = ColorWriteChannels.Red | ColorWriteChannels.Green;
             oldBuffer = PoolGame.device.DepthStencilBuffer;
             lightpass = 0;
             for (int i = 0; i < LightManager.totalLights; ++i)
@@ -74,6 +75,7 @@ namespace XNA_PoolGame.Graphics.Shadows
                 World.scenario.DrawScene(gameTime);
                 ++lightpass;
             }
+            PoolGame.device.RenderState.ColorWriteChannels = ColorWriteChannels.All;
 
             ///////////////// PASS 2 - PCF //////////////
             PostProcessManager.ChangeRenderMode(RenderPassMode.PCFShadowMapRender);

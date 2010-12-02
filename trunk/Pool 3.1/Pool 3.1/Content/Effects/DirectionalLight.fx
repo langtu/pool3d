@@ -96,7 +96,7 @@ float4 PixelShaderFunction(VertexShaderOutput input, uniform bool blightPosition
     //surface-to-light vector
     float3 lightVector;
     if (!blightPosition)
-		lightVector = -normalize(lightDirection);
+		lightVector = normalize(lightDirection);
     else 
 		lightVector = normalize(lightDirection - position.xyz);
 

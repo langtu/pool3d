@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region Using Statements
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,9 +11,18 @@ using XNA_PoolGame.Graphics.Models;
 using XNA_PoolGame.Graphics.Particles;
 using Microsoft.Xna.Framework.Graphics;
 using XNA_PoolGame.Cameras;
+#endregion
 
 namespace XNA_PoolGame.Scenarios
 {
+    public enum ScenarioType
+    {
+        Cribs,
+        Garage,
+        Bar,
+        CristalHotel
+    }
+
     /// <summary>
     /// Scenario.
     /// </summary>
@@ -25,22 +35,25 @@ namespace XNA_PoolGame.Scenarios
         /// </summary>
         public MultiMap<int, DrawableComponent> objects;
 
+        /// <summary>
+        /// Ambient color.
+        /// </summary>
         private Vector4 ambientColor;
 
         /// <summary>
-        /// Lights from the scene
+        /// Lights from the scene.
         /// </summary>
-        public List<Light> lights;
+        protected List<Light> lights;
 
         /// <summary>
         /// Particles to be rendered. Use Multimap for the drawing order of particles.
         /// </summary>
-        public MultiMap<int, ParticleSystem> particles;
+        protected MultiMap<int, ParticleSystem> particles;
 
         /// <summary>
         /// Distortion particles to be rendered. Use Multimap for the drawing order of particles.
         /// </summary>
-        public MultiMap<int, ParticleSystem> distortionparticles;
+        protected MultiMap<int, ParticleSystem> distortionparticles;
 
         /// <summary>
         /// DEM's scene.
@@ -64,11 +77,17 @@ namespace XNA_PoolGame.Scenarios
         #endregion
         
         #region Properties
+        /// <summary>
+        /// Object's scene.
+        /// </summary>
         public MultiMap<int, DrawableComponent> Objects
         {
             get { return objects; }
         }
-
+        
+        /// <summary>
+        /// Ambient color.
+        /// </summary>
         public Vector4 AmbientColor
         {
             get { return ambientColor; }
@@ -94,7 +113,7 @@ namespace XNA_PoolGame.Scenarios
 
             //if (World.EM == EnvironmentType.Dynamic || World.EM == EnvironmentType.Static)
             //    refCubeMap = new RenderTargetCube(PoolGame.device, World.EMSize, 1, PoolGame.device.PresentationParameters.BackBufferFormat);
-            LoadLights();
+            CreateLights();
         }
 
         public virtual void LoadContent()
@@ -113,7 +132,6 @@ namespace XNA_PoolGame.Scenarios
 
         public virtual void Draw(GameTime gameTime) 
         {
-
             if (PostProcessManager.currentRenderMode == RenderPassMode.ParticleSystemPass && World.drawParticles)
             {
                 foreach (ParticleSystem pa in particles)
@@ -127,7 +145,8 @@ namespace XNA_PoolGame.Scenarios
         }
 
         /// <summary>
-        /// Draw the entire scene.
+        /// Draw the entire scene, calling Draw() method for each object 
+        /// that belongs to the scene.
         /// </summary>
         /// <param name="gameTime"></param>
         public void DrawScene(GameTime gameTime)
@@ -157,7 +176,7 @@ namespace XNA_PoolGame.Scenarios
         /// <summary>
         /// Initialize lights of the scene.
         /// </summary>
-        public abstract void LoadLights();
+        public abstract void CreateLights();
 
         /// <summary>
         /// Sets particles settings before drawing them.

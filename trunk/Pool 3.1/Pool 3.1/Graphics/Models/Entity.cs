@@ -19,6 +19,27 @@ using Microsoft.Xna.Framework.Content;
 
 namespace XNA_PoolGame.Graphics.Models
 {
+    public enum VolumeType
+    {
+        BoundingBoxes,
+        BoundingSpheres
+    }
+
+    public enum EnvironmentType
+    {
+        None,
+        Dynamic,
+        Static,
+        DualParaboloid
+    }
+
+    public enum DisplacementType
+    {
+        None,
+        NormalMapping,
+        ParallaxMapping
+    }
+
     /// <summary>
     /// The basic model (without animation).
     /// </summary>
@@ -631,9 +652,9 @@ namespace XNA_PoolGame.Graphics.Models
                     {
                         if (!occluder) return;
 
-                        frustum = World.camera.Frustum;
-                        frustum2 = LightManager.lights[PostProcessManager.shading.Shadows.lightpass].Frustum;
-                        //frustum = LightManager.lights[PostProcessManager.shading.Shadows.lightpass].Frustum;
+                        //frustum = World.camera.Frustum;
+                        //frustum2 = LightManager.lights[PostProcessManager.shading.Shadows.lightpass].Frustum;
+                        frustum = LightManager.lights[PostProcessManager.shading.Shadows.lightpass].Frustum;
                         DrawModel(false, PostProcessManager.DepthEffect, PostProcessManager.shading.Shadows.GetDepthMapTechnique(), null);
                     }
                     #endregion
@@ -679,7 +700,7 @@ namespace XNA_PoolGame.Graphics.Models
                     #endregion
                     break;
                 case RenderPassMode.SSAOPrePass:
-                    #region SSAOPrePass
+                    #region SSAO prepass
                     {
                         frustum = World.camera.Frustum;
                         DrawModel(false, PostProcessManager.SSAOPrePassEffect, "SSAO", delegate { SetParametersSSAO(); });

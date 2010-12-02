@@ -102,6 +102,11 @@ namespace XNA_PoolGame.Graphics.Shadows
 
             World.scenario.DrawScene(gameTime);
 
+            PoolGame.device.SetRenderTarget(0, null);
+            PoolGame.device.SetRenderTarget(1, null);
+            PoolGame.device.SetRenderTarget(2, null);
+
+            resultTIU = PostProcessManager.mainTIU;
         }
         private void RenderSoftShadow()
         {
@@ -143,24 +148,23 @@ namespace XNA_PoolGame.Graphics.Shadows
                 //PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
                 PoolGame.device.Clear(ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
             }
-            else
-            {
-                PostProcessManager.depthTIU.DontUse(); PostProcessManager.velocityTIU.DontUse(); PostProcessManager.velocityLastFrameTIU.DontUse();
+            //else
+            //{
+            //    //PostProcessManager.depthTIU.DontUse(); PostProcessManager.velocityTIU.DontUse(); PostProcessManager.velocityLastFrameTIU.DontUse();
 
-                {
-                    PoolGame.device.SetRenderTarget(1, null);
-                    PoolGame.device.SetRenderTarget(2, null);
+            //    {
+            //        PoolGame.device.SetRenderTarget(1, null);
+            //        PoolGame.device.SetRenderTarget(2, null);
 
-                    //PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target | ClearOptions.Stencil, Color.CornflowerBlue, 1.0f, 0);
+            //        //PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target | ClearOptions.Stencil, Color.CornflowerBlue, 1.0f, 0);
                     PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target, Color.CornflowerBlue, 1.0f, 0);
-                }
-            }
+            //    }
+            //}
 
             PoolGame.device.RenderState.DepthBufferEnable = true;
             PoolGame.device.RenderState.DepthBufferWriteEnable = true;
             PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
 
-            resultTIU = PostProcessManager.mainTIU;
         }
         private void SetupPCFShadowMap()
         {

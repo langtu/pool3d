@@ -280,7 +280,7 @@ namespace XNA_PoolGame.Graphics.Shading
             PostProcessManager.depthTIU.Use();
             PoolGame.device.SetRenderTarget(0, diffuseColorTIU.renderTarget);
             PoolGame.device.SetRenderTarget(1, normalTIU.renderTarget);
-            PoolGame.device.SetRenderTarget(2, PostProcessManager.depthRT);
+            PoolGame.device.SetRenderTarget(2, PostProcessManager.depthTIU.renderTarget);
             if (World.doLightshafts) PoolGame.device.SetRenderTarget(3, scatterTIU.renderTarget);
         }
 
@@ -291,9 +291,9 @@ namespace XNA_PoolGame.Graphics.Shading
 
             PostProcessManager.clearGBuffer_DefEffect.CurrentTechnique = PostProcessManager.clearGBuffer_DefEffect.Techniques[basicTechnique];
             PostProcessManager.clearGBuffer_DefEffect.Begin();
-            PostProcessManager.clearGBuffer_DefEffect.Techniques[0].Passes[0].Begin();
+            PostProcessManager.clearGBuffer_DefEffect.CurrentTechnique.Passes[0].Begin();
             PostProcessManager.quad.Draw(PoolGame.device);
-            PostProcessManager.clearGBuffer_DefEffect.Techniques[0].Passes[0].End();
+            PostProcessManager.clearGBuffer_DefEffect.CurrentTechnique.Passes[0].End();
             PostProcessManager.clearGBuffer_DefEffect.End();
 
             PoolGame.device.Clear(ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
