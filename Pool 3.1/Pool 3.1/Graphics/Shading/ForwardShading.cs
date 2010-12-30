@@ -7,14 +7,14 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace XNA_PoolGame.Graphics.Shading
 {
-    public class FowardShading : BaseShading
+    public class ForwardShading : BaseShading
     {
         PresentationParameters pp;
 
         /// <summary>
         /// Create a new instance of FowardShading class.
         /// </summary>
-        public FowardShading()
+        public ForwardShading()
         {
             format = SurfaceFormat.Color;
             pp = PoolGame.device.PresentationParameters;
