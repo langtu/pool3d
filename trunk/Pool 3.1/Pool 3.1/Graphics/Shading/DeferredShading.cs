@@ -272,7 +272,7 @@ namespace XNA_PoolGame.Graphics.Shading
 
         private void SetGBuffer()
         {
-            diffuseColorTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, format, pp.MultiSampleType, pp.MultiSampleQuality);
+            diffuseColorTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, SurfaceFormat.Color, pp.MultiSampleType, pp.MultiSampleQuality);
             normalTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, format, pp.MultiSampleType, pp.MultiSampleQuality);
             scatterTIU = null;
             if (World.doLightshafts) scatterTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width, PoolGame.Height, format, pp.MultiSampleType, pp.MultiSampleQuality);
