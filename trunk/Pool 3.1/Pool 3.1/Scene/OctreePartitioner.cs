@@ -1,4 +1,8 @@
-﻿using System;
+﻿//#define DRAW_BOUNDINGBOX
+
+#region Using Statements
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +15,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections;
 using XNA_PoolGame.Sticks;
 using USHORT = System.UInt16;
+#endregion
 
 namespace XNA_PoolGame.Scene
 {
@@ -269,6 +274,7 @@ namespace XNA_PoolGame.Scene
             totalItemDrawn = 0;
             Camera activeCamera = World.camera;
 
+#if DRAW_BOUNDINGBOX
             if (activeCamera.EnableFrustumCulling)
             {
                 if (activeCamera.Frustum.Contains(Root.Box) != ContainmentType.Disjoint)
@@ -277,7 +283,7 @@ namespace XNA_PoolGame.Scene
             else
                 DrawBoundingBoxes(Root, activeCamera);
 
-
+#endif
         }
 
         private void DrawBoundingBoxes(OctreeNode node, Camera activeCamera)
@@ -337,7 +343,7 @@ namespace XNA_PoolGame.Scene
             Vector3 Size = (Box.Max - Box.Min);
 
             float maxSize = Math.Max(Math.Max(Size.X, Size.Y), Size.Z);
-            //Size = new Vector3(maxSize);
+            Size = new Vector3(maxSize);
 
             Root.Box.Min = Root.Center - Size / 2f;
             Root.Box.Max = Root.Center + Size / 2f;
