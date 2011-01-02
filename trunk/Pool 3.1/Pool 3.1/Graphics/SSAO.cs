@@ -131,6 +131,7 @@ namespace XNA_PoolGame.Graphics
                 resultTIU = ssaoTIU;
             }
             
+            //binaryTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width / 4, PoolGame.Height / 4, SurfaceFormat.Color);
             binaryTIU = PostProcessManager.GetIntermediateTexture();
 
             PoolGame.device.SetRenderTarget(0, binaryTIU.renderTarget);
