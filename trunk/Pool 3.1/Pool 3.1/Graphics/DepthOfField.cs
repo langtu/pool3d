@@ -59,6 +59,24 @@ namespace XNA_PoolGame.Graphics
             downscale1.DontUse();
         }
 
+        /// <summary>
+        /// Prueba.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="result"></param>
+        protected void GenerateDownscaleTargetSW(RenderTarget2D source, out TextureInUse result)
+        {
+            string techniqueName = "Downscale4";
+
+            PresentationParameters pp = PoolGame.device.PresentationParameters;
+
+            TextureInUse downscale1 = PostProcessManager.GetIntermediateTexture(source.Width / 4, source.Height / 4, source.Format, pp.MultiSampleType, pp.MultiSampleQuality);
+            PostProcessManager.scalingEffect.CurrentTechnique = PostProcessManager.scalingEffect.Techniques[techniqueName];
+            PostProcess(source, downscale1.renderTarget, ref PostProcessManager.scalingEffect);
+
+            result = downscale1;
+        }
+
         protected void GenerateDownscaleTargetHW(RenderTarget2D source, RenderTarget2D result)
         {
             TextureInUse downscale1 = PostProcessManager.GetIntermediateTexture(source.Width / 2, source.Height / 2, source.Format);
@@ -209,6 +227,8 @@ namespace XNA_PoolGame.Graphics
                 // Downscale to 1/16th size and blur
                 TextureInUse downscaleTexture = PostProcessManager.GetIntermediateTexture(source.Width / 4, source.Height / 4, SurfaceFormat.Color, pp.MultiSampleType, pp.MultiSampleQuality);
                 GenerateDownscaleTargetSW(source, downscaleTexture.renderTarget);
+                //TextureInUse downscaleTexture;
+                //GenerateDownscaleTargetSW(source, out downscaleTexture);
 
                 // For the "dumb" DOF type just do a blur, otherwise use a special blur
                 // that takes depth into account

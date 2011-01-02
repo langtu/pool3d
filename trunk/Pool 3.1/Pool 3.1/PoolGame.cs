@@ -1,4 +1,4 @@
-//#define DRAW_DEBUGTEXT
+#define DRAW_DEBUGTEXT
 
 #region Using Statements
 using XNA_PoolGame;
@@ -54,6 +54,9 @@ namespace XNA_PoolGame
         public static Rectangle fullscreen;
         public static Vector2 screenSize;
 
+        // FOR DEBUG ONLY
+        public static int cueBallCollisionPoints = 0;
+
         #region Constants
 
         public const float FieldOfView = MathHelper.PiOver4;
@@ -99,16 +102,16 @@ namespace XNA_PoolGame
 
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
-            graphics.SynchronizeWithVerticalRetrace = false;
+            graphics.SynchronizeWithVerticalRetrace = true;
             graphics.PreferMultiSampling = false;
 
             //graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
             graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
             graphics.IsFullScreen = false;
 
-            
-            graphics.MinimumVertexShaderProfile = ShaderProfile.VS_2_0;
-            graphics.MinimumPixelShaderProfile = ShaderProfile.PS_2_0;
+
+            //graphics.MinimumVertexShaderProfile = ShaderProfile.VS_2_0;
+            //graphics.MinimumPixelShaderProfile = ShaderProfile.PS_2_0;
 
             graphics.PreparingDeviceSettings +=
                new EventHandler<PreparingDeviceSettingsEventArgs>(graphics_PreparingDeviceSettings);
@@ -117,7 +120,6 @@ namespace XNA_PoolGame
             //GraphicsDevice.Reset();
 
             this.IsFixedTimeStep = false;
-            //this.TargetElapsedTime = TimeSpan.FromMilliseconds(16);
            
         }
 
@@ -127,10 +129,12 @@ namespace XNA_PoolGame
             GraphicsAdapter adapter = e.GraphicsDeviceInformation.Adapter;
             SurfaceFormat format = adapter.CurrentDisplayMode.Format;
             DisplayMode currentmode = adapter.CurrentDisplayMode;
-            
-            /*e.GraphicsDeviceInformation.PresentationParameters.MultiSampleQuality = 0;
-            e.GraphicsDeviceInformation.PresentationParameters.MultiSampleType =
-                MultiSampleType.FourSamples;*/
+               
+            // Para PC
+            //e.GraphicsDeviceInformation.PresentationParameters.MultiSampleQuality = 2;
+            //e.GraphicsDeviceInformation.PresentationParameters.MultiSampleType =
+            //    MultiSampleType.FourSamples;
+
 #if XBOX
             e.GraphicsDeviceInformation.PresentationParameters.MultiSampleQuality = 0;
             e.GraphicsDeviceInformation.PresentationParameters.MultiSampleType =
@@ -248,6 +252,10 @@ namespace XNA_PoolGame
             lastkb = kb;
             kb = Keyboard.GetState();
 
+            if (kb.IsKeyDown(Keys.LeftAlt))
+                if (kb.IsKeyDown(Keys.Enter) && lastkb.IsKeyUp(Keys.Enter))
+                    ToggleFullScreen();
+
             if (kb.IsKeyDown(Keys.Q) && lastkb.IsKeyUp(Keys.Q) && World.poolTable != null)
             {
                 World.poolTable.StopAllBalls();
@@ -266,7 +274,7 @@ namespace XNA_PoolGame
 
             if (kb.IsKeyDown(Keys.F12) && lastkb.IsKeyUp(Keys.F12))
             {
-                World.doLightshafts = !World.doLightshafts;
+                World.displayShadowsTextures = !World.displayShadowsTextures;
             }
 
             if (kb.IsKeyDown(Keys.Y) && lastkb.IsKeyUp(Keys.Y))
@@ -333,12 +341,14 @@ namespace XNA_PoolGame
 
             if (kb.IsKeyDown(Keys.F7) && lastkb.IsKeyUp(Keys.F7))
             {
-                World.useSSAOTextures = !World.useSSAOTextures;
+                //World.useSSAOTextures = !World.useSSAOTextures;
+                World.poolTable.cueBall.PositionY += 10f;
             }
 
             if (kb.IsKeyDown(Keys.F8) && lastkb.IsKeyUp(Keys.F8))
             {
-                World.EM = (EnvironmentType)(((int)World.EM + 1) % 4);
+                //World.EM = (EnvironmentType)(((int)World.EM + 1) % 4);
+                World.poolTable.cueBall.PositionY -= 10f;
             }
 
             if (kb.IsKeyDown(Keys.F9) && lastkb.IsKeyUp(Keys.F9))
@@ -445,7 +455,7 @@ namespace XNA_PoolGame
 
             ////////////////////////////////////////// LIGHTS
 
-            if (LightManager.sphereModel != null)
+            if (LightManager.sphereModel != null && false)
             {
                 if (kb.IsKeyDown(Keys.C) && lastkb.IsKeyUp(Keys.C)) currentlight = (currentlight + 1) % LightManager.totalLights;
                 GamePadState state = GamePad.GetState(PlayerIndex.One);
@@ -476,6 +486,14 @@ namespace XNA_PoolGame
             
         }
         #endregion
+
+        public void ToggleFullScreen()
+        {
+            bool toggle = !graphics.IsFullScreen;
+
+            graphics.IsFullScreen = toggle;
+            graphics.ApplyChanges();
+        }
 
         /// <summary>
         /// Reset the basic states of the Graphics Device
@@ -536,7 +554,8 @@ namespace XNA_PoolGame
                 //endTexture = PostProcessManager.shading.Shadows.ShadowMapRT[0].GetTexture();
                 //endTexture = PostProcessManager.shading.Shadows.ShadowRT.GetTexture();
                 //endTexture = World.poolTable.poolBalls[0].mDPMapFront.GetTexture();
-                //endTexture = PostProcessManager.ssao.ssaoTIU.renderTarget.GetTexture();
+                if (World.doSSAO)
+                endTexture = PostProcessManager.ssao.ssaoTIU.renderTarget.GetTexture();
                 //endTexture = PostProcessManager.ssao.normalTIU.renderTarget.GetTexture();
                 //if (PostProcessManager.ssao.viewTIU != null) endTexture = PostProcessManager.ssao.viewTIU.renderTarget.GetTexture();
                 //endTexture = ((DeferredShading)PostProcessManager.shading).scatterTIU.renderTarget.GetTexture();
@@ -545,8 +564,8 @@ namespace XNA_PoolGame
                 //endTexture = ((DeferredShading)PostProcessManager.shading).normalTIU.renderTarget.GetTexture();
                 //if (World.dofType != DOFType.None || World.motionblurType != MotionBlurType.None) endTexture = PostProcessManager.depthRT.GetTexture();
                 Rectangle rect;
-                rect = new Rectangle(0, 0, 128, 128);
-                //rect = new Rectangle(0, 0, PoolGame.Width, PoolGame.Height);
+                rect = new Rectangle(0, 0, 256, 256);
+                rect = new Rectangle(0, 0, PoolGame.Width, PoolGame.Height);
 
                 
                 batch.Begin(SpriteBlendMode.None);
@@ -600,8 +619,8 @@ namespace XNA_PoolGame
             {
                 text += "\nCalled Pocket: " + World.poolTable.roundInfo.calledPocket.pocketIndex;
             }
-            batch.DrawString(spriteFont, text, new Vector2(18, height - 316), Color.Black);
-            batch.DrawString(spriteFont, text, new Vector2(17, height - 317), Color.Tomato);
+            batch.DrawString(spriteFont, text, new Vector2(width - spriteFont.MeasureString(text).X - 10, height - 316), Color.Black);
+            batch.DrawString(spriteFont, text, new Vector2(width - spriteFont.MeasureString(text).X - 11, height - 317), Color.Tomato);
 
             batch.End();
         }
@@ -654,6 +673,7 @@ namespace XNA_PoolGame
             }
             //text += "\nDirection: \nX: " + forward.X + "\nY: " + forward.Y + "\nZ: " + forward.Z + "\n";
 
+            text += "\nBall Collisions Points Octree: " + cueBallCollisionPoints;
             text += "\n\nBloom Name: (" + PostProcessManager.gameplayBloomSettings.Name + ") (KEY: B)" + "\nShow buffer (" + PostProcessManager.showBuffer.ToString() + ")" + " (KEY: V)";
 
 

@@ -86,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cameras\EmptyCamera.cs" />
+    <Compile Include="Graphics\Billboard.cs" />
     <Compile Include="Graphics\DepthOfField.cs" />
     <Compile Include="Graphics\FullQuad.cs" />
     <Compile Include="Graphics\LensFlare.cs" />
@@ -101,11 +102,12 @@
     <Compile Include="Graphics\Scattering.cs" />
     <Compile Include="Graphics\Shading\BaseShading.cs" />
     <Compile Include="Graphics\Shading\DeferredShading.cs" />
-    <Compile Include="Graphics\Shading\FowardShading.cs" />
+    <Compile Include="Graphics\Shading\ForwardShading.cs" />
     <Compile Include="Graphics\Shadows\CubeShadowMapping.cs" />
     <Compile Include="Graphics\Shadows\ScreenSpaceShadowMapping.cs" />
     <Compile Include="Graphics\Shadows\Shadow.cs" />
     <Compile Include="Graphics\Shadows\PSMShadowMapping.cs" />
+    <Compile Include="Graphics\Shadows\VarianceCubeShadowMapping.cs" />
     <Compile Include="Graphics\Shadows\VarianceShadowMapping.cs" />
     <Compile Include="Graphics\Skybox.cs" />
     <Compile Include="Graphics\SSAO.cs" />
@@ -118,6 +120,8 @@
     <Compile Include="PoolTables\Racks\EightBallRack.cs" />
     <Compile Include="PoolTables\Racks\NineBallRack.cs" />
     <Compile Include="PoolTables\Racks\Rack.cs" />
+    <Compile Include="Scene\OctreeCollider.cs" />
+    <Compile Include="Scene\SceneManager.cs" />
     <Compile Include="Screens\Cursor.cs" />
     <Compile Include="Threading\ThreadComponent.cs" />
     <Compile Include="Helpers\Maths.cs" />
@@ -137,7 +141,7 @@
     <Compile Include="Graphics\Models\CustomModel.cs" />
     <Compile Include="Graphics\Models\Entity.cs" />
     <Compile Include="Graphics\Models\ModelManager.cs" />
-    <Compile Include="Graphics\Octree.cs" />
+    <Compile Include="Scene\OctreePartitioner.cs" />
     <Compile Include="Graphics\Particles\Fire\FireParticleSystem.cs" />
     <Compile Include="Graphics\Particles\Fire\SmokeStackFireParticleSystem.cs" />
     <Compile Include="Graphics\Particles\ParticleSettings.cs" />

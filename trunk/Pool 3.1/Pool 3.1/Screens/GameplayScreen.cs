@@ -45,15 +45,15 @@ namespace XNA_PoolGame.Screens
             //World.camera = new ChaseCamera(PoolGame.game);
             World.camera = new FreeCamera(PoolGame.game);
             World.camera.CameraPosition = new Vector3(0, 600, 0);
-            World.camera.FarPlane = 5500.0f;
+            World.camera.FarPlane = 6500.0f;
             if (World.emptycamera == null) World.emptycamera = new EmptyCamera(PoolGame.game);
 
             // SET SHADING TECHNIQUE
             if (PostProcessManager.shading != null) PostProcessManager.shading.Dispose();
             switch (World.shadingTech)
             {
-                case ShadingTechnnique.Foward:
-                    PostProcessManager.shading = new FowardShading();
+                case ShadingTechnnique.Forward:
+                    PostProcessManager.shading = new ForwardShading();
                     break;
                 case ShadingTechnnique.Deferred:
                     PostProcessManager.shading = new DeferredShading();
@@ -313,7 +313,7 @@ namespace XNA_PoolGame.Screens
 
             //        LightManager.sphereModel.Position = new Vector3(LightManager.lights[i].Position.X, LightManager.lights[i].Position.Y, LightManager.lights[i].Position.Z);
             //        LightManager.sphereModel.Draw(gameTime);
-                    
+
             //    }
             //}
             #endregion
@@ -440,6 +440,10 @@ namespace XNA_PoolGame.Screens
             }
 
             #endregion
+
+            World.scenario.sceneManager.DrawScene(gameTime);
+
+            PoolGame.game.Window.Title = "PoolGame. Nodes Drawn: " + World.scenario.sceneManager.totalItemDrawn + "/" + World.scenario.sceneManager.totalItems;
 
             if (World.cursor.Visible)
             {

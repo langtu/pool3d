@@ -16,6 +16,7 @@ float g_sample_rad = 8.85f;
 float g_intensity = 5.0f;
 float g_scale = 7.0f;
 float g_bias = 0.001f;
+float g_gamma = 0.1f;
 
 sampler g_buffer_norm = sampler_state
 {
@@ -151,15 +152,17 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 		//ao += g_self_occlusion;
 	} 
 	ao /= (float)iterations * 4.0f;
+	// ao is "black"
+		
+	////ao  = (ao - 0.5f) * 1.5f + 0.5f; //contrast
+	ao = pow(ao, g_gamma); //gamma
+	//if (ao < 0.5f)
+	//	ao = pow(ao, ao);
+	//else
+	//	ao = pow(ao, 1.0f - ao); 
 	
-	//color.rgb = 1.0f - ao;
-	color.rgb = ao;
-	
-	//color.rgb = (color.rgb - 0.5f) * 1.5f + 0.5f; //contrast
-	color.rgb = pow(color.rgb, 1.0f / 2.5f); //gamma
-	
-	//color.rgb = 1.0f - ao;
-    return color;
+	color.rgb = 1.0f - ao;
+    return (color);
 }
 
 technique SSAOTechnique

@@ -19,6 +19,7 @@ float depthBias[2];
 int totalLights;
 float3 eyePosition;
 float3 LightPosition;
+float CubeBias = 10.5f;
 
 float2 PCFSamples[9];
 
@@ -104,7 +105,7 @@ float4 PCFSM_PS(VertexShaderOutput input) : COLOR
 			(saturate(ProjectedTexCoords.y) == ProjectedTexCoords.y))
 		{
 			float shadowTerm = 0.0f;
-			for( int i = 0; i < 9; i++ )
+			for(int i = 0; i < 9; i++)
 			{
 				float StoredDepthInShadowMap;
 				if (j == 0) StoredDepthInShadowMap = tex2D(ShadowMapSampler0, ProjectedTexCoords + PCFSamples[i]).x;
@@ -181,23 +182,28 @@ VS_CUBIC_OUTPUT cubicShadowMapping_VS(float4 inPosition  : POSITION0)
 float4 cubicShadowMapping_PS(VS_CUBIC_OUTPUT In) : COLOR0
 {
     float4 color = 0.0f;
-    float3 PLightDirection = 0.0f;
-	PLightDirection = LightPosition - In.worldPos;
-	float distance = length(PLightDirection.xyz);
-	PLightDirection = PLightDirection / distance;
 
 	//compute attenuation factor
 	//PLightDirection.w = max(0.0f, 1.0f / (lightAttenuation.x + 
     //              			 lightAttenuation.y * distance + 
     //               			 lightAttenuation.z * distance * distance) );
-                               		 
     
-	//sample depth from cubic shadow map                         		 
-	float shadowMapDepth = texCUBE(cubeShadowMapSampler, float3(-PLightDirection.xy, PLightDirection.z)).x;
-	//depth comparison
-	if((distance-10.1f) <= shadowMapDepth)
-		color.xyz = 1.0f;
+    float shadowTerm = 0.0f;
+    
+    float3 PLightDirection = 0.0f;
+	//for(int i = 0; i < 9; i++)
+    {
+		PLightDirection = LightPosition - In.worldPos;
+		float distance = length(PLightDirection.xyz);
+		PLightDirection = PLightDirection / distance;
+		//sample depth from cubic shadow map
+		float shadowMapDepth = texCUBE(cubeShadowMapSampler, float3(-PLightDirection.xy, PLightDirection.z));
 	
+		//depth comparison
+		if((distance - CubeBias) <= shadowMapDepth)
+			//shadowTerm++;
+			color.xyz = 1.0f;
+	}
     color.w = 1.0f;
     return color;
 }

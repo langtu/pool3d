@@ -1,6 +1,34 @@
-- Engine
-- Algoritmo de z-prepass
+- Crear un ThreadManager y dependiendo de los cores de una máquina crear un threadcollider por cada core, 
+  para verificar las colisiones de las pelotas. Cada threadcollider contiene parte del total de pelotas
+- Determinar cuáles objetos tendrán normal mapping y crear una clase hija en el custommodelprocessor, ya que si no
+  usa normalmapping los modelos están enviando las tangentes a la tarjeta de video y esto no es necesario.
+- Implementar el OctreePartitioner (listo)
+  - Ahora implementar las colisiones con el OctreePartitioner
+    - Crear una clase Triangle que tenga los índices de los vértices de un triángulo
+    - 
+
+- Implementar el Screen Space Blur Shadow con los siguientes arreglos u optimizaciones
+  - Blurear un pixel si y sólo si los píxeles vecinos tienen la misma normal
+  - Blurear menos un pixel que se encuentre lejos de la cámara y blurear más el que está cerca
+
+- Optimizar el octree
+  - Validar que no existan vértices repetidos
+  - Crear, por cada nodo, su IndexBuffer y VertexBuffer
+  - Si un triángulo pertenece a varios nodos, dividirlo.
+
+- Crear una clase DisposeManager que se encargue de disposear los nodos
 - IDisposable para todas las clases
+- Pasar el juego a XNA 4.0
+- Engine en la versión 4.0 de XNA
+- Implementar los light shafts :D
+  - Implementar Interleaved Sampling con pocos planos (25 planos) (ver shaderx3.ppt)
+  - Probar downsampleando el rendertarget
+
+- Validar que los rendertargets se gestionen bien por el PostProcessingManager.
+- Cambiar el formato del RenderTarget del SSAO a Single y dibujar sólo en el Red Channel
+- Algoritmo de z-prepass
+- Acomodar el SSAO, ya que renderiza algunos bordes no deseados en el framebuffer
+
 - Realizar HUD
 	- Menus
 	- Gameplay
@@ -19,7 +47,7 @@
 - Calcular bien la view matrix de una luz
 - Hardware instancing
 	- Separar instancemodel de entity (crear nueva clase)
-	- Terminar todas las técnicas
+	- Terminar todas las técnicas o probar cuál es la mejor técnica e implementarla
 
 - Acomodar Normal mapping con PSM Shadow Mapping
 - Partículas con DOF y MotionBlur (Listo)
@@ -34,7 +62,7 @@
 - DeferredRendering (listo)
 	- Agregar Point lights y luces con objetos sin forma (listo)
 	
-- Modificar custom pipeline para reconocer texturas NormalMap, HeightMap, Specular, AOMap (es un desastre, olvidarse de esto)
+- Modificar custom pipeline para reconocer texturas NormalMap, HeightMap, Specular, AOMap (es un desastre, olvidarse de esto) (probar con los atributos shared en los shaders)
 - SSAO (listo)
 	- http://www.gamedev.net/reference/programming/features/simpleSSAO/
 	- Owen Worley
@@ -47,9 +75,10 @@
 - BSP
 - Colocar los parametros de los efectos en las clases (effect.Parameters[""]) a variables para ser más eficiente
 - Realizar Antialiasing a pata (Edge detection and blur)
-- Incluir buen chequeo de frustrum culling a las sombras
+- Incluir buen chequeo de frustrum culling a las sombras (chequear CreateShadow de Matrix para guiarse)
 - Dual-Paraboloid Reflection
 - Dual-Paraboloid Shadow Maps
 - Tamaño del Shadow Map no cuadrado
 - Cube Shadow map (Listo)
+  - PCF cube shadow map (leer shaderx2 y shaderx3)
 - Implementar subclases de la clase light (DirectionalLight, etc...) con sus atributos respectivos

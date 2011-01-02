@@ -49,7 +49,7 @@ namespace XNA_PoolGame.Graphics
     
     public enum ShadingTechnnique
     {
-        Foward,
+        Forward,
         Deferred
     }
     #endregion

@@ -59,7 +59,7 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 	
 	//ssaoColor -= 0.5f;
 	
-	ssaoColor = 1.0f - ssaoColor;
+	//ssaoColor = 1.0f - ssaoColor;
 	
 	//float4 color = (tex2D(inputSampler, input.TexCoord) * 0.8f) + (0.2f * ssaoColor);
 	float4 color = tex2D(inputSampler, input.TexCoord) * (ssaoColor);

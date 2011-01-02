@@ -12,7 +12,7 @@ using TextureInUse = XNA_PoolGame.Graphics.PostProcessManager.TextureInUse;
 namespace XNA_PoolGame.Graphics
 {
     /// <summary>
-    /// Light Shafts.
+    /// God rays without occlusion.
     /// </summary>
     public class Scattering : IDisposable
     {

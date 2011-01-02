@@ -7,7 +7,7 @@ using System.Collections;
 namespace XNA_PoolGame.Helpers
 {
     /// <summary>
-    /// Represents a map that might have multiples values to a key.
+    /// Represents a map that might have multiple values to a key.
     /// </summary>
     public class MultiMap<TKey, TValue> : IEnumerable
     {

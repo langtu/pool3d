@@ -84,7 +84,7 @@ namespace XNA_PoolGame.Screens.Screen_Manager
             : base(game)
         {
             this.UpdateOrder = 1; this.DrawOrder = 5;
-            TraceEnabled = true;
+            TraceEnabled = false;
 
         }
 
