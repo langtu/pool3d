@@ -30,6 +30,7 @@ using XNA_PoolGame.Threading;
 using XNA_PoolGame.Graphics.Shading;
 using XNA_PoolGame.PoolTables.Racks;
 using XNA_PoolGame.Graphics.Shadows;
+using XNA_PoolGame.Scene;
 #endregion
 
 namespace XNA_PoolGame
@@ -100,8 +101,8 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 1280;
-            graphics.PreferredBackBufferHeight = 720;
+            graphics.PreferredBackBufferWidth = 640;
+            graphics.PreferredBackBufferHeight = 480;
             graphics.SynchronizeWithVerticalRetrace = true;
             graphics.PreferMultiSampling = false;
 
@@ -666,14 +667,15 @@ namespace XNA_PoolGame
             }*/
             text += "\nElapsedGameTime.TotalSeconds: " + gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (World.camera != null)
+            if (World.camera != null && World.scenario != null)
             {
                 text += "\nFrustum Culling: " + World.camera.EnableFrustumCulling.ToString() + " (" + World.camera.ItemsDrawn + "/" + World.scenario.objects.Count + ")" + " (KEY: P)";
                 
             }
             //text += "\nDirection: \nX: " + forward.X + "\nY: " + forward.Y + "\nZ: " + forward.Z + "\n";
 
-            text += "\nBall Collisions Points Octree: " + cueBallCollisionPoints;
+            if (World.scenario != null)
+                text += "\nBall Collisions Points Octree: " + cueBallCollisionPoints + " Level Reached/Max: " + ((OctreePartitioner)World.scenario.sceneManager).collider.SubdivisionReached + "/" + ((OctreePartitioner)World.scenario.sceneManager).MaxNodeLevel;
             text += "\n\nBloom Name: (" + PostProcessManager.gameplayBloomSettings.Name + ") (KEY: B)" + "\nShow buffer (" + PostProcessManager.showBuffer.ToString() + ")" + " (KEY: V)";
 
 

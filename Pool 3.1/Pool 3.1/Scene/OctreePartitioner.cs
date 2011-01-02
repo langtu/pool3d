@@ -248,6 +248,7 @@ namespace XNA_PoolGame.Scene
         private readonly int MaxTriangles;
         private int CurrentSubdivision;
 
+        public int MaxNodeLevel { get; private set; }
         public OctreeCollider collider;
 
         public OctreePartitioner(Scenario Scenario, int MaxLevels)
@@ -258,6 +259,7 @@ namespace XNA_PoolGame.Scene
             this.MaxSubdivisions = MaxLevels;
             this.MaxTriangles = 1000;
             CurrentSubdivision = 0;
+            MaxNodeLevel = 0;
 
             collider = new OctreeCollider(this);
         }
@@ -274,6 +276,7 @@ namespace XNA_PoolGame.Scene
             }
             else
                 DrawBoundingBoxes(Root, activeCamera);
+
 
         }
 
@@ -326,6 +329,7 @@ namespace XNA_PoolGame.Scene
             }
 
             totalItems = 0;
+            MaxNodeLevel = 0;
             PartitionedGeometryData pgd = new PartitionedGeometryData();
             GetSceneGeometryDesc(ref pgd);
 
@@ -349,6 +353,7 @@ namespace XNA_PoolGame.Scene
             node.Box.Max = nodeCenter + nodeSize / 2f;
             node.Box.Min = nodeCenter - nodeSize / 2f;
 
+            MaxNodeLevel = Math.Max(CurrentSubdivision, MaxNodeLevel);
             if (numTriangles > MaxTriangles && CurrentSubdivision < MaxSubdivisions)
             {
                 node.SubDivided = true;

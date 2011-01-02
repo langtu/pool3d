@@ -11,6 +11,7 @@ namespace XNA_PoolGame.Scene
     public class OctreeCollider
     {
         OctreePartitioner partitioner;
+        public int SubdivisionReached { get; private set; }
         public OctreeCollider(OctreePartitioner partitioner)
         {
             this.partitioner = partitioner;
@@ -20,10 +21,12 @@ namespace XNA_PoolGame.Scene
         {
             Queue<OctreeNode> queue = new Queue<OctreeNode>();
             queue.Enqueue(partitioner.Root);
+            SubdivisionReached = 0;
 
             while (queue.Count > 0)
             {
                 OctreeNode node = queue.Dequeue();
+                SubdivisionReached = Math.Max(node.CurrentLevel, SubdivisionReached);
 
                 if (node.SubDivided)
                 {
@@ -62,7 +65,6 @@ namespace XNA_PoolGame.Scene
                 else
                 {
                     float r2 = sphere.Radius * sphere.Radius;
-                    float closestDistance = float.MaxValue; 
                     foreach (KeyValuePair<Entity, GeometryDescription> item in node.PGD.GeometryDescriptions)
                     {
                         GeometryDescription geometry = item.Value;
@@ -82,7 +84,6 @@ namespace XNA_PoolGame.Scene
                             Vector3 closestPoint = closestPointInTriangle(sphere.Center, pos1, pos2, pos3);
                             
                             float squaredDist = (closestPoint - sphere.Center).LengthSquared();
-                            closestDistance = Math.Min(closestDistance, squaredDist);
                             if (squaredDist <= r2)
                             {
                                 // TODO: Cambiar esto, está malo. Debería tener una referencia al triángulo.
