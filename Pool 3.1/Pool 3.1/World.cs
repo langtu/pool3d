@@ -12,6 +12,7 @@ using XNA_PoolGame.PoolTables.Racks;
 using XNA_PoolGame.Screens;
 using XNA_PoolGame.Graphics.Models;
 using XNA_PoolGame.Graphics.Shadows;
+using XNA_PoolGame.Scene;
 
 namespace XNA_PoolGame
 {
@@ -85,11 +86,11 @@ namespace XNA_PoolGame
 
         // SHADOWS SETTINGS
         public static bool displayShadows = true;
-        public static bool displayShadowsTextures = false;
-        public static int shadowMapSize = 1024 / 2;
+        public static bool displayShadowsTextures = true;
+        public static int shadowMapSize = 1024 * 2;
         public static ShadowTechnnique shadowTechnique = ShadowTechnnique.CubeShadowMapping;
         //
-        public static ShadingTechnnique shadingTech = ShadingTechnnique.Foward;
+        public static ShadingTechnnique shadingTech = ShadingTechnnique.Forward;
 
         // NORMAL MAPPING
         public static DisplacementType displacementType = DisplacementType.None;
@@ -125,6 +126,8 @@ namespace XNA_PoolGame
         public static int EMSize = 64;
 
         public static bool doLightshafts = false;
+
+        public static SceneManagerEnum SceneManagerType = SceneManagerEnum.Octree;
     }
 
     

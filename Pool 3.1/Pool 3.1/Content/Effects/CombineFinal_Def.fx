@@ -64,7 +64,8 @@ float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
     float3 diffuseLight = light.rgb;
     float specularLight = light.a;
     
-    return float4(shadowTerm * (diffuseColor * (diffuseLight + AmbientColor.xyz) + specularLight), 1);
+    //return float4(shadowTerm * (diffuseColor * (diffuseLight + AmbientColor.xyz) + specularLight), 1);
+    return float4(shadowTerm * (diffuseColor * (diffuseLight) + specularLight) + diffuseColor * AmbientColor.xyz, 1);
 }
 
 technique Technique1

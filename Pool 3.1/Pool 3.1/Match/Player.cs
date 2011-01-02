@@ -182,16 +182,16 @@ namespace XNA_PoolGame
                                 if (controller.LeftStick.Y != 0.0f)
                                 {
                                     Vector3 newPosition = stick.ballTarget.Position + controller.LeftStick.Y * stick.Direction * dt * 200.0f;
-                                    if (table.roundInfo.cueBallBehindHeadString) newPosition = Vector3.Max(table.headDelimiters[0], Vector3.Min(newPosition, table.headDelimiters[1]));
-                                    else newPosition = Vector3.Max(table.surfaceDelimiters[0], Vector3.Min(newPosition, table.surfaceDelimiters[1]));
+                                    //if (table.roundInfo.cueBallBehindHeadString) newPosition = Vector3.Max(table.headDelimiters[0], Vector3.Min(newPosition, table.headDelimiters[1]));
+                                    //else newPosition = Vector3.Max(table.surfaceDelimiters[0], Vector3.Min(newPosition, table.surfaceDelimiters[1]));
 
                                     stick.ballTarget.Position = newPosition;
                                 }
                                 if (controller.LeftStick.X != 0.0f)
                                 {
                                     Vector3 newPosition = stick.ballTarget.Position - controller.LeftStick.X * stick.AxisOfRotation * dt * 200.0f;
-                                    if (table.roundInfo.cueBallBehindHeadString) newPosition = Vector3.Max(table.headDelimiters[0], Vector3.Min(newPosition, table.headDelimiters[1]));
-                                    else newPosition = Vector3.Max(table.surfaceDelimiters[0], Vector3.Min(newPosition, table.surfaceDelimiters[1]));
+                                    //if (table.roundInfo.cueBallBehindHeadString) newPosition = Vector3.Max(table.headDelimiters[0], Vector3.Min(newPosition, table.headDelimiters[1]));
+                                    //else newPosition = Vector3.Max(table.surfaceDelimiters[0], Vector3.Min(newPosition, table.surfaceDelimiters[1]));
 
                                     stick.ballTarget.Position = newPosition;
                                 }
@@ -207,13 +207,15 @@ namespace XNA_PoolGame
                                 }
                                 else
                                 {
-                                    if (prevcontroller.LeftStick.X > 0.0f && controller.LeftStick.X > 0.0f) repeater = MathHelper.Clamp(repeater + 0.04f, 1.0f, 24.0f);
-                                    else if (prevcontroller.LeftStick.X < 0.0f && controller.LeftStick.X < 0.0f) repeater = MathHelper.Clamp(repeater + 0.04f, 1.0f, 24.0f);
+                                    if (prevcontroller.LeftStick.X > 0.0f && controller.LeftStick.X > 0.0f) repeater = MathHelper.Clamp(repeater + 50f * dt, 1.0f, 12.0f);
+                                    else if (prevcontroller.LeftStick.X < 0.0f && controller.LeftStick.X < 0.0f) repeater = MathHelper.Clamp(repeater + 50f * dt, 1.0f, 12.0f);
 
-                                    if (prevcontroller.LeftStick.X != 0.0f && controller.LeftStick.X == 0.0f) repeater = 1.0f;
+                                    else if (prevcontroller.LeftStick.X != 0.0f && controller.LeftStick.X == 0.0f)
+                                        repeater = 1.0f;
 
 
                                     stick.AngleY -= controller.LeftStick.X * repeater * dt * 20.0f;
+                                    Console.WriteLine(repeater);
                                 }
                             }
 
@@ -262,7 +264,7 @@ namespace XNA_PoolGame
                             stick.charging = false;
                         }
                         else if (prevcontroller.isAPressed && controller.isAPressed)
-                            stick.Power = MathHelper.Clamp(stick.Power + (controller.RightTrigger - controller.LeftStick.Y * 20.0f) * dt * 40.0f, 0.0f, stick.MAX_POWER);
+                            stick.Power = MathHelper.Clamp(stick.Power + (controller.RightTrigger - controller.LeftStick.Y * 20.0f) * dt * 400.0f, 0.0f, stick.MAX_POWER);
 
                     }
                 }

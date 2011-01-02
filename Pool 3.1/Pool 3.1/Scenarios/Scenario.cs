@@ -11,6 +11,7 @@ using XNA_PoolGame.Graphics.Models;
 using XNA_PoolGame.Graphics.Particles;
 using Microsoft.Xna.Framework.Graphics;
 using XNA_PoolGame.Cameras;
+using XNA_PoolGame.Scene;
 #endregion
 
 namespace XNA_PoolGame.Scenarios
@@ -65,6 +66,7 @@ namespace XNA_PoolGame.Scenarios
         /// </summary>
         public MultiMap<int, Entity> dems;
 
+        public SceneManager sceneManager;
 
         public MultiMap<int, VolumetricLightEntity> volumetriclights;
 
@@ -75,7 +77,10 @@ namespace XNA_PoolGame.Scenarios
 
         public bool texcubeGenerated = false;
         #endregion
-        
+
+        // HACK
+        private bool hack;
+
         #region Properties
         /// <summary>
         /// Object's scene.
@@ -109,11 +114,16 @@ namespace XNA_PoolGame.Scenarios
             lights = new List<Light>();
             volumetriclights = new MultiMap<int, VolumetricLightEntity>();
 
-            this.ambientColor = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
-
             //if (World.EM == EnvironmentType.Dynamic || World.EM == EnvironmentType.Static)
             //    refCubeMap = new RenderTargetCube(PoolGame.device, World.EMSize, 1, PoolGame.device.PresentationParameters.BackBufferFormat);
             CreateLights();
+            switch (World.SceneManagerType)
+            {
+                case SceneManagerEnum.Octree:
+                    sceneManager = new OctreePartitioner(this, 40);
+                    break;
+            }
+            hack = false;
         }
 
         public virtual void LoadContent()
@@ -128,6 +138,11 @@ namespace XNA_PoolGame.Scenarios
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
+            if (!hack)
+            {
+                sceneManager.BuildScene();
+                hack = true;
+            }
         }
 
         public virtual void Draw(GameTime gameTime) 
@@ -151,6 +166,7 @@ namespace XNA_PoolGame.Scenarios
         /// <param name="gameTime"></param>
         public void DrawScene(GameTime gameTime)
         {
+            //sceneManager.DrawScene(gameTime);
             foreach (DrawableComponent bm in this.Objects)
             {
                 if (bm.Visible) bm.Draw(gameTime);

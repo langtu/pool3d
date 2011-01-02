@@ -53,6 +53,11 @@ namespace XNA_PoolGame.Screens
             base.LoadContent();
         }
 
+        /// <summary>
+        /// Calculates the cursor ray for the current mouse position. See implementation
+        /// for details.
+        /// </summary>
+        /// <returns></returns>
         public Ray CalculateCursorRay()
         {
             Vector4 nearSource;

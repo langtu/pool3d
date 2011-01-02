@@ -15,6 +15,7 @@ using XNA_PoolGame.Scenarios;
 using System.Threading;
 using XNA_PoolGame.Graphics.Models;
 using XNA_PoolGame.PoolTables.Racks;
+using XNA_PoolGame.Scene;
 #endregion
 
 namespace XNA_PoolGame.PoolTables
@@ -184,7 +185,7 @@ namespace XNA_PoolGame.PoolTables
         {
             //this.DEM = true;
             loaded = false;
-
+            //this.drawboundingvolume = true;
 
             /////
             this.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
@@ -408,6 +409,12 @@ namespace XNA_PoolGame.PoolTables
                     BallsStopped(this, EventArgs.Empty);
             }
 
+            // PRUEBA!
+            List<Vector3> points = new List<Vector3>();
+            List<int> triangles = new List<int>();
+            BoundingSphere bs = new BoundingSphere(cueBall.Position, cueBall.Radius);
+            ((OctreePartitioner)World.scenario.sceneManager).collider.CheckCollisions(bs, ref triangles, ref points);
+            PoolGame.cueBallCollisionPoints = points.Count;
             base.Update(gameTime);
             
         }

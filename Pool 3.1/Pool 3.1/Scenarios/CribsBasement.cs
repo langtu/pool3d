@@ -72,6 +72,8 @@ namespace XNA_PoolGame.Scenarios
             : base(game)
         {
 
+            this.AmbientColor = new Vector4(0.12f, 0.12f, 0.12f, 1.0f);
+            //this.AmbientColor = Vector4.Zero;
         }
 
         public override void Initialize()
@@ -436,12 +438,12 @@ namespace XNA_PoolGame.Scenarios
 
             ////////////////////////////////////////////////
             //World.scenario.Objects.Add(ballsinstanced);
-            
+
             World.scenario.Objects.Add(smokestack);
             World.scenario.Objects.Add(smokeStackFireWood);
             World.scenario.Objects.Add(smokeFireWoodKeeper);
-            //World.scenario.Objects.Add(smokeFireWoodOut);
-            
+            World.scenario.Objects.Add(smokeFireWoodOut);
+
 
             for (int i = 0; i < tabourets.Length; ++i)
                 World.scenario.Objects.Add(tabourets[i]);
@@ -469,8 +471,8 @@ namespace XNA_PoolGame.Scenarios
             World.scenario.Objects.Add(carpet);
             World.scenario.Objects.Add(bar);
             World.scenario.Objects.Add(vase);
-            
-            
+
+
             foreach (Entity wall in walls)
                 World.scenario.Objects.Add(wall);
 
@@ -498,7 +500,7 @@ namespace XNA_PoolGame.Scenarios
             lights = new List<Light>();
 
             //Light light1 = new Light(new Vector3(-178, 383, 0));
-            Light light1 = new Light(new Vector3(0, 383, 0));
+            Light light1 = new Light(new Vector3(0, 383, 0)); // Cube map
 
             light1.DiffuseColor = new Vector4(0.9f, 0.85f, 0.9f, 1.0f);
             //light1.DepthBias = 0.01193f; // 2048
@@ -539,11 +541,6 @@ namespace XNA_PoolGame.Scenarios
             
         }
 
-        public override void LoadContent()
-        {
-            base.LoadContent();
-        }
-
         public override void UpdateParticles(GameTime gameTime)
         {
             const int fireParticlesPerFrame = 13;
@@ -562,10 +559,10 @@ namespace XNA_PoolGame.Scenarios
             {
                 if (World.doDistortion)
                 {
-                    for (int i = 0; i < 2; ++i)
+                    for (int i = 0; i < 1; ++i)
                     {
-                        //heatParticles.AddParticle(center + new Vector3(-45.0f + (float)Maths.random.NextDouble() * 95.0f, 45.0f + (float)Maths.random.NextDouble() * 20.0f, -20.0f + (float)Maths.random.NextDouble() * 40), Vector3.Zero);
-                        heatParticles.AddParticle(center + new Vector3(-15.0f, 45.0f , -20.0f), Vector3.Zero);
+                        heatParticles.AddParticle(center + new Vector3(-45.0f + (float)Maths.random.NextDouble() * 95.0f, 45.0f + (float)Maths.random.NextDouble() * 20.0f, -20.0f + (float)Maths.random.NextDouble() * 40), Vector3.Zero);
+                        //heatParticles.AddParticle(center + new Vector3(-15.0f, 45.0f , -20.0f), Vector3.Zero);
                     }
                 }
             }

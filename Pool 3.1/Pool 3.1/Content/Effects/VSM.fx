@@ -95,7 +95,7 @@ float4 PCFSM_PS(VertexShaderOutput input) : COLOR
 			float4 moments;
 			if (j == 0) moments = tex2D(ShadowMapSampler0, ProjectedTexCoords);
 			else moments = tex2D(ShadowMapSampler1, ProjectedTexCoords);
-					
+			
   			float E_x2 = moments.y;
 			float Ex_2 = moments.x * moments.x;
 			float variance = min(max(E_x2 - Ex_2, 0.0f) + 0.0005f, 1.0);

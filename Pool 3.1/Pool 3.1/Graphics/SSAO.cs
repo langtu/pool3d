@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 namespace XNA_PoolGame.Graphics
 {
     /// <summary>
-    /// Screen Space Ambient Occlussion.
+    /// Screen Space Ambient Occlusion.
     /// </summary>
     public class SSAO : IDisposable
     {
@@ -21,6 +21,10 @@ namespace XNA_PoolGame.Graphics
         public float radius;
         public float bias;
         public float screensize;
+        /// <summary>
+        /// 1.0f means no gamma operator.
+        /// </summary>
+        public float gamma;
         public Texture2D noiseTexture;
         public Effect effect;
         public Effect combinefinal;
@@ -37,7 +41,7 @@ namespace XNA_PoolGame.Graphics
             noiseTexture = PoolGame.content.Load<Texture2D>("Textures\\noise");
             effect = PoolGame.content.Load<Effect>("Effects\\SSAO");
             combinefinal = PoolGame.content.Load<Effect>("Effects\\Multiply");
-            intensity = 8.0f;//4.0f;//2.0f;
+            intensity = 16.0f;//4.0f;//2.0f;
             scale = 1.5f;//1.0f;
             randomsize = (float)(noiseTexture.Width * noiseTexture.Height);
             screensize = (float)(PoolGame.Width * PoolGame.Height);
@@ -45,7 +49,8 @@ namespace XNA_PoolGame.Graphics
             bias = 0.01f;
             halfPixel.X = 0.5f / (float)PoolGame.Width;
             halfPixel.Y = 0.5f / (float)PoolGame.Height;
-            blurIt = true;
+            gamma = 0.8f;
+            blurIt = false;
 
             effect.Parameters["halfPixel"].SetValue(halfPixel);
             effect.Parameters["g_screen_size"].SetValue(screensize);
@@ -56,6 +61,7 @@ namespace XNA_PoolGame.Graphics
             effect.Parameters["g_intensity"].SetValue(intensity);
             effect.Parameters["g_bias"].SetValue(bias);
             effect.Parameters["g_sample_rad"].SetValue(radius);
+            effect.Parameters["g_gamma"].SetValue(gamma);
 
             effect.Parameters["RandomMap"].SetValue(noiseTexture);
             pp = PoolGame.device.PresentationParameters;
@@ -64,12 +70,19 @@ namespace XNA_PoolGame.Graphics
         public void Draw(TextureInUse source)
         {
             //ssaoTIU = PostProcessManager.GetIntermediateTexture();
-            ssaoTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width / 4, PoolGame.Height / 4);
+            ssaoTIU = PostProcessManager.GetIntermediateTexture(PoolGame.Width / 2, PoolGame.Height / 2);
             PoolGame.device.SetRenderTarget(0, ssaoTIU.renderTarget);
             PoolGame.device.SetRenderTarget(1, null);
             PoolGame.device.SetRenderTarget(2, null);
 
             PoolGame.device.Clear(Color.Black);
+
+            /////////////////// TESTING
+            effect.Parameters["g_scale"].SetValue(scale);
+            effect.Parameters["g_intensity"].SetValue(intensity);
+            effect.Parameters["g_bias"].SetValue(bias);
+            effect.Parameters["g_sample_rad"].SetValue(radius);
+            effect.Parameters["g_gamma"].SetValue(gamma);
 
             effect.Parameters["NormalMap"].SetValue(normalTIU.renderTarget.GetTexture());
             if (World.shadingTech == ShadingTechnnique.Deferred)

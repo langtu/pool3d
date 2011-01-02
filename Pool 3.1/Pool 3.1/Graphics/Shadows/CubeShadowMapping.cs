@@ -16,19 +16,20 @@ namespace XNA_PoolGame.Graphics.Shadows
     public class CubeShadowMapping : Shadow
     {
         public RenderTargetCube renderCube;
-        PresentationParameters pp;
-        int size = 512;
+        protected PresentationParameters pp;
+        protected int size = 512;
 
-        Matrix[] views = new Matrix[6];
-        BoundingFrustum[] frustums = new BoundingFrustum[6];
-        Matrix projection;
-        bool firstTime;
-        int currentFace;
+        protected Matrix[] views = new Matrix[6];
+        protected BoundingFrustum[] frustums = new BoundingFrustum[6];
+        protected Matrix projection;
+        protected bool firstTime;
+        protected int currentFace;
+        protected float bias;
 
         /// <summary>
         /// Cube Render Target Format.
         /// </summary>
-        private SurfaceFormat format;
+        protected SurfaceFormat format;
 
         public BoundingFrustum CurrentFrustum
         {
@@ -41,15 +42,17 @@ namespace XNA_PoolGame.Graphics.Shadows
 
             format = SurfaceFormat.Single;
             renderCube = new RenderTargetCube(PoolGame.device, size, 1, format, pp.MultiSampleType, pp.MultiSampleQuality, RenderTargetUsage.DiscardContents);
-            stencilBuffer = new DepthStencilBuffer(PoolGame.device, size, size, PoolGame.device.PresentationParameters.AutoDepthStencilFormat);
+            stencilBuffer = new DepthStencilBuffer(PoolGame.device, size, size, PoolGame.device.PresentationParameters.AutoDepthStencilFormat, pp.MultiSampleType, pp.MultiSampleQuality);
             ShadowRT = new RenderTarget2D(PoolGame.device, pp.BackBufferWidth, pp.BackBufferHeight, 1, PoolGame.device.DisplayMode.Format,
                 pp.MultiSampleType, pp.MultiSampleQuality);
 
             shadowTIU = new TextureInUse(ShadowRT, false);
             PostProcessManager.renderTargets.Add(shadowTIU);
 
-            projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver2, 1.0f, 1.0f, 2750.0f);
+            projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver2, 1.0f, 0.1f, 2500.0f);
             firstTime = true;
+
+            bias = 1f / 2500.0f;
         }
 
         public override void Draw(GameTime gameTime)
@@ -59,6 +62,8 @@ namespace XNA_PoolGame.Graphics.Shadows
             ///////////////// PASS 1 - Cube Depth Map ////////
             PostProcessManager.ChangeRenderMode(RenderPassMode.CubeShadowMapPass);
 
+            //PoolGame.device.ScissorRectangle = new Rectangle(0, 0, PoolGame.Width, PoolGame.Height);
+            //PoolGame.device.RenderState.ScissorTestEnable = true;
             BoundingFrustum cameraFrustum = World.camera.Frustum;
 
             oldBuffer = PoolGame.device.DepthStencilBuffer;
@@ -72,7 +77,7 @@ namespace XNA_PoolGame.Graphics.Shadows
                 SetDepthMapParameters(LightManager.lights[i]);
                 for (int iFace = 0; iFace < 6; iFace++)
                 {
-                    if (cameraFrustum.Contains(frustums[iFace]) == ContainmentType.Disjoint)
+                    if (World.camera.EnableFrustumCulling && cameraFrustum.Contains(frustums[iFace]) == ContainmentType.Disjoint)
                         continue;
 
                     currentFace = iFace;
@@ -94,19 +99,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             World.scenario.DrawScene(gameTime);
             shadowOcclussionTIU = shadowTIU;
 
-
-            ///////////////// PASS 3 - SSSM /////////////
-            World.camera.ItemsDrawn = 0;
-            PostProcessManager.ChangeRenderMode(RenderPassMode.ScreenSpaceSoftShadowRender);
-            RenderSoftShadow();
-
-            World.scenario.DrawScene(gameTime);
-
-            PoolGame.device.SetRenderTarget(0, null);
-            PoolGame.device.SetRenderTarget(1, null);
-            PoolGame.device.SetRenderTarget(2, null);
-
-            resultTIU = PostProcessManager.mainTIU;
+            //PoolGame.device.RenderState.ScissorTestEnable = false;
         }
         private void RenderSoftShadow()
         {
@@ -175,7 +168,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             PoolGame.device.SetRenderTarget(0, ShadowRT);
             PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Target, Color.White, 1.0f, 0);
 
-            PoolGame.device.RenderState.CullMode = CullMode.None;
+            PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
         }
 
         private void SetupShadowMap(int light, int iFace)
@@ -183,7 +176,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             PostProcessManager.DepthEffect.Parameters["ViewProj"].SetValue(frustums[currentFace].Matrix);
 
             PoolGame.device.RenderState.DepthBufferEnable = true;
-            PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
+            PoolGame.device.RenderState.CullMode = CullMode.CullClockwiseFace;
             // Render the scene to all cubemap faces.
             CubeMapFace cubeMapFace = (CubeMapFace)iFace;
 
@@ -249,12 +242,24 @@ namespace XNA_PoolGame.Graphics.Shadows
 
         public override void Pass3(GameTime gameTime)
         {
-            
+
         }
 
         public override void Pass4(GameTime gameTime)
         {
-            
+
+            ///////////////// PASS 3 - SSSM /////////////
+            World.camera.ItemsDrawn = 0;
+            PostProcessManager.ChangeRenderMode(RenderPassMode.ScreenSpaceSoftShadowRender);
+            RenderSoftShadow();
+
+            World.scenario.DrawScene(gameTime);
+
+            PoolGame.device.SetRenderTarget(0, null);
+            PoolGame.device.SetRenderTarget(1, null);
+            PoolGame.device.SetRenderTarget(2, null);
+
+            resultTIU = PostProcessManager.mainTIU;
         }
 
         public override string GetDepthMapTechnique()
@@ -268,6 +273,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             PostProcessManager.PCFShadowMap.Parameters["eyePosition"].SetValue(World.camera.CameraPosition);
             PostProcessManager.PCFShadowMap.Parameters["ViewProj"].SetValue(World.camera.ViewProjection);
             PostProcessManager.PCFShadowMap.Parameters["LightPosition"].SetValue(lights[0].Position);
+            PostProcessManager.PCFShadowMap.Parameters["CubeBias"].SetValue(bias);
         }
 
         public override void SetDepthMapParameters(Light light)

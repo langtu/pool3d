@@ -120,7 +120,7 @@ namespace XNA_PoolGame.Graphics.Shadows
                 PoolGame.device.SetRenderTarget(2, PostProcessManager.velocityRT);
 
                 //PoolGame.device.Clear(ClearOptions.Target | ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
-                PoolGame.device.Clear(ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Black, 1.0f, 0);
+                PoolGame.device.Clear(ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
                 PostProcessManager.DrawQuad(PostProcessManager.whiteTexture, PostProcessManager.clearGBufferEffect);
             }
 

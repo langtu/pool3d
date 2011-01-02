@@ -167,6 +167,10 @@ namespace XNA_PoolGame.Graphics.Models
 
         #region Properties
 
+        public BoundingBox[] Boxes
+        {
+            get { return boxes; }
+        }
         public BoundingSphere BoundingSphere
         {
             get { return boundingSphere; }
@@ -650,7 +654,7 @@ namespace XNA_PoolGame.Graphics.Models
                 case RenderPassMode.ShadowMapRender:
                     #region Depth Map
                     {
-                        if (!occluder) return;
+                        //if (!occluder) return;
 
                         //frustum = World.camera.Frustum;
                         //frustum2 = LightManager.lights[PostProcessManager.shading.Shadows.lightpass].Frustum;

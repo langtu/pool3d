@@ -102,7 +102,7 @@ namespace XNA_PoolGame.Graphics.Shadows
         public void SetupShadowMap(int lightindex)
         {
             PoolGame.device.RenderState.DepthBufferEnable = true;
-            PoolGame.device.RenderState.CullMode = CullMode.CullCounterClockwiseFace;
+            PoolGame.device.RenderState.CullMode = CullMode.CullClockwiseFace;
 
             //Render Shadow Map
             PoolGame.device.SetRenderTarget(0, ShadowMapRT[lightindex]);
