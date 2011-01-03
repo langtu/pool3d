@@ -21,6 +21,7 @@ namespace XNA_PoolGame.Scene
 
         public int totalItemDrawn;
         public int totalItems;
+        public Collider collider;
 
         protected SceneManager(Scenario scenario)
         {

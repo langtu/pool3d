@@ -38,7 +38,9 @@ namespace XNA_PoolGame.Scene
     {
         public USHORT[] Indices;
         public Vector3[] Vertices;
+        public Vector3[] Normals;
 
+        public Vector3[] TriangleNormals;
         public int Triangles;
     }
 
@@ -51,33 +53,27 @@ namespace XNA_PoolGame.Scene
             GeometryDescriptions = new Dictionary<Entity, GeometryDescription>();
         }
 
-        public void AddModelPart(ref Entity entity, Vector3[] positions, USHORT[] indices)
+        public void AddModelPart(ref Entity entity, Vector3[] positions, USHORT[] indices, Vector3[] normals, Vector3[] trianglesNormals)
         {
             GeometryDescription geometry;
             if (GeometryDescriptions.TryGetValue(entity, out geometry))
             {
                 int IndicesSize = geometry.Indices.Length;
                 int VertexSize = geometry.Vertices.Length;
-
-                //USHORT[] newIndices = new USHORT[geometry.Indices.Length + indices.Length];
-                //Vector3[] newVertices = new Vector3[geometry.Vertices.Length + positions.Length];
-
-
-                //Array.Copy(geometry.Indices, newIndices, IndicesSize);
-                //Array.Copy(geometry.Vertices, newVertices, VertexSize);
-                //Array.Copy(indices, 0, newIndices, IndicesSize, indices.Length);
-                //Array.Copy(positions, 0, newVertices, VertexSize, positions.Length);
-
-                //geometry.Indices = newIndices;
-                //geometry.Vertices = newVertices;
+                int NormalSize = geometry.Normals.Length;
+                int TriangleNormalsSize = geometry.TriangleNormals.Length;
 
                 Array.Resize<USHORT>(ref geometry.Indices, geometry.Indices.Length + indices.Length);
                 Array.Resize<Vector3>(ref geometry.Vertices, geometry.Vertices.Length + positions.Length);
+                Array.Resize<Vector3>(ref geometry.Normals, geometry.Normals.Length + normals.Length);
+                Array.Resize<Vector3>(ref geometry.TriangleNormals, geometry.TriangleNormals.Length + trianglesNormals.Length);
                 geometry.Triangles += indices.Length / 3;
 
 
                 Array.Copy(indices, 0, geometry.Indices, IndicesSize, indices.Length);
                 Array.Copy(positions, 0, geometry.Vertices, VertexSize, positions.Length);
+                Array.Copy(normals, 0, geometry.Normals, NormalSize, normals.Length);
+                Array.Copy(trianglesNormals, 0, geometry.TriangleNormals, TriangleNormalsSize, trianglesNormals.Length);
 
                 for (int i = IndicesSize; i < geometry.Indices.Length; i++)
                 {
@@ -91,8 +87,13 @@ namespace XNA_PoolGame.Scene
 
                 geometry.Indices = new USHORT[indices.Length];
                 geometry.Vertices = new Vector3[positions.Length];
+                geometry.Normals = new Vector3[normals.Length];
+                geometry.TriangleNormals = new Vector3[indices.Length / 3];
+
                 Array.Copy(indices, geometry.Indices, indices.Length);
                 Array.Copy(positions, geometry.Vertices, positions.Length);
+                Array.Copy(normals, geometry.Normals, normals.Length);
+                Array.Copy(trianglesNormals, geometry.TriangleNormals, trianglesNormals.Length);
 
                 geometry.Triangles = indices.Length / 3;
                 GeometryDescriptions.Add(entity, geometry);
@@ -254,7 +255,6 @@ namespace XNA_PoolGame.Scene
         private int CurrentSubdivision;
 
         public int MaxNodeLevel { get; private set; }
-        public OctreeCollider collider;
 
         public OctreePartitioner(Scenario Scenario, int MaxLevels)
             : base(Scenario)
@@ -468,6 +468,7 @@ namespace XNA_PoolGame.Scene
 
                 GeometryDescription newGeometry = new GeometryDescription();
                 newGeometry.Indices = new USHORT[list.TriangleCount * 3];
+                newGeometry.TriangleNormals = new Vector3[list.TriangleCount];
 
                 int index = 0;
                 for (int i = 0; i < list.Triangles.Count; i++)
@@ -478,6 +479,16 @@ namespace XNA_PoolGame.Scene
                         newGeometry.Indices[index * 3 + 1] = pgd.GeometryDescriptions[entity].Indices[i * 3 + 1];
                         newGeometry.Indices[index * 3 + 2] = pgd.GeometryDescriptions[entity].Indices[i * 3 + 2];
 
+                        //Vector3 v1 = pgd.GeometryDescriptions[entity].Vertices[pgd.GeometryDescriptions[entity].Indices[i * 3]]
+                        //    - pgd.GeometryDescriptions[entity].Vertices[pgd.GeometryDescriptions[entity].Indices[i * 3 + 1]];
+
+                        //Vector3 v2 = pgd.GeometryDescriptions[entity].Vertices[pgd.GeometryDescriptions[entity].Indices[i * 3]]
+                        //    - pgd.GeometryDescriptions[entity].Vertices[pgd.GeometryDescriptions[entity].Indices[i * 3 + 2]];
+
+                        //newGeometry.TriangleNormals[index] = Vector3.Cross(v2, v1);
+                        //newGeometry.TriangleNormals[index].Normalize();
+
+                        newGeometry.TriangleNormals[index] = pgd.GeometryDescriptions[entity].TriangleNormals[i];
                         newGeometry.Triangles++;
                         index++;
                     }
@@ -485,6 +496,9 @@ namespace XNA_PoolGame.Scene
                 //newGeometry.Vertices = new Vector3[pgd.GeometryDescriptions[entity].Vertices.Length];
                 //Array.Copy(pgd.GeometryDescriptions[entity].Vertices, newGeometry.Vertices, pgd.GeometryDescriptions[entity].Vertices.Length);
                 newGeometry.Vertices = pgd.GeometryDescriptions[entity].Vertices;
+                newGeometry.Normals = pgd.GeometryDescriptions[entity].Normals;
+
+
 
                 //List<Vector3> tmpVertices = new List<Vector3>();
                 //int index = 0;
@@ -699,11 +713,10 @@ namespace XNA_PoolGame.Scene
                     // Para cada CustomModelPart, agrega la información de la geometría.
                     foreach (CustomModelPart modelPart in entity.ModelL1.modelParts)
                     {
-                        VertexElement[] VertexElements = modelPart.VertexDeclaration.GetVertexElements();
-                        //if (VertexPositionNormalTextureBinormalNormal.VertexElements == null) 
-                        //    VertexPositionNormalTextureBinormalNormal.VertexElements = modelPart.VertexDeclaration.GetVertexElements();
+                        //VertexElement[] VertexElements = modelPart.VertexDeclaration.GetVertexElements();
 
                         Vector3[] localpositions = new Vector3[modelPart.VertexCount];
+                        Vector3[] localnormals = new Vector3[modelPart.VertexCount];
 
                         VertexPositionNormalTextureBinormalTangent[] partInfo = new VertexPositionNormalTextureBinormalTangent[modelPart.VertexCount];
 
@@ -713,13 +726,29 @@ namespace XNA_PoolGame.Scene
                         {
                             // Aplica la transformación que tiene el entity a todos los vértices.
                             localpositions[i] = Vector3.Transform(partInfo[i].Position, entity.LocalWorld);
+                            localnormals[i] = Vector3.Transform(partInfo[i].Normal, entity.LocalWorld);
+                            localnormals[i].Normalize();
                         }
+
 
                         int bytes = modelPart.IndexBuffer.SizeInBytes / (modelPart.TriangleCount * 3);
                         USHORT[] localindices = new USHORT[modelPart.TriangleCount * 3];
                         modelPart.IndexBuffer.GetData(localindices);
 
-                        partitionedData.AddModelPart(ref entity, localpositions, localindices);
+                        Vector3[] trianglesNormals = new Vector3[modelPart.TriangleCount];
+                        for (int i = 0; i < modelPart.TriangleCount; i++)
+                        {
+                            Vector3 v1 = localpositions[localindices[i * 3]]
+                            - localpositions[localindices[i * 3 + 1]];
+
+                            Vector3 v2 = localpositions[localindices[i * 3]]
+                            - localpositions[localindices[i * 3 + 2]];
+
+                            trianglesNormals[i] = Vector3.Cross(v2, v1);
+                            trianglesNormals[i].Normalize();
+                        }
+
+                        partitionedData.AddModelPart(ref entity, localpositions, localindices, localnormals, trianglesNormals);
                     }
                 }
             }

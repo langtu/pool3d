@@ -5,7 +5,7 @@ using System.Text;
 
 namespace XNA_PoolGame.Graphics
 {
-    class Billboard
+    public class Billboard
     {
     }
 }

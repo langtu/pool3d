@@ -333,11 +333,23 @@ namespace XNA_PoolGame
             }
             if (kb.IsKeyDown(Keys.F3) && lastkb.IsKeyUp(Keys.F3))
             {
-                int next = (((int)World.instancingTech) + 1);
-                if (next > (int)InstancingTechnique.NoInstancingOrStateBatching) World.instancingTech = 0;
-                else World.instancingTech = (InstancingTechnique)next;
+                //int next = (((int)World.instancingTech) + 1);
+                //if (next > (int)InstancingTechnique.NoInstancingOrStateBatching) World.instancingTech = 0;
+                //else World.instancingTech = (InstancingTechnique)next;
 
-                ((CribsBasement)World.scenario).ballsinstanced.SetInstancingTechnique(World.instancingTech);
+                //((CribsBasement)World.scenario).ballsinstanced.SetInstancingTechnique(World.instancingTech);
+                int number= Maths.random.Next(1, 15);
+                Ball ball = new Ball(this, number, "Models\\Balls\\newball", "Textures\\Balls\\ball " + number, World.poolTable, World.ballRadius);
+                ball.Position = World.camera.CameraPosition;
+
+                Vector3 dir = -World.camera.Forward;
+                dir.Normalize();
+                ball.velocity = dir * 100.0f;
+
+                Components.Add(ball);
+                World.scenario.Objects.Add(ball);
+                World.poolTable.poolBalls.Add(ball);
+                World.poolTable.TotalBalls++;
             }
 
             if (kb.IsKeyDown(Keys.F7) && lastkb.IsKeyUp(Keys.F7))
@@ -674,8 +686,8 @@ namespace XNA_PoolGame
             }
             //text += "\nDirection: \nX: " + forward.X + "\nY: " + forward.Y + "\nZ: " + forward.Z + "\n";
 
-            if (World.scenario != null)
-                text += "\nBall Collisions Points Octree: " + cueBallCollisionPoints + " Level Reached/Max: " + ((OctreePartitioner)World.scenario.sceneManager).collider.SubdivisionReached + "/" + ((OctreePartitioner)World.scenario.sceneManager).MaxNodeLevel;
+            //if (World.scenario != null)
+                //text += "\nBall Collisions Points Octree: " + cueBallCollisionPoints + " Level Reached/Max: " + ((OctreePartitioner)World.scenario.sceneManager).collider.SubdivisionReached + "/" + ((OctreePartitioner)World.scenario.sceneManager).MaxNodeLevel;
             text += "\n\nBloom Name: (" + PostProcessManager.gameplayBloomSettings.Name + ") (KEY: B)" + "\nShow buffer (" + PostProcessManager.showBuffer.ToString() + ")" + " (KEY: V)";
 
 
