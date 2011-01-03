@@ -528,7 +528,7 @@ namespace XNA_PoolGame.Graphics.Models
                     else
                     {
                         spheres[modelPartIndex] = new BoundingSphere();
-                        diff = max - min;
+                        diff = (max - min) / 2f;
                         spheres[modelPartIndex].Center = (max + min) / 2.0f;
                         spheres[modelPartIndex].Radius = Math.Max(diff.X, Math.Max(diff.Y, diff.Z));
                     }
@@ -536,7 +536,7 @@ namespace XNA_PoolGame.Graphics.Models
                 }
                 boundingBox.Min = min;
                 boundingBox.Max = max;
-                diff = max - min;
+                diff = (max - min) / 2f;
                 boundingSphere.Center = (max + min) / 2.0f;
                 boundingSphere.Radius = Math.Max(diff.X, Math.Max(diff.Y, diff.Z));
             }

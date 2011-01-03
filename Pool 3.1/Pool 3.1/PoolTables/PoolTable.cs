@@ -236,7 +236,7 @@ namespace XNA_PoolGame.PoolTables
             rack = World.rackfactories[World.gameMode].CreateRack(this);
             rack.BuildBallsRack();
 
-            //TotalBalls = 2;
+            TotalBalls = 1;
             for (int i = 0; i < TotalBalls; i++)
             {
                 poolBalls[i].Scale = new Vector3(poolballscaleFactor);
@@ -409,12 +409,12 @@ namespace XNA_PoolGame.PoolTables
                     BallsStopped(this, EventArgs.Empty);
             }
 
-            // PRUEBA!
-            List<Vector3> points = new List<Vector3>();
-            List<int> triangles = new List<int>();
-            BoundingSphere bs = new BoundingSphere(cueBall.Position, cueBall.Radius);
-            ((OctreePartitioner)World.scenario.sceneManager).collider.CheckCollisions(bs, ref triangles, ref points);
-            PoolGame.cueBallCollisionPoints = points.Count;
+            //// PRUEBA!
+            //List<Vector3> points = new List<Vector3>();
+            //List<int> triangles = new List<int>();
+            //BoundingSphere bs = new BoundingSphere(cueBall.Position, cueBall.Radius);
+            //((OctreePartitioner)World.scenario.sceneManager).collider.CheckCollisions(bs, ref triangles, ref points);
+            //PoolGame.cueBallCollisionPoints = points.Count;
             base.Update(gameTime);
             
         }

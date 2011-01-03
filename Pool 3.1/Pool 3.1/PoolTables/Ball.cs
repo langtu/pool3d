@@ -129,24 +129,26 @@ namespace XNA_PoolGame
 
         public bool IsMoving()
         {
-            //while (this.thinkingFlag) { }
+            ////while (this.thinkingFlag) { }
 
-            if (currentTrajectory == Trajectory.Motion)
-            {
-                if (velocity.LengthSquared() < MIN_SPEED_SQUARED)
-                    return false;
-                else
-                    return true;
-            }
-            else if (currentTrajectory == Trajectory.Free)
-            {
-                //if (velocity.LengthSquared() < MIN_SPEED_SQUARED /*&& (this.PositionY == min_Altitute)*/)
-                if (prepreviousvelocity == previousvelocity && previousvelocity == velocity)
-                    return false;
-                else
-                    return true;
-            }
-            return false;
+            //if (currentTrajectory == Trajectory.Motion)
+            //{
+            //    if (velocity.LengthSquared() < MIN_SPEED_SQUARED)
+            //        return false;
+            //    else
+            //        return true;
+            //}
+            //else if (currentTrajectory == Trajectory.Free)
+            //{
+            //    //if (velocity.LengthSquared() < MIN_SPEED_SQUARED /*&& (this.PositionY == min_Altitute)*/)
+            //    if (prepreviousvelocity == previousvelocity && previousvelocity == velocity)
+            //        return false;
+            //    else
+            //        return true;
+            //}
+
+
+            return true;
         }
 
 
@@ -526,7 +528,7 @@ namespace XNA_PoolGame
                 //this.InitialRotation = this.Rotation;
             }*/
 
-            float dt2 = _dt / (float)(numSteps);
+            float dt = _dt / (float)(3);
 
             for (int step = 0; step < 3; ++step)
             {
@@ -539,8 +541,8 @@ namespace XNA_PoolGame
 
 
                 // integrate (keep it simple: just use euler)
-                this.velocity += acce * dt2;
-                this.Position += this.velocity * dt2;
+                this.velocity += acce * dt;
+                this.Position += this.velocity * dt;
 
                 // compute new angular momentum (damping)
                 this.angularMomentum *= 0.995f;
@@ -555,28 +557,134 @@ namespace XNA_PoolGame
                 // integrate rotational part into quaternion
                 Quaternion quatRotDot = new Quaternion(omega, 0.0f) * this.rotQ;
                 quatRotDot *= -0.5f;
-                quatRotDot *= dt2;
+                quatRotDot *= dt;
                 //quatRotDot *= 0.01f;
 
                 quatRotDot += this.rotQ;
-                //quatRotDot *= 0.02f;
                 quatRotDot.Normalize();
 
                 this.rotQ = quatRotDot;
                 this.Rotation = Matrix.CreateFromQuaternion(rotQ);
+                this.PreRotation = Matrix.Identity;
 
-                Vector3 avgFaceNormal = Vector3.Up;
-                Vector3 avgColPoint = this.Position - Vector3.Up * this.radius;
-                avgColPoint.Y = Math.Max(avgColPoint.Y, table.SURFACE_POSITION_Y);
+                handleScenarioCollisions();
 
-                //if (avgColPoint.Y - table.SURFACE_POSITION_Y <= 0.0001f)
-                if (avgColPoint.Y - table.SURFACE_POSITION_Y == 0.0f)
-                    resolveCollisions(avgColPoint, avgFaceNormal);
+                //handleSphereSphereCollisions();
 
-                handleSphereSphereCollisions();
-
-                StopBall();
+                //StopBall();
             }
+        }
+
+        private void handleScenarioCollisions()
+        {
+            // compute collisions with level and store them in mCollisionPoints
+            //mTimePhysics.Stop();
+            //mTimeCollisions.Start();
+
+            List<Vector3> arenaCollidingFaces = new List<Vector3>();
+            List<Vector3> arenaCollisionPoints = new List<Vector3>();
+
+            World.scenario.sceneManager.collider.CheckCollisions(this.BoundingSphere, ref arenaCollidingFaces, ref arenaCollisionPoints);
+
+            //mNumCollisionTests++;
+            //mTimeCollisions.Stop();
+            //mTimePhysics.Start();
+
+            // add collisions to colliding faces
+            //foreach (Face f in arenaCollidingFaces)
+            //{
+
+            //    if (mCollidingFaces.ContainsKey(f))
+            //        mCollidingFaces[f]++;
+            //    else
+            //        mCollidingFaces.Add(f, 1);
+
+            //}
+
+            // are there any collisions?
+            if (arenaCollisionPoints.Count != 0)
+            {
+                // compute average of all collision points
+                Vector3 avgColPoint = Vector3.Zero;
+                Vector3 avgFaceNormal = Vector3.Zero;
+                Vector3 closestNormal = Vector3.Zero;
+                float closestDistance = float.MaxValue;
+
+                //LinkedListNode<Vector3> curPoint = arenaCollisionPoints.First;
+                //LinkedListNode<Face> curFace = arenaCollidingFaces.First;
+                for (int i = 0; i < arenaCollisionPoints.Count; i++)
+                {
+                    avgFaceNormal += arenaCollidingFaces[i];
+                    avgColPoint += arenaCollisionPoints[i];
+
+                    // update closest normal
+                    float d = (this.Position - arenaCollisionPoints[i]).LengthSquared();
+                    if (d < closestDistance)
+                    {
+                        closestDistance = d;
+                        closestNormal = arenaCollidingFaces[i];
+                    }
+                }
+
+                // this can happen at very thin walls for example
+                if (avgFaceNormal == Vector3.Zero)
+                    avgFaceNormal = closestNormal;
+
+                // normalize
+                avgFaceNormal.Normalize();
+                avgColPoint /= arenaCollisionPoints.Count;
+
+                // --- resolve collision ------
+                resolveArenaCollisions(avgColPoint, avgFaceNormal);
+            }
+        }
+        private void resolveArenaCollisions(Vector3 avgColPoint, Vector3 avgFaceNormal)
+        {
+            // average inverse collision direction
+            Vector3 avgColVec = this.Position - avgColPoint;
+
+            // collision direction
+            Vector3 r = Vector3.Normalize(-avgColVec);
+            r *= this.radius;
+
+            // move sphere out of colliding state
+            this.Position += (-r - avgColVec);
+
+            // the coefficient of restitution (1 for perfect elastic pulse)
+            float e = 0.9f;
+
+            // the relative velocity
+            float relativeVelocity = Vector3.Dot(this.velocity, avgFaceNormal);
+
+            // intermediate computations
+            Vector3 tmp = Vector3.Cross(r, avgFaceNormal);
+            tmp = Vector3.Transform(tmp, this.invWorldInertia);
+            tmp = Vector3.Cross(tmp, r);
+
+            // the impulse's length
+            float j = (-(1 + e) * relativeVelocity) / ((1 / mMass) + Vector3.Dot(avgFaceNormal, tmp));
+
+            // the actual impulse
+            Vector3 J = avgFaceNormal * j;
+
+            // apply the impulse to the linear velocity
+            this.velocity += (J / mMass);
+
+            // the impulse torque
+            Vector3 torqueImpuls = Vector3.Cross(r, J);
+
+            // apply the torque to the angular velocity
+            this.angularMomentum += torqueImpuls;
+
+            // initiate rotation by changing angular momentum based on velocity of particle in contact with arena
+            Vector3 omega = Vector3.Transform(this.angularMomentum, this.invBodyInertia);
+            Vector3 collisionPointVelocity = Vector3.Cross(omega, r);
+
+            // velocity difference of negative particle velocity and center of mass velocity
+            Vector3 velocityDifference = collisionPointVelocity + this.velocity;
+
+            // adjust angular momentum such that the velocity of the colliding particle equals the velocity of the center of mass
+            this.angularMomentum = -Vector3.Cross(r, collisionPointVelocity - velocityDifference);
         }
         private void resolveSphereSphereCollision(Ball cur, ref Ball other)
         {
@@ -749,75 +857,76 @@ namespace XNA_PoolGame
             lock (table.syncballsready)
                 ++table.ballsready;
 
-            switch (currentTrajectory)
-            {
-                #region Motion
-                case Trajectory.Motion:
-                    HandleMotion((float)gameTime.ElapsedGameTime.TotalSeconds);
-                    break;
-                #endregion
-                #region Free
-                case Trajectory.Free:
-                    HandleFree((float)gameTime.ElapsedGameTime.TotalSeconds);
+            HandleMotion2((float)gameTime.ElapsedGameTime.TotalSeconds);
+            //switch (currentTrajectory)
+            //{
+            //    #region Motion
+            //    case Trajectory.Motion:
+            //        HandleMotion((float)gameTime.ElapsedGameTime.TotalSeconds);
+            //        break;
+            //    #endregion
+            //    #region Free
+            //    case Trajectory.Free:
+            //        HandleFree((float)gameTime.ElapsedGameTime.TotalSeconds);
 
-                    #region Old
-                    //t = dt * World.timeFactor;
+            //        #region Old
+            //        //t = dt * World.timeFactor;
 
-                    //if (IsMoving())
-                    //{
-                    //    //Vector3 tmp = velocity - new Vector3(0, velocity.Y, 0);
-                    //    Vector3 tmp = velocity;
-                    //    Vector3 axis = Vector3.Normalize(Vector3.Cross(Vector3.Up, velocity));
-                    //    float angle = tmp.Length() * World.ballRadius * 0.0229f * t;
-                    //    //float angle = velocity.Length() * dt * MathHelper.TwoPi / World.ballRadious;
+            //        //if (IsMoving())
+            //        //{
+            //        //    //Vector3 tmp = velocity - new Vector3(0, velocity.Y, 0);
+            //        //    Vector3 tmp = velocity;
+            //        //    Vector3 axis = Vector3.Normalize(Vector3.Cross(Vector3.Up, velocity));
+            //        //    float angle = tmp.Length() * World.ballRadius * 0.0229f * t;
+            //        //    //float angle = velocity.Length() * dt * MathHelper.TwoPi / World.ballRadious;
 
-                    //    //Quaternion rotationThisFrame = Quaternion.CreateFromAxisAngle(axis, angle);
-                    //    //localRotation *= rotationThisFrame;
+            //        //    //Quaternion rotationThisFrame = Quaternion.CreateFromAxisAngle(axis, angle);
+            //        //    //localRotation *= rotationThisFrame;
 
-                    //    //localRotation.Normalize();
+            //        //    //localRotation.Normalize();
 
-                    //    //this.Rotation = Matrix.CreateFromQuaternion(localRotation);
-                    //}
+            //        //    //this.Rotation = Matrix.CreateFromQuaternion(localRotation);
+            //        //}
 
-                    //PositionX += velocity.X * t;
-                    //PositionZ += velocity.Z * t;
+            //        //PositionX += velocity.X * t;
+            //        //PositionZ += velocity.Z * t;
 
-                    //if (PositionY > min_Altitute)
-                    //    velocity.Y += World.gravity * t;
+            //        //if (PositionY > min_Altitute)
+            //        //    velocity.Y += World.gravity * t;
 
-                    //if (PositionY < min_Altitute - 0.05f)
-                    //{
-                    //    PositionY = min_Altitute;
-                    //    velocity.Y *= -0.08f;
-                    //    velocity.X *= 0.7f;
-                    //    velocity.Z *= 0.7f;
-                    //}
-                    //else
-                    //{
-                    //    PositionY += velocity.Y * t + 0.5f * World.gravity * t * t;
-                    //}
-                    ///*if (Math.Abs(velocity.X) < MIN_SPEED)
-                    //{
-                    //    velocity.X = 0;
-                    //}*/
-                    ///*if (Math.Abs(velocity.Z) < MIN_SPEED)
-                    //{
-                    //    velocity.Z = 0;
-                    //}*/
+            //        //if (PositionY < min_Altitute - 0.05f)
+            //        //{
+            //        //    PositionY = min_Altitute;
+            //        //    velocity.Y *= -0.08f;
+            //        //    velocity.X *= 0.7f;
+            //        //    velocity.Z *= 0.7f;
+            //        //}
+            //        //else
+            //        //{
+            //        //    PositionY += velocity.Y * t + 0.5f * World.gravity * t * t;
+            //        //}
+            //        ///*if (Math.Abs(velocity.X) < MIN_SPEED)
+            //        //{
+            //        //    velocity.X = 0;
+            //        //}*/
+            //        ///*if (Math.Abs(velocity.Z) < MIN_SPEED)
+            //        //{
+            //        //    velocity.Z = 0;
+            //        //}*/
 
-                    ////Console.WriteLine(velocity.Y);
-                    //if (Math.Abs(velocity.X) < MIN_SPEED && Math.Abs(velocity.Z) < MIN_SPEED && Math.Abs(velocity.Y) < MIN_SPEED_Y
-                    //    && pocketWhereAt != -1 && PositionY >= min_Altitute && PositionY <= min_Altitute + 2.0f)
-                    //{
-                    //    Stop();
-                    //}
-                    #endregion
+            //        ////Console.WriteLine(velocity.Y);
+            //        //if (Math.Abs(velocity.X) < MIN_SPEED && Math.Abs(velocity.Z) < MIN_SPEED && Math.Abs(velocity.Y) < MIN_SPEED_Y
+            //        //    && pocketWhereAt != -1 && PositionY >= min_Altitute && PositionY <= min_Altitute + 2.0f)
+            //        //{
+            //        //    Stop();
+            //        //}
+            //        #endregion
 
-                    break;
-                #endregion
-            }
+            //        break;
+            //    #endregion
+            //}
 
-            if (!this.collisionFlag && !IsMoving()) Stop();
+            //if (!this.collisionFlag && !IsMoving()) Stop();
 
             lock (table.syncballsready)
                 --table.ballsready;

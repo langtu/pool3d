@@ -8,7 +8,11 @@ using XNA_PoolGame.Graphics.Models;
 
 namespace XNA_PoolGame.Scene
 {
-    public class OctreeCollider
+    public abstract class Collider
+    {
+        public abstract void CheckCollisions(BoundingSphere sphere, ref List<Vector3> collidingFaces, ref List<Vector3> collisionPoints);
+    }
+    public class OctreeCollider : Collider
     {
         OctreePartitioner partitioner;
         public int SubdivisionReached { get; private set; }
@@ -17,7 +21,7 @@ namespace XNA_PoolGame.Scene
             this.partitioner = partitioner;
         }
 
-        public void CheckCollisions(BoundingSphere sphere, ref List<int> collidingFaces, ref List<Vector3> collisionPoints)
+        public override void CheckCollisions(BoundingSphere sphere, ref List<Vector3> collidingFaces, ref List<Vector3> collisionPoints)
         {
             Queue<OctreeNode> queue = new Queue<OctreeNode>();
             queue.Enqueue(partitioner.Root);
@@ -86,8 +90,7 @@ namespace XNA_PoolGame.Scene
                             float squaredDist = (closestPoint - sphere.Center).LengthSquared();
                             if (squaredDist <= r2)
                             {
-                                // TODO: Cambiar esto, está malo. Debería tener una referencia al triángulo.
-                                collidingFaces.Add(i);
+                                collidingFaces.Add(geometry.TriangleNormals[i]);   
                                 collisionPoints.Add(closestPoint);
                             }
                         }

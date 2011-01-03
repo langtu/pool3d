@@ -13,7 +13,8 @@ namespace XNA_PoolGame.Graphics.Shadows
     public enum ShadowBlurTechnnique
     {
         Normal,
-        SoftShadow
+        SoftShadow,
+        DeferredSoftShadow
     }
 
     public enum ShadowTechnnique

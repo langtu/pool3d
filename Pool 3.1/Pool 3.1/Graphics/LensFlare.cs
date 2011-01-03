@@ -7,7 +7,7 @@ using System.Text;
 
 namespace XNA_PoolGame.Graphics
 {
-    public class LensFlare
+    public class LensFlare : Billboard
     {
 
     }

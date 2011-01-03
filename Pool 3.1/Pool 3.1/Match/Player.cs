@@ -166,10 +166,10 @@ namespace XNA_PoolGame
                 #region Playing
                 case MatchPhase.Playing:
 
-                if (!table.ballsMoving)
-                {
                     if (controller.RightStick != Vector2.Zero) 
                         World.camera.MovePicthYaw(controller.RightStick * 200.0f * dt);
+                if (!table.ballsMoving)
+                {
 
                     if (!stick.charging)
                     {
