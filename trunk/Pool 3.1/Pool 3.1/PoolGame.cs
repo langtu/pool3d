@@ -1,4 +1,4 @@
-#define DRAW_DEBUGTEXT
+//#define DRAW_DEBUGTEXT
 
 #region Using Statements
 using XNA_PoolGame;
@@ -101,9 +101,9 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 1280;
-            graphics.PreferredBackBufferHeight = 720;
-            graphics.SynchronizeWithVerticalRetrace = true;
+            graphics.PreferredBackBufferWidth = 640;
+            graphics.PreferredBackBufferHeight = 480;
+            graphics.SynchronizeWithVerticalRetrace = false;
             graphics.PreferMultiSampling = false;
 
             //graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;

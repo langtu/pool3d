@@ -15,6 +15,7 @@ namespace XNA_PoolGame.Scene
     public class OctreeCollider : Collider
     {
         OctreePartitioner partitioner;
+        Queue<OctreeNode> queue = new Queue<OctreeNode>();
         public int SubdivisionReached { get; private set; }
         public OctreeCollider(OctreePartitioner partitioner)
         {
@@ -23,7 +24,7 @@ namespace XNA_PoolGame.Scene
 
         public override void CheckCollisions(BoundingSphere sphere, ref List<Vector3> collidingFaces, ref List<Vector3> collisionPoints)
         {
-            Queue<OctreeNode> queue = new Queue<OctreeNode>();
+            queue.Clear();
             queue.Enqueue(partitioner.Root);
             SubdivisionReached = 0;
 
@@ -72,7 +73,7 @@ namespace XNA_PoolGame.Scene
                     foreach (KeyValuePair<Entity, GeometryDescription> item in node.PGD.GeometryDescriptions)
                     {
                         GeometryDescription geometry = item.Value;
-                        for (int i = 2; i < geometry.Triangles; i++)
+                        for (int i = 0; i < geometry.Triangles; i++)
                         {
                             Vector3 pos1 = geometry.Vertices[geometry.Indices[i * 3]];
                             Vector3 pos2 = geometry.Vertices[geometry.Indices[i * 3 + 1]];
@@ -90,7 +91,7 @@ namespace XNA_PoolGame.Scene
                             float squaredDist = (closestPoint - sphere.Center).LengthSquared();
                             if (squaredDist <= r2)
                             {
-                                collidingFaces.Add(geometry.TriangleNormals[i]);   
+                                collidingFaces.Add(geometry.TriangleNormals[i]);
                                 collisionPoints.Add(closestPoint);
                             }
                         }

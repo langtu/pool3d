@@ -129,7 +129,8 @@ namespace XNA_PoolGame.Match
                 table.roundInfo.ballRailsHit[table.poolBalls[i]] = false;
             }
 
-            this.cueballState = this.ballStates[0];
+            if (ballStates.Count > 0)
+                this.cueballState = this.ballStates[0];
         }
 
         public void EndSet()

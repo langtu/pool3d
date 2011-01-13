@@ -442,7 +442,7 @@ namespace XNA_PoolGame.Scenarios
             World.scenario.Objects.Add(smokestack);
             World.scenario.Objects.Add(smokeStackFireWood);
             World.scenario.Objects.Add(smokeFireWoodKeeper);
-            World.scenario.Objects.Add(smokeFireWoodOut);
+            //World.scenario.Objects.Add(smokeFireWoodOut);
 
 
             for (int i = 0; i < tabourets.Length; ++i)

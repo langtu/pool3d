@@ -55,7 +55,7 @@ namespace XNA_PoolGame
         public Vector3 angularMomentum = Vector3.Zero;
         public Matrix invBodyInertia = Matrix.Identity;
 
-        private const int numSteps = 6;
+        private const int numSteps = 20;
 
         public float mMass = 1.0f;
 
@@ -528,9 +528,9 @@ namespace XNA_PoolGame
                 //this.InitialRotation = this.Rotation;
             }*/
 
-            float dt = _dt / (float)(3);
+            float dt = _dt / (float)(numSteps);
 
-            for (int step = 0; step < 3; ++step)
+            for (int step = 0; step < numSteps; ++step)
             {
                 // compute forces
                 Vector3 forces = -0.15f * velocity;
@@ -558,13 +558,12 @@ namespace XNA_PoolGame
                 Quaternion quatRotDot = new Quaternion(omega, 0.0f) * this.rotQ;
                 quatRotDot *= -0.5f;
                 quatRotDot *= dt;
-                //quatRotDot *= 0.01f;
 
                 quatRotDot += this.rotQ;
                 quatRotDot.Normalize();
 
                 this.rotQ = quatRotDot;
-                this.Rotation = Matrix.CreateFromQuaternion(rotQ);
+                this.Rotation = Matrix.CreateFromQuaternion(this.rotQ);
                 this.PreRotation = Matrix.Identity;
 
                 handleScenarioCollisions();

@@ -1,4 +1,5 @@
 ﻿//#define DRAW_BOUNDINGBOX
+//#define DRAW_NORMALS
 
 #region Using Statements
 
@@ -211,6 +212,7 @@ namespace XNA_PoolGame.Scene
 
         public void DrawBoundingBox()
         {
+#if DRAW_BOUNDINGBOX
             World.poolTable.vectorRenderer.SetWorldMatrix(Matrix.Identity);
             World.poolTable.vectorRenderer.SetViewProjMatrix(World.camera.ViewProjection);
             World.poolTable.vectorRenderer.SetColor(NodeColors[OctreeChildEnum]);
@@ -218,6 +220,33 @@ namespace XNA_PoolGame.Scene
             PoolGame.device.RenderState.DepthBufferWriteEnable = false;
             PoolGame.device.RenderState.DepthBufferEnable = false;
             World.poolTable.vectorRenderer.DrawBoundingBox(Box);
+#endif
+#if DRAW_NORMALS
+            if (PGD == null) return;
+
+            World.poolTable.vectorRenderer.SetWorldMatrix(Matrix.Identity);
+            World.poolTable.vectorRenderer.SetViewProjMatrix(World.camera.ViewProjection);
+            // Normals
+            PoolGame.device.RenderState.DepthBufferWriteEnable = false;
+            PoolGame.device.RenderState.DepthBufferEnable = true;
+
+      
+            World.poolTable.vectorRenderer.SetColor(Color.LightPink);
+            foreach (KeyValuePair<Entity, GeometryDescription> item in PGD.GeometryDescriptions)
+            {
+                GeometryDescription geometry = item.Value;
+                for (int i = 0; i < geometry.Triangles; i++)
+                {
+                    Vector3 v0 = geometry.Vertices[geometry.Indices[i * 3 + 0]];
+                    Vector3 v1 = geometry.Vertices[geometry.Indices[i * 3 + 1]];
+                    Vector3 v2 = geometry.Vertices[geometry.Indices[i * 3 + 2]];
+
+                    Vector3 center = (v0 + v1 + v2) / 3f;
+
+                    World.poolTable.vectorRenderer.DrawLine(center, center + geometry.TriangleNormals[i] * 20f);        
+                }
+            }
+#endif
         }
 
         #region Miembros de IEnumerable
@@ -274,7 +303,7 @@ namespace XNA_PoolGame.Scene
             totalItemDrawn = 0;
             Camera activeCamera = World.camera;
 
-#if DRAW_BOUNDINGBOX
+
             if (activeCamera.EnableFrustumCulling)
             {
                 if (activeCamera.Frustum.Contains(Root.Box) != ContainmentType.Disjoint)
@@ -283,7 +312,7 @@ namespace XNA_PoolGame.Scene
             else
                 DrawBoundingBoxes(Root, activeCamera);
 
-#endif
+
         }
 
         private void DrawBoundingBoxes(OctreeNode node, Camera activeCamera)
@@ -343,7 +372,7 @@ namespace XNA_PoolGame.Scene
             Vector3 Size = (Box.Max - Box.Min);
 
             float maxSize = Math.Max(Math.Max(Size.X, Size.Y), Size.Z);
-            Size = new Vector3(maxSize);
+            //Size = new Vector3(maxSize);
 
             Root.Box.Min = Root.Center - Size / 2f;
             Root.Box.Max = Root.Center + Size / 2f;
@@ -497,7 +526,6 @@ namespace XNA_PoolGame.Scene
                 //Array.Copy(pgd.GeometryDescriptions[entity].Vertices, newGeometry.Vertices, pgd.GeometryDescriptions[entity].Vertices.Length);
                 newGeometry.Vertices = pgd.GeometryDescriptions[entity].Vertices;
                 newGeometry.Normals = pgd.GeometryDescriptions[entity].Normals;
-
 
 
                 //List<Vector3> tmpVertices = new List<Vector3>();
@@ -671,6 +699,7 @@ namespace XNA_PoolGame.Scene
         {
             public List<bool> Triangles;
             public int TriangleCount;
+            public TriangleList() { }
         }
 
         #region Triangle Count
@@ -726,7 +755,11 @@ namespace XNA_PoolGame.Scene
                         {
                             // Aplica la transformación que tiene el entity a todos los vértices.
                             localpositions[i] = Vector3.Transform(partInfo[i].Position, entity.LocalWorld);
-                            localnormals[i] = Vector3.Transform(partInfo[i].Normal, entity.LocalWorld);
+
+                            Vector3 scale, translation;
+                            Quaternion rotation;
+                            entity.LocalWorld.Decompose(out scale, out rotation, out translation);
+                            localnormals[i] = Vector3.Transform(partInfo[i].Normal, rotation);
                             localnormals[i].Normalize();
                         }
 
@@ -748,6 +781,10 @@ namespace XNA_PoolGame.Scene
                             trianglesNormals[i].Normalize();
                         }
 
+                        Vector3 vv1 = Vector3.Right;
+                        Vector3 vv2 = Vector3.Up;
+
+                        Vector3 n = Vector3.Cross(vv1, vv2);
                         partitionedData.AddModelPart(ref entity, localpositions, localindices, localnormals, trianglesNormals);
                     }
                 }
