@@ -37,14 +37,17 @@ namespace XNA_PoolGame.Screens
 
             // Create our menu entries.
             MenuEntry resumeGameMenuEntry = new MenuEntry("Resume Game");
+            MenuEntry optionsGameMenuEntry = new MenuEntry("Options");
             MenuEntry quitGameMenuEntry = new MenuEntry("Quit Game");
 
             // Hook up menu event handlers.
             resumeGameMenuEntry.Selected += ResumeGameSelected;
+            optionsGameMenuEntry.Selected += OptionsMenuEntrySelected;
             quitGameMenuEntry.Selected += QuitGameMenuEntrySelected;
 
             // Add entries to the menu.
             MenuEntries.Add(resumeGameMenuEntry);
+            MenuEntries.Add(optionsGameMenuEntry);
             MenuEntries.Add(quitGameMenuEntry);
         }
 
@@ -62,6 +65,11 @@ namespace XNA_PoolGame.Screens
 
             World.camera.SetMouseCentered();
             PoolGame.game.DefreezeComponentUpdates(true);
+        }
+
+        void OptionsMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+        {
+
         }
 
         protected override void OnCancel(PlayerIndex playerIndex)
@@ -98,16 +106,16 @@ namespace XNA_PoolGame.Screens
 
             if (ScreenState == ScreenState.Active || ScreenState == ScreenState.TransitionOn) 
             {
-                SpriteBatch sprite = PostProcessManager.spriteBatch;
-                GaussianBlur gauss = PostProcessManager.gaussianBlur;
+                //SpriteBatch sprite = PostProcessManager.spriteBatch;
+                //GaussianBlur gauss = PostProcessManager.gaussianBlur;
 
-                PoolGame.device.ResolveBackBuffer(PostProcessManager.resolveTarget);
-                Texture2D backtex = PostProcessManager.resolveTarget;
+                //PoolGame.device.ResolveBackBuffer(PostProcessManager.resolveTarget);
+                //Texture2D backtex = PostProcessManager.resolveTarget;
 
-                Texture2D tex = gauss.PerformGaussianBlur(backtex, PostProcessManager.halfRTHor, PostProcessManager.halfRTVert, sprite);
-                sprite.Begin(SpriteBlendMode.None, SpriteSortMode.Immediate, SaveStateMode.SaveState);
-                sprite.Draw(tex, new Rectangle(0, 0, PoolGame.Width, PoolGame.Height), Color.White);
-                sprite.End();
+                //Texture2D tex = gauss.PerformGaussianBlur(backtex, PostProcessManager.halfRTHor, PostProcessManager.halfRTVert, sprite);
+                //sprite.Begin(SpriteBlendMode.None, SpriteSortMode.Immediate, SaveStateMode.SaveState);
+                //sprite.Draw(tex, new Rectangle(0, 0, PoolGame.Width, PoolGame.Height), Color.White);
+                //sprite.End();
             }
 
             base.Draw(gameTime);

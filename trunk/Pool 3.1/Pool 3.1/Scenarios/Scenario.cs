@@ -117,12 +117,12 @@ namespace XNA_PoolGame.Scenarios
             //if (World.EM == EnvironmentType.Dynamic || World.EM == EnvironmentType.Static)
             //    refCubeMap = new RenderTargetCube(PoolGame.device, World.EMSize, 1, PoolGame.device.PresentationParameters.BackBufferFormat);
             CreateLights();
-            switch (World.SceneManagerType)
-            {
-                case SceneManagerEnum.Octree:
-                    sceneManager = new OctreePartitioner(this, 40);
-                    break;
-            }
+            //switch (World.SceneManagerType)
+            //{
+            //    case SceneManagerEnum.Octree:
+            //        sceneManager = new OctreePartitioner(this, 0);
+            //        break;
+            //}
             hack = false;
         }
 
@@ -138,11 +138,11 @@ namespace XNA_PoolGame.Scenarios
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            if (!hack)
-            {
-                sceneManager.BuildScene();
-                hack = true;
-            }
+            //if (!hack)
+            //{
+            //    sceneManager.BuildScene();
+            //    hack = true;
+            //}
         }
 
         public virtual void Draw(GameTime gameTime) 

@@ -60,12 +60,12 @@ namespace XNA_PoolGame.Screens
         /// <returns></returns>
         public Ray CalculateCursorRay()
         {
-            Vector4 nearSource;
+            Vector4 nearSource = Vector4.Zero;
             nearSource.X = this.cursorPosition.X * 2.0f - 1.0f;
             nearSource.Y = -(this.cursorPosition.Y * 2.0f - 1.0f);
             nearSource.Z = 0.0f;
             nearSource.W = 1.0f;
-            Vector4 farSource;
+            Vector4 farSource = Vector4.Zero;
             farSource.X = this.cursorPosition.X * 2.0f - 1.0f;
             farSource.Y = -(this.cursorPosition.Y * 2.0f - 1.0f);
             farSource.Z = 1.0f;

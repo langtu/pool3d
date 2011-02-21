@@ -51,7 +51,7 @@ namespace XNA_PoolGame.Graphics.Models
         /// 3D object. (1st level detail)
         /// </summary>
         protected CustomModel modelL1 = null;
-        protected string modelNameL1 = null;
+        public string modelNameL1 = null;
         protected string textureAsset = null;
         protected bool drawboundingvolume = false;
         protected Color bvColor = Color.Red;
@@ -687,6 +687,10 @@ namespace XNA_PoolGame.Graphics.Models
                     #endregion
                     break;
                 case RenderPassMode.ScreenSpaceSoftShadowRender:
+                    if (World.DrawWiredFrames)
+                        PoolGame.device.RenderState.FillMode = FillMode.WireFrame;
+                    else
+                        PoolGame.device.RenderState.FillMode = FillMode.Solid;
                     #region Screen Space Soft Shadow
                     {
                         frustum = World.camera.Frustum;
@@ -702,6 +706,8 @@ namespace XNA_PoolGame.Graphics.Models
                         DrawModel(true, PostProcessManager.SSSoftShadow_MRT, basicTechnique, delegate { SetParametersSoftShadowMRT(ref LightManager.lights); });
                     }
                     #endregion
+                    if (World.DrawWiredFrames)
+                        PoolGame.device.RenderState.FillMode = FillMode.Solid;
                     break;
                 case RenderPassMode.SSAOPrePass:
                     #region SSAO prepass

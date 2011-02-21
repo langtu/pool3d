@@ -332,29 +332,29 @@ namespace XNA_PoolGame.Graphics
 
             SurfaceFormat format = pp.BackBufferFormat;
             
-            halfRTHor = new RenderTarget2D(PoolGame.device,
-                renderTargetWidth, renderTargetHeight, 1,
-                format, pp.MultiSampleType,
-                pp.MultiSampleQuality);
+            //halfRTHor = new RenderTarget2D(PoolGame.device,
+            //    renderTargetWidth, renderTargetHeight, 1,
+            //    format, pp.MultiSampleType,
+            //    pp.MultiSampleQuality);
 
-            halfHorTIU = new TextureInUse(halfRTHor, false);
-            renderTargets.Add(halfHorTIU);
+            //halfHorTIU = new TextureInUse(halfRTHor, false);
+            //renderTargets.Add(halfHorTIU);
 
-            halfRTVert = new RenderTarget2D(PoolGame.device,
-                renderTargetWidth, renderTargetHeight, 1,
-                format, pp.MultiSampleType, pp.MultiSampleQuality);
+            //halfRTVert = new RenderTarget2D(PoolGame.device,
+            //    renderTargetWidth, renderTargetHeight, 1,
+            //    format, pp.MultiSampleType, pp.MultiSampleQuality);
 
 
-            halfVertTIU = new TextureInUse(halfRTVert, false);
-            renderTargets.Add(halfVertTIU);
+            //halfVertTIU = new TextureInUse(halfRTVert, false);
+            //renderTargets.Add(halfVertTIU);
             
-            GBlurHRT = new RenderTarget2D(PoolGame.device, pp.BackBufferWidth, pp.BackBufferHeight, 1, pp.BackBufferFormat, pp.MultiSampleType, pp.MultiSampleQuality);
-            GBlurHTIU = new TextureInUse(GBlurHRT, false);
-            renderTargets.Add(GBlurHTIU);
+            //GBlurHRT = new RenderTarget2D(PoolGame.device, pp.BackBufferWidth, pp.BackBufferHeight, 1, pp.BackBufferFormat, pp.MultiSampleType, pp.MultiSampleQuality);
+            //GBlurHTIU = new TextureInUse(GBlurHRT, false);
+            //renderTargets.Add(GBlurHTIU);
 
-            GBlurVRT = new RenderTarget2D(PoolGame.device, pp.BackBufferWidth, pp.BackBufferHeight, 1, pp.BackBufferFormat, pp.MultiSampleType, pp.MultiSampleQuality);
-            GBlurVTIU = new TextureInUse(GBlurVRT, false);
-            renderTargets.Add(GBlurVTIU);
+            //GBlurVRT = new RenderTarget2D(PoolGame.device, pp.BackBufferWidth, pp.BackBufferHeight, 1, pp.BackBufferFormat, pp.MultiSampleType, pp.MultiSampleQuality);
+            //GBlurVTIU = new TextureInUse(GBlurVRT, false);
+            //renderTargets.Add(GBlurVTIU);
 
             depthRT = new RenderTarget2D(PoolGame.device, pp.BackBufferWidth, pp.BackBufferHeight, 1, SurfaceFormat.Single, pp.MultiSampleType,
                 pp.MultiSampleQuality, RenderTargetUsage.DiscardContents);
@@ -374,25 +374,24 @@ namespace XNA_PoolGame.Graphics
             velocityTIU = new TextureInUse(velocityRT, false);
             renderTargets.Add(velocityTIU);
 
-            velocityRTLastFrame = new RenderTarget2D(PoolGame.device,
-                                                pp.BackBufferWidth,
-                                                pp.BackBufferHeight,
-                                                1,
-                                                SurfaceFormat.Vector2,
-                                                pp.MultiSampleType,
-                                                pp.MultiSampleQuality,
-                                                RenderTargetUsage.DiscardContents);
+            //velocityRTLastFrame = new RenderTarget2D(PoolGame.device,
+            //                                    pp.BackBufferWidth,
+            //                                    pp.BackBufferHeight,
+            //                                    1,
+            //                                    SurfaceFormat.Vector2,
+            //                                    pp.MultiSampleType,
+            //                                    pp.MultiSampleQuality,
+            //                                    RenderTargetUsage.DiscardContents);
 
 
-            velocityLastFrameTIU = new TextureInUse(velocityRTLastFrame, false);
-            renderTargets.Add(velocityLastFrameTIU);
+            //velocityLastFrameTIU = new TextureInUse(velocityRTLastFrame, false);
+            //renderTargets.Add(velocityLastFrameTIU);
 
             mainRT = new RenderTarget2D(PoolGame.device, pp.BackBufferWidth, pp.BackBufferHeight, 1, format, pp.MultiSampleType,
                 pp.MultiSampleQuality, RenderTargetUsage.DiscardContents);
 
             mainTIU = new TextureInUse(mainRT, false);
             renderTargets.Add(mainTIU);
-
             
             resolveTarget = new ResolveTexture2D(PoolGame.device, width, height, 1, format);
 
@@ -593,30 +592,36 @@ namespace XNA_PoolGame.Graphics
         }
 
         #region Bloom
-        public static void DrawBloomPostProcessing(RenderTarget2D input, RenderTarget2D result, GameTime gameTime)
+        public static void DrawBloomPostProcessing(TextureInUse input, RenderTarget2D result, GameTime gameTime)
         {
             bloomExtractEffect.Parameters["BloomThreshold"].SetValue(gameplayBloomSettings.BloomThreshold);
             //PoolGame.device.ResolveBackBuffer(PostProcessManager.resolveTarget);
 
-            PostProcessManager.halfHorTIU.Use(); PostProcessManager.halfVertTIU.Use();
+            //PostProcessManager.halfHorTIU.Use(); PostProcessManager.halfVertTIU.Use();
+            int renderTargetWidth = PoolGame.device.Viewport.Width / 2;
+            int renderTargetHeight = PoolGame.device.Viewport.Height / 2;
+            PresentationParameters pp = PoolGame.device.PresentationParameters;
 
-            PoolGame.device.SetRenderTarget(0, halfRTHor);
-            DrawQuad(input.GetTexture(), bloomExtractEffect, IntermediateBuffer.PreBloom);
+            TextureInUse halfH = GetIntermediateTexture(renderTargetWidth, renderTargetHeight, pp.BackBufferFormat);        
 
-            SetBlurEffectParameters(1.0f / (float)halfRTHor.Width, 0, gaussianBlurEffect);
+            PoolGame.device.SetRenderTarget(0, halfH.renderTarget);
+            DrawQuad(input.renderTarget.GetTexture(), bloomExtractEffect, IntermediateBuffer.PreBloom);
+
+            input.DontUse();
+            SetBlurEffectParameters(1.0f / (float)renderTargetWidth, 0, gaussianBlurEffect);
+
+            TextureInUse halfV = GetIntermediateTexture(renderTargetWidth, renderTargetHeight, pp.BackBufferFormat);   
+            PoolGame.device.SetRenderTarget(0, halfV.renderTarget);
+            DrawQuad(halfH.renderTarget.GetTexture(), gaussianBlurEffect, IntermediateBuffer.BlurredHorizontally);
+
+            halfH.DontUse();
+            SetBlurEffectParameters(0, 1.0f / (float)renderTargetHeight, gaussianBlurEffect);
 
 
-            PoolGame.device.SetRenderTarget(0, halfRTVert);
-            DrawQuad(halfRTHor.GetTexture(), gaussianBlurEffect, IntermediateBuffer.BlurredHorizontally);
+            PoolGame.device.SetRenderTarget(0, halfH.renderTarget);
+            DrawQuad(halfV.renderTarget.GetTexture(), PostProcessManager.gaussianBlurEffect, IntermediateBuffer.BlurredBothWays);
 
-
-            SetBlurEffectParameters(0, 1.0f / (float)halfRTHor.Height, gaussianBlurEffect);
-
-
-            PoolGame.device.SetRenderTarget(0, halfRTHor);
-            DrawQuad(halfRTVert.GetTexture(), PostProcessManager.gaussianBlurEffect, IntermediateBuffer.BlurredBothWays);
-
-            Texture2D tex = input.GetTexture();
+            Texture2D tex = input.renderTarget.GetTexture();
             PoolGame.device.SetRenderTarget(0, result);
 
             EffectParameterCollection parameters = bloomCombineEffect.Parameters;
@@ -628,7 +633,7 @@ namespace XNA_PoolGame.Graphics
 
             PoolGame.device.Textures[1] = tex;
 
-            DrawQuad(halfRTHor.GetTexture(), PostProcessManager.bloomCombineEffect, IntermediateBuffer.FinalResult);
+            DrawQuad(halfH.renderTarget.GetTexture(), PostProcessManager.bloomCombineEffect, IntermediateBuffer.FinalResult);
             PoolGame.device.Textures[1] = null;
         }
 

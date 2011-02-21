@@ -1,5 +1,5 @@
 ﻿//#define DRAW_BOUNDINGBOX
-//#define DRAW_NORMALS
+#define DRAW_NORMALS
 
 #region Using Statements
 
@@ -212,15 +212,16 @@ namespace XNA_PoolGame.Scene
 
         public void DrawBoundingBox()
         {
-#if DRAW_BOUNDINGBOX
-            World.poolTable.vectorRenderer.SetWorldMatrix(Matrix.Identity);
-            World.poolTable.vectorRenderer.SetViewProjMatrix(World.camera.ViewProjection);
-            World.poolTable.vectorRenderer.SetColor(NodeColors[OctreeChildEnum]);
+            //if (debug)
+            //{
+            //    World.poolTable.vectorRenderer.SetWorldMatrix(Matrix.Identity);
+            //    World.poolTable.vectorRenderer.SetViewProjMatrix(World.camera.ViewProjection);
+            //    World.poolTable.vectorRenderer.SetColor(NodeColors[OctreeChildEnum]);
 
-            PoolGame.device.RenderState.DepthBufferWriteEnable = false;
-            PoolGame.device.RenderState.DepthBufferEnable = false;
-            World.poolTable.vectorRenderer.DrawBoundingBox(Box);
-#endif
+            //    PoolGame.device.RenderState.DepthBufferWriteEnable = false;
+            //    PoolGame.device.RenderState.DepthBufferEnable = false;
+            //    World.poolTable.vectorRenderer.DrawBoundingBox(Box);
+            //}
 #if DRAW_NORMALS
             if (PGD == null) return;
 
@@ -781,10 +782,10 @@ namespace XNA_PoolGame.Scene
                             trianglesNormals[i].Normalize();
                         }
 
-                        Vector3 vv1 = Vector3.Right;
-                        Vector3 vv2 = Vector3.Up;
+                        //Vector3 vv1 = Vector3.Right;
+                        //Vector3 vv2 = Vector3.Up;
 
-                        Vector3 n = Vector3.Cross(vv1, vv2);
+                        //Vector3 n = Vector3.Cross(vv1, vv2);
                         partitionedData.AddModelPart(ref entity, localpositions, localindices, localnormals, trianglesNormals);
                     }
                 }

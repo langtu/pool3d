@@ -15,7 +15,7 @@ namespace XNA_PoolGame.Graphics.Models
     {
         public int totalinstances;
         public Matrix[] transforms;
-        InstancingTechnique instancetech = InstancingTechnique.HardwareInstancing;
+        InstancingTechnique instancetech = InstancingTechnique.NoInstancing;
 
         InstancedModel model = null;
         string modelName = null;

@@ -12,14 +12,15 @@ namespace XNA_PoolGame.Helpers
     public class MultiMap<TKey, TValue> : IEnumerable
     {
         #region Fields
-        private SortedDictionary<TKey, List<TValue>> multimap;
+//#if XBOX
+        private Dictionary<TKey, List<TValue>> multimap;
         private int count;
         #endregion
 
         #region Constructor
         public MultiMap()
         {
-            multimap = new SortedDictionary<TKey, List<TValue>>();
+            multimap = new Dictionary<TKey, List<TValue>>();
             count = 0;
         }
         #endregion

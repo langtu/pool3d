@@ -116,7 +116,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             }
             else
             {
-                PostProcessManager.depthTIU.Use(); PostProcessManager.velocityTIU.Use(); PostProcessManager.velocityLastFrameTIU.Use();
+                PostProcessManager.depthTIU.Use(); PostProcessManager.velocityTIU.Use(); //PostProcessManager.velocityLastFrameTIU.Use();
                 PoolGame.device.SetRenderTarget(1, PostProcessManager.depthRT);
                 PoolGame.device.SetRenderTarget(2, PostProcessManager.velocityRT);
 

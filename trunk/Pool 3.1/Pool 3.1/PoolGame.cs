@@ -58,6 +58,9 @@ namespace XNA_PoolGame
         // FOR DEBUG ONLY
         public static int cueBallCollisionPoints = 0;
 
+        public bool doUpdates = true;
+        public bool updateOneFrame = false;
+
         #region Constants
 
         public const float FieldOfView = MathHelper.PiOver4;
@@ -75,7 +78,6 @@ namespace XNA_PoolGame
         //public static BloomComponent bloom;
 
         protected KeyboardState lastkb, kb;
-
 
         #endregion
 
@@ -101,26 +103,28 @@ namespace XNA_PoolGame
             Content.RootDirectory = "Content";
             game = this;
 
-            graphics.PreferredBackBufferWidth = 640;
-            graphics.PreferredBackBufferHeight = 480;
-            graphics.SynchronizeWithVerticalRetrace = false;
+//#if !XBOX
+            graphics.PreferredBackBufferWidth = 800;// 1280;
+            graphics.PreferredBackBufferHeight = 600;// 720;
+            graphics.SynchronizeWithVerticalRetrace = true;
             graphics.PreferMultiSampling = false;
 
+            graphics.PreferredBackBufferFormat = SurfaceFormat.Color;
             //graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
             graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
-            graphics.IsFullScreen = false;
-
+            //graphics.IsFullScreen = false;
+//#endif
 
             //graphics.MinimumVertexShaderProfile = ShaderProfile.VS_2_0;
             //graphics.MinimumPixelShaderProfile = ShaderProfile.PS_2_0;
 
-            graphics.PreparingDeviceSettings +=
-               new EventHandler<PreparingDeviceSettingsEventArgs>(graphics_PreparingDeviceSettings);
+            //graphics.PreparingDeviceSettings +=
+            //   new EventHandler<PreparingDeviceSettingsEventArgs>(graphics_PreparingDeviceSettings);
 
+            this.IsFixedTimeStep = false;
             graphics.ApplyChanges();
             //GraphicsDevice.Reset();
 
-            this.IsFixedTimeStep = false;
            
         }
 
@@ -137,13 +141,16 @@ namespace XNA_PoolGame
             //    MultiSampleType.FourSamples;
 
 #if XBOX
-            e.GraphicsDeviceInformation.PresentationParameters.MultiSampleQuality = 0;
-            e.GraphicsDeviceInformation.PresentationParameters.MultiSampleType =
-                MultiSampleType.FourSamples;
+            //e.GraphicsDeviceInformation.PresentationParameters.MultiSampleQuality = 0;
+            //e.GraphicsDeviceInformation.PresentationParameters.MultiSampleType =
+            //    MultiSampleType.FourSamples;
             e.GraphicsDeviceInformation.PresentationParameters.BackBufferWidth = 1280;
             e.GraphicsDeviceInformation.PresentationParameters.BackBufferHeight = 720;
-            e.GraphicsDeviceInformation.PresentationParameters.BackBufferFormat = SurfaceFormat.Bgr32;
-            e.GraphicsDeviceInformation.PresentationParameters.AutoDepthStencilFormat = DepthFormat.Depth24Stencil8Single;
+            //e.GraphicsDeviceInformation.PresentationParameters.BackBufferFormat = SurfaceFormat.Bgr32;
+            graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
+            //e.GraphicsDeviceInformation.PresentationParameters.BackBufferFormat = SurfaceFormat.Color;
+            //e.GraphicsDeviceInformation.PresentationParameters.AutoDepthStencilFormat = DepthFormat.Depth24Stencil8Single;
+            //e.GraphicsDeviceInformation.PresentationParameters.AutoDepthStencilFormat = DepthFormat.Depth24;
             e.GraphicsDeviceInformation.PresentationParameters.EnableAutoDepthStencil = true;
             return;
 #endif
@@ -200,7 +207,6 @@ namespace XNA_PoolGame
             screenManager.AddScreen(new GameplayScreen(), PlayerIndex.One);
 
             kb = Keyboard.GetState();
-
             base.Initialize();
         }
         #endregion
@@ -245,13 +251,28 @@ namespace XNA_PoolGame
         {
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+            lastkb = kb;
+            kb = Keyboard.GetState();
+            if (kb.IsKeyDown(Keys.PageUp) && lastkb.IsKeyUp(Keys.PageUp))
+            {
+                doUpdates = true; updateOneFrame = false;
+            }
+            if (kb.IsKeyDown(Keys.PageDown) && lastkb.IsKeyUp(Keys.PageDown))
+            {
+                doUpdates = false; updateOneFrame = true;
+            }
+            if (!doUpdates && !updateOneFrame)
+            {
+                World.camera.Update(gameTime);
+                World.CurrentPlayer.Update(gameTime);
+
+                return;
+            }
+            
             foreach (IThreadable bm in ModelManager.allthreads)
                 bm.BeginThread(gameTime);
 
-            
             #region Keyboard Updates
-            lastkb = kb;
-            kb = Keyboard.GetState();
 
             if (kb.IsKeyDown(Keys.LeftAlt))
                 if (kb.IsKeyDown(Keys.Enter) && lastkb.IsKeyUp(Keys.Enter))
@@ -262,10 +283,16 @@ namespace XNA_PoolGame
                 World.poolTable.StopAllBalls();
             }
 
+            if (kb.IsKeyDown(Keys.F1) && lastkb.IsKeyUp(Keys.F1))
+            {
+                World.scenario.sceneManager.debug = !World.scenario.sceneManager.debug;
+            }
+
             // SHADOWS
             if (kb.IsKeyDown(Keys.F10) && lastkb.IsKeyUp(Keys.F10))
             {
-                World.displacementType = (DisplacementType)(((int)(World.displacementType + 1) % 3));
+                //World.displacementType = (DisplacementType)(((int)(World.displacementType + 1) % 3));
+                World.DrawWiredFrames = !World.DrawWiredFrames;
             }
 
             if (kb.IsKeyDown(Keys.F11) && lastkb.IsKeyUp(Keys.F11))
@@ -328,8 +355,10 @@ namespace XNA_PoolGame
 
             if (kb.IsKeyDown(Keys.F2) && lastkb.IsKeyUp(Keys.F2))
             {
-                lock (World.scenario.syncobject)
-                    World.doDistortion = !World.doDistortion;
+                //lock (World.scenario.syncobject)
+                //    World.doDistortion = !World.doDistortion;
+
+                World.scenario.sceneManager.BuildScene();
             }
             if (kb.IsKeyDown(Keys.F3) && lastkb.IsKeyUp(Keys.F3))
             {
@@ -345,13 +374,24 @@ namespace XNA_PoolGame
                 Vector3 dir = -World.camera.Forward;
                 dir.Normalize();
                 ball.velocity = dir * 100.0f;
+                //ball.velocity = Vector3.Zero;
 
                 Components.Add(ball);
                 World.scenario.Objects.Add(ball);
                 World.poolTable.poolBalls.Add(ball);
                 World.poolTable.TotalBalls++;
             }
-
+            if (kb.IsKeyDown(Keys.F4) && lastkb.IsKeyUp(Keys.F4))
+            {
+                for (int i = 0; i < World.poolTable.poolBalls.Count; i++)
+                {
+                    World.scenario.Objects.Remove(World.poolTable.poolBalls[i]);
+                    Components.Remove(World.poolTable.poolBalls[i]);
+                    World.poolTable.poolBalls[i].Dispose();
+                }
+                World.poolTable.poolBalls.Clear();
+                World.poolTable.TotalBalls = 0;
+            }
             if (kb.IsKeyDown(Keys.F7) && lastkb.IsKeyUp(Keys.F7))
             {
                 //World.useSSAOTextures = !World.useSSAOTextures;
@@ -402,7 +442,7 @@ namespace XNA_PoolGame
                     Vector3 pointOfView = ((ChaseCamera)(World.camera)).LookAt;
                     ((ChaseCamera)(World.camera)).Reset();
 
-                    Vector3 angle;
+                    Vector3 angle = Vector3.Zero;
 
                     angle.X = (float)Maths.AngleBetweenVectors(Vector3.Up, viewMatrix.Up);
                     angle.Y = Math.Min((float)Maths.AngleBetweenVectors(Vector3.Right, viewMatrix.Right), -(float)Maths.AngleBetweenVectors(Vector3.Left, viewMatrix.Right));
@@ -496,7 +536,9 @@ namespace XNA_PoolGame
                 
             }
             base.Update(gameTime);
-            
+
+            if (!doUpdates) 
+                updateOneFrame = false;
         }
         #endregion
 

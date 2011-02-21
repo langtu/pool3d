@@ -72,6 +72,7 @@ namespace XNA_PoolGame.Scene
                     float r2 = sphere.Radius * sphere.Radius;
                     foreach (KeyValuePair<Entity, GeometryDescription> item in node.PGD.GeometryDescriptions)
                     {
+                        //Console.WriteLine(item.Key.modelNameL1);
                         GeometryDescription geometry = item.Value;
                         for (int i = 0; i < geometry.Triangles; i++)
                         {
@@ -89,7 +90,7 @@ namespace XNA_PoolGame.Scene
                             Vector3 closestPoint = closestPointInTriangle(sphere.Center, pos1, pos2, pos3);
                             
                             float squaredDist = (closestPoint - sphere.Center).LengthSquared();
-                            if (squaredDist <= r2)
+                            if ((squaredDist) <= r2)
                             {
                                 collidingFaces.Add(geometry.TriangleNormals[i]);
                                 collisionPoints.Add(closestPoint);
