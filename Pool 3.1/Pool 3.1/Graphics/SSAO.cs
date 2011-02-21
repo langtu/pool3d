@@ -50,7 +50,7 @@ namespace XNA_PoolGame.Graphics
             halfPixel.X = 0.5f / (float)PoolGame.Width;
             halfPixel.Y = 0.5f / (float)PoolGame.Height;
             gamma = 0.8f;
-            blurIt = false;
+            blurIt = true;
 
             effect.Parameters["halfPixel"].SetValue(halfPixel);
             effect.Parameters["g_screen_size"].SetValue(screensize);

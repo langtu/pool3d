@@ -21,6 +21,7 @@ namespace XNA_PoolGame
     /// </summary>
     public static class World
     {
+        public static bool DrawWiredFrames = false;
         // LIGHTS
         public static int TotalLights = 1;
 
@@ -33,7 +34,7 @@ namespace XNA_PoolGame
         public static bool Debug = false;
 
         
-        public static float gravity = -980.0f; // -9.8 m/s^2 ....
+        public static float gravity = -980f; // -9.8 m/s^2 ....
         public static float timeFactor = 1.0f; //2.5f;
 
         public static Vector3 mGravity = new Vector3(0.0f, gravity, 0.0f);
@@ -86,7 +87,7 @@ namespace XNA_PoolGame
 
         // SHADOWS SETTINGS
         public static bool displayShadows = true;
-        public static bool displayShadowsTextures = true;
+        public static bool displayShadowsTextures = false;
         public static int shadowMapSize = 1024 * 2;
         public static ShadowTechnnique shadowTechnique = ShadowTechnnique.CubeShadowMapping;
         //
@@ -100,7 +101,7 @@ namespace XNA_PoolGame
         public static bool doNormalPositionPass = false;
 
         //
-        public static bool useSSAOTextures = true;
+        public static bool useSSAOTextures = false;
         public static bool doSSAO = false;
         
         // BLOOM
@@ -115,7 +116,7 @@ namespace XNA_PoolGame
         public static bool drawParticles = true;
 
         // INSTANCING MODELS
-        public static InstancingTechnique instancingTech = InstancingTechnique.HardwareInstancing;
+        public static InstancingTechnique instancingTech = InstancingTechnique.NoInstancing;
 
         //
         public static EnvironmentType EM = EnvironmentType.None;

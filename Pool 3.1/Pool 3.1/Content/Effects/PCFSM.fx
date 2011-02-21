@@ -77,7 +77,7 @@ struct VertexShaderOutput
 //--- VertexShader ---
 VertexShaderOutput PCFSM_VS(VertexShaderInput input)
 {
-	VertexShaderOutput output;
+	VertexShaderOutput output=(VertexShaderOutput)0;
 	float4 worldPosition = mul(input.Position, World);
 	output.Position = mul(worldPosition, ViewProj);
 	for (int light_i = 0; light_i < totalLights; ++light_i)
@@ -94,7 +94,7 @@ VertexShaderOutput PCFSM_VS(VertexShaderInput input)
 float4 PCFSM_PS(VertexShaderOutput input) : COLOR
 {
     float2 ProjectedTexCoords;
-    float4 wt[2];//= {{1.0f,1.0f,1.0f,1.0f}, {1.0f,1.0f,1.0f,1.0f}};
+    float4 wt[2]= {{1.0f,1.0f,1.0f,1.0f}, {1.0f,1.0f,1.0f,1.0f}};
     for (int j = 0; j < totalLights; ++j)
     {
 		ProjectedTexCoords[0] = input.ShadowMapPos[j].x / input.ShadowMapPos[j].w / 2.0f + 0.5f;
@@ -130,12 +130,12 @@ float4 PCFSM_PS(VertexShaderOutput input) : COLOR
 }
 
 ////////////////////////////////////////////////////////////
-
+/*
 // Vertex shader helper function shared between the different instancing techniques.
 VertexShaderOutput VertexShaderCommon(VertexShaderInput input,
                                       float4x4 instanceTransform)
 {
-	VertexShaderOutput output;
+	VertexShaderOutput output = (VertexShaderOutput)0;
 	float4 worldPosition = mul(input.Position, instanceTransform);
 	output.Position = mul(worldPosition, ViewProj);
 	for (int light_i = 0; light_i < totalLights; ++light_i)
@@ -161,7 +161,7 @@ VertexShaderOutput HardwareInstancingVertexShader(VertexShaderInput input,
                                                 float4x4 instanceTransform : TEXCOORD1)
 {
     return VertexShaderCommon(input, transpose(instanceTransform));
-}
+}*/
 struct VS_CUBIC_OUTPUT
 {
 	float4 position  :  POSITION0;
@@ -207,7 +207,7 @@ float4 cubicShadowMapping_PS(VS_CUBIC_OUTPUT In) : COLOR0
     color.w = 1.0f;
     return color;
 }
-
+/*
 // Windows instancing technique for shader 2.0 cards.
 technique ShaderInstancingPCFSMTechnique
 {
@@ -227,7 +227,7 @@ technique HardwareInstancingPCFSMTechnique
         PixelShader = compile ps_3_0 PCFSM_PS();
     }
 }
-
+*/
 //#endif
 
 //------------------

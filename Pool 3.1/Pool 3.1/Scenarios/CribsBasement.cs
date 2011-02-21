@@ -103,12 +103,15 @@ namespace XNA_PoolGame.Scenarios
             distortionparticles.Add(heatParticles);            
             
             ////////////////////////////////
-            core = new ParticlesCore(PoolGame.game);
-            core.Scenario = this;
-            core.AddParticlesFromMultiMap(particles);
-            core.AddParticlesFromMultiMap(distortionparticles);
-            PoolGame.game.Components.Add(core);
+            if (World.drawParticles)
+            {
+                core = new ParticlesCore(PoolGame.game);
+                core.Scenario = this;
+                core.AddParticlesFromMultiMap(particles);
+                core.AddParticlesFromMultiMap(distortionparticles);
+                PoolGame.game.Components.Add(core);
 
+            }
 
             smokestack = new Entity(PoolGame.game, "Models\\Cribs\\smokestack");
             smokestack.Position = new Vector3(1150.0f - 120.0f, 0, 0);
@@ -154,7 +157,7 @@ namespace XNA_PoolGame.Scenarios
             smokeFireWoodOut.UseModelPartBB = false;
             //smokeFireWoodOut.occluder = false;
 
-            PoolGame.game.Components.Add(smokeFireWoodOut);
+            //PoolGame.game.Components.Add(smokeFireWoodOut);
 
             tabourets = new Entity[2];
             tabourets[0] = new Entity(PoolGame.game, "Models\\Cribs\\tabouret-design1");
@@ -305,6 +308,7 @@ namespace XNA_PoolGame.Scenarios
 
             /////////////// FLOOR
             floor = new Entity(PoolGame.game, "Models\\Cribs\\floor");
+            //floor = new Entity(PoolGame.game, "Models\\floor");
             floor.Position = new Vector3(-200.0f, 0.0f, 0.0f);
             floor.TEXTURE_ADDRESS_MODE = TextureAddressMode.Wrap;
             floor.SpecularColor = Vector4.Zero;
@@ -549,12 +553,15 @@ namespace XNA_PoolGame.Scenarios
             Vector3 center = new Vector3(1150.0f - 120.0f, 80.0f, -15.0f);
             //Vector3 center = new Vector3(0,200 ,0 );
 
-            for (int i = 0; i < fireParticlesPerFrame; i++)
+            if (World.drawParticles)
             {
-                //fireParticles.AddParticle(Maths.RandomPointOnCube(center, 90.0f), Vector3.Zero);
-                fireParticles.AddParticle(center, Vector3.Zero);
+                for (int i = 0; i < fireParticlesPerFrame; i++)
+                {
+                    //fireParticles.AddParticle(Maths.RandomPointOnCube(center, 90.0f), Vector3.Zero);
+                    fireParticles.AddParticle(center, Vector3.Zero);
+                }
+                fireParticles.AddParticle(center + new Vector3(0, 20, 0), Vector3.Zero);
             }
-            fireParticles.AddParticle(center + new Vector3(0, 20, 0), Vector3.Zero);
             lock (syncobject)
             {
                 if (World.doDistortion)
@@ -570,14 +577,16 @@ namespace XNA_PoolGame.Scenarios
 
             const int smokeParticlesPerFrame = 4/2;
 
-            for (int i = 0; i < smokeParticlesPerFrame; i++)
+            if (World.drawParticles)
             {
-                //smokeParticles.AddParticle(center + Vector3.Up * 25.0f, Vector3.Zero);
-                smokeParticles.AddParticle(smokeWoodPositions[0], Vector3.Zero);
-                smokeParticles.AddParticle(smokeWoodPositions[1], Vector3.Zero);
-                
-            }
+                for (int i = 0; i < smokeParticlesPerFrame; i++)
+                {
+                    //smokeParticles.AddParticle(center + Vector3.Up * 25.0f, Vector3.Zero);
+                    smokeParticles.AddParticle(smokeWoodPositions[0], Vector3.Zero);
+                    smokeParticles.AddParticle(smokeWoodPositions[1], Vector3.Zero);
 
+                }
+            }
 
             //smokeParticles.AddParticle(new Vector3(0, 200, 0), Vector3.Zero);
             //smokeParticles.AddParticle(new Vector3(0, 200, 0), Vector3.Zero);

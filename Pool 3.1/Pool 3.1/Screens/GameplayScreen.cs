@@ -41,9 +41,10 @@ namespace XNA_PoolGame.Screens
         public override void LoadContent()
         {
 
+            World.cursor = new Cursor(PoolGame.game);
             // CAMERA
-            //World.camera = new ChaseCamera(PoolGame.game);
-            World.camera = new FreeCamera(PoolGame.game);
+            World.camera = new ChaseCamera(PoolGame.game);
+            //World.camera = new FreeCamera(PoolGame.game);
             World.camera.CameraPosition = new Vector3(0, 600, 0);
             World.camera.FarPlane = 6500.0f;
             if (World.emptycamera == null) World.emptycamera = new EmptyCamera(PoolGame.game);
@@ -109,16 +110,16 @@ namespace XNA_PoolGame.Screens
             ////////////// PLAYERS //////////////
             World.playerCount = 2;
             World.playerInTurnIndex = 0;
-            //if (!GamePad.GetState(PlayerIndex.One).IsConnected)
+            if (!GamePad.GetState(PlayerIndex.One).IsConnected)
             {
                 World.players[0] = new Player(PoolGame.game, "Edgar", (int)PlayerIndex.One, new KeyBoard(PlayerIndex.One), TeamNumber.One, World.poolTable);
                 World.players[1] = new Player(PoolGame.game, "Adry", (int)PlayerIndex.Two, new KeyBoard(PlayerIndex.Two), TeamNumber.Two, World.poolTable);
             }
-            //else
-            //{
-            //    World.players[0] = new Player(PoolGame.game, "Edgar", (int)PlayerIndex.One, new XboxPad(PlayerIndex.One), TeamNumber.One, World.poolTable);
-            //    World.players[1] = new Player(PoolGame.game, "Adry", (int)PlayerIndex.Two, new XboxPad(PlayerIndex.One), TeamNumber.Two, World.poolTable);
-            //}
+            else
+            {
+                World.players[0] = new Player(PoolGame.game, "Edgar", (int)PlayerIndex.One, new XboxPad(PlayerIndex.One), TeamNumber.One, World.poolTable);
+                World.players[1] = new Player(PoolGame.game, "Adry", (int)PlayerIndex.Two, new XboxPad(PlayerIndex.One), TeamNumber.Two, World.poolTable);
+            }
 
             ////////////// REFEREE //////////////
             World.referee = new Referee(PoolGame.game, World.poolTable, World.players[0], World.players[1]);
@@ -161,7 +162,6 @@ namespace XNA_PoolGame.Screens
             PoolGame.game.Components.Add(World.referee);
 
 
-            World.cursor = new Cursor(PoolGame.game);
             PoolGame.game.Components.Add(World.cursor);
 
 
@@ -426,7 +426,7 @@ namespace XNA_PoolGame.Screens
             if (World.BloomPostProcessing)
             {
                 PostProcessManager.ChangeRenderMode(RenderPassMode.Bloom);
-                PostProcessManager.DrawBloomPostProcessing(resultTIU.renderTarget, null, gameTime);
+                PostProcessManager.DrawBloomPostProcessing(resultTIU, null, gameTime);
             }
             else
             {
@@ -441,9 +441,9 @@ namespace XNA_PoolGame.Screens
 
             #endregion
 
-            World.scenario.sceneManager.DrawScene(gameTime);
+            //World.scenario.sceneManager.DrawScene(gameTime);
 
-            PoolGame.game.Window.Title = "PoolGame. Nodes Drawn: " + World.scenario.sceneManager.totalItemDrawn + "/" + World.scenario.sceneManager.totalItems;
+            //PoolGame.game.Window.Title = "PoolGame. Nodes Drawn: " + World.scenario.sceneManager.totalItemDrawn + "/" + World.scenario.sceneManager.totalItems;
 
             if (World.cursor.Visible)
             {
@@ -459,9 +459,9 @@ namespace XNA_PoolGame.Screens
             PostProcessManager.ssao.FreeStuff();
             PostProcessManager.shading.FreeStuff();
 
-            PostProcessManager.halfVertTIU.DontUse(); PostProcessManager.halfHorTIU.DontUse();
+           // PostProcessManager.halfVertTIU.DontUse(); PostProcessManager.halfHorTIU.DontUse();
             PostProcessManager.depthTIU.DontUse();
-            if (World.motionblurType == MotionBlurType.None) { PostProcessManager.velocityTIU.DontUse(); PostProcessManager.velocityLastFrameTIU.DontUse(); }
+            if (World.motionblurType == MotionBlurType.None) { PostProcessManager.velocityTIU.DontUse(); /*PostProcessManager.velocityLastFrameTIU.DontUse();*/ }
             if (PostProcessManager.distortionsample != null) PostProcessManager.distortionsample.DontUse();
 
             if (World.motionblurType != MotionBlurType.None)

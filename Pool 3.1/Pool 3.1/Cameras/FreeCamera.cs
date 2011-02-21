@@ -92,17 +92,17 @@ namespace XNA_PoolGame.Cameras
                 viewDirty = true;
             }
 
-            if (kb.IsKeyDown(Keys.PageUp))
-            {
-                cameraPosition += Vector3.Down * localspeed * delta;
-                viewDirty = true;
-            }
+            //if (kb.IsKeyDown(Keys.PageUp))
+            //{
+            //    cameraPosition += Vector3.Down * localspeed * delta;
+            //    viewDirty = true;
+            //}
 
-            if (kb.IsKeyDown(Keys.PageDown))
-            {
-                cameraPosition += Vector3.Up * localspeed * delta;
-                viewDirty = true;
-            }
+            //if (kb.IsKeyDown(Keys.PageDown))
+            //{
+            //    cameraPosition += Vector3.Up * localspeed * delta;
+            //    viewDirty = true;
+            //}
             if (kb.IsKeyDown(Keys.T) && lastkb.IsKeyUp(Keys.T))
             {
                 World.poolTable.poolBalls[1].min_Altitute = 138.44f;
@@ -123,46 +123,46 @@ namespace XNA_PoolGame.Cameras
 
             if (kb.IsKeyDown(Keys.F1) && lastkb.IsKeyUp(Keys.F1))
             {
-                World.poolTable.poolBalls[3].min_Altitute = 138.44f;
-                World.poolTable.poolBalls[3].Position = new Vector3(World.poolTable.pockets[2].bounds.Center.X, World.poolTable.SURFACE_POSITION_Y + World.ballRadius * 15, World.poolTable.pockets[2].bounds.Center.Z);
-                World.poolTable.poolBalls[3].currentTrajectory = Trajectory.Free;
-                World.poolTable.poolBalls[3].velocity = new Vector3(0, -10, 0);
-                World.poolTable.poolBalls[3].pocketWhereAt = 2;
+                //World.poolTable.poolBalls[3].min_Altitute = 138.44f;
+                //World.poolTable.poolBalls[3].Position = new Vector3(World.poolTable.pockets[2].bounds.Center.X, World.poolTable.SURFACE_POSITION_Y + World.ballRadius * 15, World.poolTable.pockets[2].bounds.Center.Z);
+                //World.poolTable.poolBalls[3].currentTrajectory = Trajectory.Free;
+                //World.poolTable.poolBalls[3].velocity = new Vector3(0, -10, 0);
+                //World.poolTable.poolBalls[3].pocketWhereAt = 2;
             }
 
-            if (kb.IsKeyDown(Keys.F4) && lastkb.IsKeyUp(Keys.F4))
-            {
+            //if (kb.IsKeyDown(Keys.F4) && lastkb.IsKeyUp(Keys.F4))
+            //{
 
-                if (!switch_pos)
-                {
-                    last_position = cameraPosition;
-                    last_angle = angle;
-                    //cameraPosition = new Vector3(0, 1000, 0);
-                    viewMatrix = LightManager.lights[PoolGame.game.currentlight].LightView;
+            //    if (!switch_pos)
+            //    {
+            //        last_position = cameraPosition;
+            //        last_angle = angle;
+            //        //cameraPosition = new Vector3(0, 1000, 0);
+            //        viewMatrix = LightManager.lights[PoolGame.game.currentlight].LightView;
 
 
-                    angle.X = (float)Maths.AngleBetweenVectors(Vector3.Up, viewMatrix.Up);
-                    angle.Y = -(float)Maths.AngleBetweenVectors(Vector3.Right, viewMatrix.Right);
-                    angle.Z = MathHelper.ToRadians(0.0f);
+            //        angle.X = (float)Maths.AngleBetweenVectors(Vector3.Up, viewMatrix.Up);
+            //        angle.Y = -(float)Maths.AngleBetweenVectors(Vector3.Right, viewMatrix.Right);
+            //        angle.Z = MathHelper.ToRadians(0.0f);
 
-                    cameraPosition = LightManager.lights[PoolGame.game.currentlight].Position;
-                    prevPojection = this.Projection;
-                    projectionMatrix = LightManager.lights[PoolGame.game.currentlight].LightProjection;
+            //        cameraPosition = LightManager.lights[PoolGame.game.currentlight].Position;
+            //        prevPojection = this.Projection;
+            //        projectionMatrix = LightManager.lights[PoolGame.game.currentlight].LightProjection;
 
-                    //angle.X = MathHelper.ToRadians(90.0f);
-                    //angle.Y = MathHelper.ToRadians(90.0f);
-                    //angle.Z = MathHelper.ToRadians(0.0f);
-                }
-                else
-                {
-                    cameraPosition = last_position;
-                    angle = last_angle;
-                    projectionMatrix = prevPojection;
-                }
-                switch_pos = !switch_pos;
-                viewDirty = true;
+            //        //angle.X = MathHelper.ToRadians(90.0f);
+            //        //angle.Y = MathHelper.ToRadians(90.0f);
+            //        //angle.Z = MathHelper.ToRadians(0.0f);
+            //    }
+            //    else
+            //    {
+            //        cameraPosition = last_position;
+            //        angle = last_angle;
+            //        projectionMatrix = prevPojection;
+            //    }
+            //    switch_pos = !switch_pos;
+            //    viewDirty = true;
 
-            }
+            //}
             
 
             if (viewDirty) UpdateCameraMatrices();

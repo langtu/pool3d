@@ -61,7 +61,7 @@ namespace XNA_PoolGame.Helpers
                 SaveStateMode.SaveState);
             string text = "FPS: " + rateFrames;
 
-            Vector2 offset = font.MeasureString(text); offset.X += 4.0f; offset.Y = 0;
+            Vector2 offset = font.MeasureString(text); offset.X += 0.0175f * PoolGame.Width; offset.Y = -0.0175f * PoolGame.Height;
             totalFrames++;
 
             batch.DrawString(font, text, new Vector2(PoolGame.Width, 4) - offset, Color.Black);

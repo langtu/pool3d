@@ -8,11 +8,11 @@
 
 
 // Array of instance transforms used by the VFetch and ShaderInstancing techniques.
-float4x4 InstanceTransforms[MAX_SHADER_MATRICES];
+//float4x4 InstanceTransforms[MAX_SHADER_MATRICES];
 
 //------------------
 //--- Parameters ---
-float4x4 World;
+float4x4 World : WORLD;
 float4x4 ViewProj;
 float MaxDepth;
 
@@ -116,7 +116,7 @@ VertexShaderOutput VFetchInstancingVertexShader(int index : INDEX)
 
 
 #else*/
-
+/*
 // On Windows, we can use an array of shader constants to implement
 // instancing. The instance index is passed in as part of the vertex
 // buffer data, and we use that to decide which world transform should apply.
@@ -133,7 +133,7 @@ VertexShaderOutput HardwareInstancingVertexShader(VertexShaderInput input,
 {
     return VertexShaderCommon(input, transpose(instanceTransform));
 }
-
+*/
 //#endif
 
 float3 LightPosition;
@@ -209,7 +209,7 @@ technique VFetchInstancingDepthMap
 
 #else
 */
-
+/*
 // Windows instancing technique for shader 2.0 cards.
 technique ShaderInstancingDepthMap
 {
@@ -231,7 +231,7 @@ technique HardwareInstancingDepthMap
     }
 }
 
-
+*/
 //#endif
 
 

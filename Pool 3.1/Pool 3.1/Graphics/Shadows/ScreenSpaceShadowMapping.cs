@@ -148,7 +148,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             
             if (World.motionblurType != MotionBlurType.None || World.dofType != DOFType.None)
             {
-                PostProcessManager.depthTIU.Use(); PostProcessManager.velocityTIU.Use(); PostProcessManager.velocityLastFrameTIU.Use();
+                PostProcessManager.depthTIU.Use(); PostProcessManager.velocityTIU.Use(); //PostProcessManager.velocityLastFrameTIU.Use();
                 PoolGame.device.SetRenderTarget(1, PostProcessManager.depthRT);
                 PoolGame.device.SetRenderTarget(2, PostProcessManager.velocityRT);
 
@@ -161,7 +161,7 @@ namespace XNA_PoolGame.Graphics.Shadows
             }
             else
             {
-                PostProcessManager.depthTIU.DontUse(); PostProcessManager.velocityTIU.DontUse(); PostProcessManager.velocityLastFrameTIU.DontUse();
+                PostProcessManager.depthTIU.DontUse(); PostProcessManager.velocityTIU.DontUse(); //PostProcessManager.velocityLastFrameTIU.DontUse();
 
                 {
                     PoolGame.device.SetRenderTarget(1, null);

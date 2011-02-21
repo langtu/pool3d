@@ -166,13 +166,13 @@ namespace XNA_PoolGame
                 #region Playing
                 case MatchPhase.Playing:
 
-                    if (controller.RightStick != Vector2.Zero) 
-                        World.camera.MovePicthYaw(controller.RightStick * 200.0f * dt);
                 if (!table.ballsMoving)
                 {
-
                     if (!stick.charging)
                     {
+
+                        if (controller.RightStick != Vector2.Zero)
+                            World.camera.MovePicthYaw(controller.RightStick * 200.0f * dt);
                         if (!stick.Visible) stick.Visible = true;
 
                         if (!controller.isRightShoulderPressed)
@@ -215,7 +215,7 @@ namespace XNA_PoolGame
 
 
                                     stick.AngleY -= controller.LeftStick.X * repeater * dt * 20.0f;
-                                    Console.WriteLine(repeater);
+                                    //Console.WriteLine(repeater);
                                 }
                             }
 

@@ -23,6 +23,7 @@ namespace XNA_PoolGame.Scene
         public int totalItems;
         public Collider collider;
 
+        public bool debug;
         protected SceneManager(Scenario scenario)
         {
             this.scenario = scenario;

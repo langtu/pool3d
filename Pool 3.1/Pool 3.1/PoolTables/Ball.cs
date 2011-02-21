@@ -50,13 +50,15 @@ namespace XNA_PoolGame
         public float angleRotation = 0.0f;
         public OrientedBoundingBox obb;
 
+        public Matrix invBodyInertia = Matrix.Identity;
         public Matrix invWorldInertia = Matrix.Identity;
         public Quaternion rotQ = Quaternion.Identity;
         public Vector3 angularMomentum = Vector3.Zero;
-        public Matrix invBodyInertia = Matrix.Identity;
 
-        private const int numSteps = 20;
+        private const int numSteps = 3;
 
+        public const float mLinearFriction = 0.15f;
+        public const float mAngularDamping = 0.995f;
         public float mMass = 1.0f;
 
         public float totaltime = 0.0f;
@@ -131,21 +133,21 @@ namespace XNA_PoolGame
         {
             ////while (this.thinkingFlag) { }
 
-            //if (currentTrajectory == Trajectory.Motion)
-            //{
-            //    if (velocity.LengthSquared() < MIN_SPEED_SQUARED)
-            //        return false;
-            //    else
-            //        return true;
-            //}
-            //else if (currentTrajectory == Trajectory.Free)
-            //{
-            //    //if (velocity.LengthSquared() < MIN_SPEED_SQUARED /*&& (this.PositionY == min_Altitute)*/)
-            //    if (prepreviousvelocity == previousvelocity && previousvelocity == velocity)
-            //        return false;
-            //    else
-            //        return true;
-            //}
+            if (currentTrajectory == Trajectory.Motion)
+            {
+                if (velocity.LengthSquared() < MIN_SPEED_SQUARED)
+                    return false;
+                else
+                    return true;
+            }
+            else if (currentTrajectory == Trajectory.Free)
+            {
+                //if (velocity.LengthSquared() < MIN_SPEED_SQUARED /*&& (this.PositionY == min_Altitute)*/)
+                if (prepreviousvelocity == previousvelocity && previousvelocity == velocity)
+                    return false;
+                else
+                    return true;
+            }
 
 
             return true;
@@ -512,7 +514,7 @@ namespace XNA_PoolGame
         #region Update
 
         #region Old HandleMotion
-        public void HandleMotion2(float _dt)
+        public void HandleMotion2(GameTime gameTime)
         {
             /*if (velocity.LengthSquared() < MIN_SPEED_SQUARED)
             {
@@ -528,24 +530,23 @@ namespace XNA_PoolGame
                 //this.InitialRotation = this.Rotation;
             }*/
 
-            float dt = _dt / (float)(numSteps);
+            float dt = gameTime.ElapsedGameTime.Milliseconds * 0.005f / (numSteps);
 
             for (int step = 0; step < numSteps; ++step)
             {
                 // compute forces
-                Vector3 forces = -0.15f * velocity;
+                Vector3 forces = -mLinearFriction * velocity;
                 forces += World.mGravity;
 
                 // compute acceleration
-                Vector3 acce = forces / mMass;
-
+                Vector3 ac = forces / mMass;
 
                 // integrate (keep it simple: just use euler)
-                this.velocity += acce * dt;
+                this.velocity += ac * dt;
                 this.Position += this.velocity * dt;
 
                 // compute new angular momentum (damping)
-                this.angularMomentum *= 0.995f;
+                this.angularMomentum *= mAngularDamping;
 
                 // integrate angular momentum
                 Matrix rot = Matrix.CreateFromQuaternion(this.rotQ);
@@ -563,7 +564,7 @@ namespace XNA_PoolGame
                 quatRotDot.Normalize();
 
                 this.rotQ = quatRotDot;
-                this.Rotation = Matrix.CreateFromQuaternion(this.rotQ);
+                this.Rotation = Matrix.CreateFromQuaternion(rotQ);
                 this.PreRotation = Matrix.Identity;
 
                 handleScenarioCollisions();
@@ -609,8 +610,6 @@ namespace XNA_PoolGame
                 Vector3 closestNormal = Vector3.Zero;
                 float closestDistance = float.MaxValue;
 
-                //LinkedListNode<Vector3> curPoint = arenaCollisionPoints.First;
-                //LinkedListNode<Face> curFace = arenaCollidingFaces.First;
                 for (int i = 0; i < arenaCollisionPoints.Count; i++)
                 {
                     avgFaceNormal += arenaCollidingFaces[i];
@@ -618,7 +617,7 @@ namespace XNA_PoolGame
 
                     // update closest normal
                     float d = (this.Position - arenaCollisionPoints[i]).LengthSquared();
-                    if (d < closestDistance)
+                    if (d <= closestDistance)
                     {
                         closestDistance = d;
                         closestNormal = arenaCollidingFaces[i];
@@ -630,8 +629,10 @@ namespace XNA_PoolGame
                     avgFaceNormal = closestNormal;
 
                 // normalize
+                //avgFaceNormal /= (float)arenaCollisionPoints.Count;
                 avgFaceNormal.Normalize();
-                avgColPoint /= arenaCollisionPoints.Count;
+
+                avgColPoint /= (float)arenaCollisionPoints.Count;
 
                 // --- resolve collision ------
                 resolveArenaCollisions(avgColPoint, avgFaceNormal);
@@ -650,7 +651,7 @@ namespace XNA_PoolGame
             this.Position += (-r - avgColVec);
 
             // the coefficient of restitution (1 for perfect elastic pulse)
-            float e = 0.9f;
+            float e = 0.7f;
 
             // the relative velocity
             float relativeVelocity = Vector3.Dot(this.velocity, avgFaceNormal);
@@ -661,7 +662,7 @@ namespace XNA_PoolGame
             tmp = Vector3.Cross(tmp, r);
 
             // the impulse's length
-            float j = (-(1 + e) * relativeVelocity) / ((1 / mMass) + Vector3.Dot(avgFaceNormal, tmp));
+            float j = (-(1f + e) * relativeVelocity) / ((1f / mMass) + Vector3.Dot(avgFaceNormal, tmp));
 
             // the actual impulse
             Vector3 J = avgFaceNormal * j;
@@ -685,6 +686,7 @@ namespace XNA_PoolGame
             // adjust angular momentum such that the velocity of the colliding particle equals the velocity of the center of mass
             this.angularMomentum = -Vector3.Cross(r, collisionPointVelocity - velocityDifference);
         }
+
         private void resolveSphereSphereCollision(Ball cur, ref Ball other)
         {
             // the coefficient of restitution (1 for perfect elastic pulse)
@@ -852,80 +854,81 @@ namespace XNA_PoolGame
 #if DRAWBALL_BV_AFTERISPOTTED && DRAWBALL_BV
             drawboundingvolume = this.pocketWhereAt >= 0;
 #endif
-            if (!IsMoving() || table == null) { base.Update(gameTime); return; }
+            //if (/*!IsMoving() ||*/ table == null || World.scenario == null || World.scenario.sceneManager.collider == null) { base.Update(gameTime); return; }
+            if (!IsMoving() || table == null || World.scenario == null) { base.Update(gameTime); return; }
             lock (table.syncballsready)
                 ++table.ballsready;
 
-            HandleMotion2((float)gameTime.ElapsedGameTime.TotalSeconds);
-            //switch (currentTrajectory)
-            //{
-            //    #region Motion
-            //    case Trajectory.Motion:
-            //        HandleMotion((float)gameTime.ElapsedGameTime.TotalSeconds);
-            //        break;
-            //    #endregion
-            //    #region Free
-            //    case Trajectory.Free:
-            //        HandleFree((float)gameTime.ElapsedGameTime.TotalSeconds);
+            //HandleMotion2(gameTime);
+            switch (currentTrajectory)
+            {
+                #region Motion
+                case Trajectory.Motion:
+                    HandleMotion((float)gameTime.ElapsedGameTime.TotalSeconds);
+                    break;
+                #endregion
+                #region Free
+                case Trajectory.Free:
+                    HandleFree((float)gameTime.ElapsedGameTime.TotalSeconds);
 
-            //        #region Old
-            //        //t = dt * World.timeFactor;
+                    #region Old
+                    //t = dt * World.timeFactor;
 
-            //        //if (IsMoving())
-            //        //{
-            //        //    //Vector3 tmp = velocity - new Vector3(0, velocity.Y, 0);
-            //        //    Vector3 tmp = velocity;
-            //        //    Vector3 axis = Vector3.Normalize(Vector3.Cross(Vector3.Up, velocity));
-            //        //    float angle = tmp.Length() * World.ballRadius * 0.0229f * t;
-            //        //    //float angle = velocity.Length() * dt * MathHelper.TwoPi / World.ballRadious;
+                    //if (IsMoving())
+                    //{
+                    //    //Vector3 tmp = velocity - new Vector3(0, velocity.Y, 0);
+                    //    Vector3 tmp = velocity;
+                    //    Vector3 axis = Vector3.Normalize(Vector3.Cross(Vector3.Up, velocity));
+                    //    float angle = tmp.Length() * World.ballRadius * 0.0229f * t;
+                    //    //float angle = velocity.Length() * dt * MathHelper.TwoPi / World.ballRadious;
 
-            //        //    //Quaternion rotationThisFrame = Quaternion.CreateFromAxisAngle(axis, angle);
-            //        //    //localRotation *= rotationThisFrame;
+                    //    //Quaternion rotationThisFrame = Quaternion.CreateFromAxisAngle(axis, angle);
+                    //    //localRotation *= rotationThisFrame;
 
-            //        //    //localRotation.Normalize();
+                    //    //localRotation.Normalize();
 
-            //        //    //this.Rotation = Matrix.CreateFromQuaternion(localRotation);
-            //        //}
+                    //    //this.Rotation = Matrix.CreateFromQuaternion(localRotation);
+                    //}
 
-            //        //PositionX += velocity.X * t;
-            //        //PositionZ += velocity.Z * t;
+                    //PositionX += velocity.X * t;
+                    //PositionZ += velocity.Z * t;
 
-            //        //if (PositionY > min_Altitute)
-            //        //    velocity.Y += World.gravity * t;
+                    //if (PositionY > min_Altitute)
+                    //    velocity.Y += World.gravity * t;
 
-            //        //if (PositionY < min_Altitute - 0.05f)
-            //        //{
-            //        //    PositionY = min_Altitute;
-            //        //    velocity.Y *= -0.08f;
-            //        //    velocity.X *= 0.7f;
-            //        //    velocity.Z *= 0.7f;
-            //        //}
-            //        //else
-            //        //{
-            //        //    PositionY += velocity.Y * t + 0.5f * World.gravity * t * t;
-            //        //}
-            //        ///*if (Math.Abs(velocity.X) < MIN_SPEED)
-            //        //{
-            //        //    velocity.X = 0;
-            //        //}*/
-            //        ///*if (Math.Abs(velocity.Z) < MIN_SPEED)
-            //        //{
-            //        //    velocity.Z = 0;
-            //        //}*/
+                    //if (PositionY < min_Altitute - 0.05f)
+                    //{
+                    //    PositionY = min_Altitute;
+                    //    velocity.Y *= -0.08f;
+                    //    velocity.X *= 0.7f;
+                    //    velocity.Z *= 0.7f;
+                    //}
+                    //else
+                    //{
+                    //    PositionY += velocity.Y * t + 0.5f * World.gravity * t * t;
+                    //}
+                    ///*if (Math.Abs(velocity.X) < MIN_SPEED)
+                    //{
+                    //    velocity.X = 0;
+                    //}*/
+                    ///*if (Math.Abs(velocity.Z) < MIN_SPEED)
+                    //{
+                    //    velocity.Z = 0;
+                    //}*/
 
-            //        ////Console.WriteLine(velocity.Y);
-            //        //if (Math.Abs(velocity.X) < MIN_SPEED && Math.Abs(velocity.Z) < MIN_SPEED && Math.Abs(velocity.Y) < MIN_SPEED_Y
-            //        //    && pocketWhereAt != -1 && PositionY >= min_Altitute && PositionY <= min_Altitute + 2.0f)
-            //        //{
-            //        //    Stop();
-            //        //}
-            //        #endregion
+                    ////Console.WriteLine(velocity.Y);
+                    //if (Math.Abs(velocity.X) < MIN_SPEED && Math.Abs(velocity.Z) < MIN_SPEED && Math.Abs(velocity.Y) < MIN_SPEED_Y
+                    //    && pocketWhereAt != -1 && PositionY >= min_Altitute && PositionY <= min_Altitute + 2.0f)
+                    //{
+                    //    Stop();
+                    //}
+                    #endregion
 
-            //        break;
-            //    #endregion
-            //}
+                    break;
+                #endregion
+            }
 
-            //if (!this.collisionFlag && !IsMoving()) Stop();
+            if (!this.collisionFlag && !IsMoving()) Stop();
 
             lock (table.syncballsready)
                 --table.ballsready;

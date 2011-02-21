@@ -653,6 +653,11 @@
     <None Include="Effects\pp_Common.fxh">
       <Name>pp_Common</Name>
     </None>
+    <Compile Include="Models\floor.X">
+      <Name>floor</Name>
+      <Importer>XImporter</Importer>
+      <Processor>CustomModelProcessor</Processor>
+    </Compile>
     <Compile Include="Models\coneAR.X">
       <Name>coneAR</Name>
       <Importer>XImporter</Importer>

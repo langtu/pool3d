@@ -1,0 +1,238 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <ProjectGuid>{816b8d6e-b43b-4ad4-b566-d47765ff49f5}</ProjectGuid>
+    <ProjectTypeGuids>{6D335F3A-9D43-41b4-9D22-F6F17C4BE596};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">Xbox 360</Platform>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>XNA_PoolGame</RootNamespace>
+    <AssemblyName>XNA_PoolGame</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <XnaFrameworkVersion>v3.1</XnaFrameworkVersion>
+    <XnaPlatform>Xbox 360</XnaPlatform>
+    <XnaCrossPlatformGroupID>04cee3d1-a365-4db3-8d3b-efacd6081138</XnaCrossPlatformGroupID>
+    <ApplicationIcon>Game.ico</ApplicationIcon>
+    <Thumbnail>GameThumbnail.png</Thumbnail>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <StartupObject>XNA_PoolGame.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Xbox 360' ">
+    <OutputPath>bin\Xbox 360\Debug</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoStdLib>true</NoStdLib>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE;XBOX;XBOX360</DefineConstants>
+    <XnaCompressContent>true</XnaCompressContent>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Xbox 360' ">
+    <OutputPath>bin\Xbox 360\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoStdLib>true</NoStdLib>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE;XBOX;XBOX360</DefineConstants>
+    <XnaCompressContent>true</XnaCompressContent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Cameras\EmptyCamera.cs" />
+    <Compile Include="Graphics\Billboard.cs" />
+    <Compile Include="Graphics\DepthOfField.cs" />
+    <Compile Include="Graphics\FullQuad.cs" />
+    <Compile Include="Graphics\LensFlare.cs" />
+    <Compile Include="Graphics\Models\AlphaEntity.cs" />
+    <Compile Include="Graphics\Models\BoundingVolumeEntity.cs" />
+    <Compile Include="Graphics\Models\InstancedEntity.cs" />
+    <Compile Include="Graphics\Models\CustomModelPart.cs" />
+    <Compile Include="Graphics\Models\InstancedModel.cs" />
+    <Compile Include="Graphics\Models\InstancedModelPart.cs" />
+    <Compile Include="Graphics\Models\VolumetricLightEntity.cs" />
+    <Compile Include="Graphics\MotionBlur.cs" />
+    <Compile Include="Graphics\Particles\Fire\HeatParticleSystem.cs" />
+    <Compile Include="Graphics\Scattering.cs" />
+    <Compile Include="Graphics\Shading\BaseShading.cs" />
+    <Compile Include="Graphics\Shading\DeferredShading.cs" />
+    <Compile Include="Graphics\Shading\ForwardShading.cs" />
+    <Compile Include="Graphics\Shadows\CubeShadowMapping.cs" />
+    <Compile Include="Graphics\Shadows\ScreenSpaceShadowMapping.cs" />
+    <Compile Include="Graphics\Shadows\Shadow.cs" />
+    <Compile Include="Graphics\Shadows\PSMShadowMapping.cs" />
+    <Compile Include="Graphics\Shadows\VarianceCubeShadowMapping.cs" />
+    <Compile Include="Graphics\Shadows\VarianceShadowMapping.cs" />
+    <Compile Include="Graphics\Skybox.cs" />
+    <Compile Include="Graphics\SSAO.cs" />
+    <Compile Include="Helpers\Tuple.cs" />
+    <Compile Include="Match\MatchManager.cs" />
+    <Compile Include="Match\Referee.cs" />
+    <Compile Include="Match\Team.cs" />
+    <Compile Include="PoolTables\BallCollider.cs" />
+    <Compile Include="Graphics\Particles\ParticlesCore.cs" />
+    <Compile Include="PoolTables\Racks\EightBallRack.cs" />
+    <Compile Include="PoolTables\Racks\NineBallRack.cs" />
+    <Compile Include="PoolTables\Racks\Rack.cs" />
+    <Compile Include="Scene\OctreeCollider.cs" />
+    <Compile Include="Scene\SceneManager.cs" />
+    <Compile Include="Screens\Cursor.cs" />
+    <Compile Include="Threading\ThreadComponent.cs" />
+    <Compile Include="Helpers\Maths.cs" />
+    <Compile Include="PoolTables\Ball.cs" />
+    <Compile Include="Cameras\Camera.cs" />
+    <Compile Include="Cameras\ChaseCamera.cs" />
+    <Compile Include="Cameras\FreeCamera.cs" />
+    <Compile Include="GameControllers\GameController.cs" />
+    <Compile Include="GameControllers\XboxPad.cs" />
+    <Compile Include="GameControllers\KeyBoard.cs" />
+    <Compile Include="Graphics\Bloom PostProcessing\BloomSettings.cs" />
+    <Compile Include="Graphics\DrawableComponent.cs" />
+    <Compile Include="Graphics\FrustumCulling.cs" />
+    <Compile Include="Graphics\GaussianBlur.cs" />
+    <Compile Include="Graphics\IDrawable.cs" />
+    <Compile Include="Threading\IThreadable.cs" />
+    <Compile Include="Graphics\Models\CustomModel.cs" />
+    <Compile Include="Graphics\Models\Entity.cs" />
+    <Compile Include="Graphics\Models\ModelManager.cs" />
+    <Compile Include="Scene\OctreePartitioner.cs" />
+    <Compile Include="Graphics\Particles\Fire\FireParticleSystem.cs" />
+    <Compile Include="Graphics\Particles\Fire\SmokeStackFireParticleSystem.cs" />
+    <Compile Include="Graphics\Particles\ParticleSettings.cs" />
+    <Compile Include="Graphics\Particles\ParticleSystem.cs" />
+    <Compile Include="Graphics\Particles\ParticleVertex.cs" />
+    <Compile Include="Graphics\Particles\Smoke\SmokePlumeParticleSystem.cs" />
+    <Compile Include="Graphics\PostProcessManager.cs" />
+    <Compile Include="Graphics\Shadows\Light.cs" />
+    <Compile Include="Graphics\Shadows\LightManager.cs" />
+    <Compile Include="Helpers\FPSCounter.cs" />
+    <Compile Include="Helpers\IKey.cs" />
+    <Compile Include="Helpers\MultiMap.cs" />
+    <Compile Include="Helpers\OrientedBoundingBox.cs" />
+    <Compile Include="Helpers\VectorRenderComponent.cs" />
+    <Compile Include="Match\Player.cs" />
+    <Compile Include="Match\RoundInformation.cs" />
+    <Compile Include="PoolGame.cs" />
+    <Compile Include="PoolTables\Classic.cs" />
+    <Compile Include="PoolTables\Pocket.cs" />
+    <Compile Include="PoolTables\PoolTable.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scenarios\CribsBasement.cs" />
+    <Compile Include="Scenarios\Garage.cs" />
+    <Compile Include="Scenarios\Scenario.cs" />
+    <Compile Include="Screens\BackGroundScreen.cs" />
+    <Compile Include="Screens\GameplayScreen.cs" />
+    <Compile Include="Screens\LoadingScreen.cs" />
+    <Compile Include="Screens\MainMenuScreen.cs" />
+    <Compile Include="Screens\Entries\MenuEntry.cs" />
+    <Compile Include="Screens\MenuScreen.cs" />
+    <Compile Include="Screens\OptionsMenuScreen.cs" />
+    <Compile Include="Screens\PauseMenuScreen.cs" />
+    <Compile Include="Screens\PlayerIndexEventArgs.cs" />
+    <Compile Include="Screens\Screen Manager\MenuController.cs" />
+    <Compile Include="Screens\Screen Manager\ScreenManager.cs" />
+    <Compile Include="Screens\Screen.cs" />
+    <Compile Include="Sticks\Stick.cs" />
+    <Compile Include="World.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Game.ico" />
+    <Content Include="GameThumbnail.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <NestedContentProject Include="Content\Content.contentproj">
+      <Project>8f6a4336-7d7f-448a-9cc8-d51a18657908</Project>
+      <Visible>False</Visible>
+    </NestedContentProject>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Xna.Framework.3.1">
+      <Visible>False</Visible>
+      <ProductName>Microsoft XNA Framework Redistributable 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Xna.Framework">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xna.Framework.Game">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="mscorlib">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Core">
+      <Private>False</Private>
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <Private>False</Private>
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

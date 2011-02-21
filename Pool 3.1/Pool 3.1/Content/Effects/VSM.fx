@@ -61,7 +61,7 @@ struct VertexShaderOutput
 //--- VertexShader ---
 VertexShaderOutput PCFSM_VS(VertexShaderInput input)
 {
-	VertexShaderOutput output;
+	VertexShaderOutput output = (VertexShaderOutput)0;
 	float4 worldPosition = mul(input.Position, World);
 	output.Position = mul(worldPosition, ViewProj);
 	
@@ -79,7 +79,7 @@ VertexShaderOutput PCFSM_VS(VertexShaderInput input)
 float4 PCFSM_PS(VertexShaderOutput input) : COLOR
 {
 	float2 ProjectedTexCoords;
-    float4 wt[2];
+    float4 wt[2] =  {{1.0f,1.0f,1.0f,1.0f}, {1.0f,1.0f,1.0f,1.0f}};
     
     for (int j = 0; j < totalLights; ++j)
     {

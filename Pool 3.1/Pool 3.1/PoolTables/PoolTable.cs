@@ -236,7 +236,7 @@ namespace XNA_PoolGame.PoolTables
             rack = World.rackfactories[World.gameMode].CreateRack(this);
             rack.BuildBallsRack();
 
-            TotalBalls = 0;
+            //TotalBalls = 0;
             for (int i = 0; i < TotalBalls; i++)
             {
                 poolBalls[i].Scale = new Vector3(poolballscaleFactor);
